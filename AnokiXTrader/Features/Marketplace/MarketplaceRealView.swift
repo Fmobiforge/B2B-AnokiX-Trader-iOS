@@ -174,19 +174,16 @@ struct MarketplaceRealView: View {
     // MARK: - Banner slider
 
     /// Custom carousel. A page-style `TabView` inside a vertical `ScrollView`
-    /// renders corrupted and overlaps neighbouring content, so we show one banner
-    /// at a time (cross-fade on `.id` change), auto-advance on the timer, and put
-    /// tappable page dots in their own row *below* the banner (never overlapping).
+    /// renders corrupted and overlaps neighbouring content, so we show one
+    /// fixed-height `BannerCard` at a time (Kingfisher cross-fades the image as the
+    /// URL changes), auto-advance on the timer, and put tappable page dots in their
+    /// own row *below* the banner (never overlapping).
     @ViewBuilder
     private var bannerSlider: some View {
         if let banners = store.data?.banners, !banners.isEmpty {
             let safeIndex = max(0, min(bannerIndex, banners.count - 1))
             VStack(spacing: 12) {
                 BannerCard(banner: banners[safeIndex])
-                    .frame(height: 180)
-                    .frame(maxWidth: .infinity)
-                    .id(safeIndex)
-                    .transition(.opacity)
 
                 if banners.count > 1 {
                     HStack(spacing: 6) {
@@ -410,41 +407,57 @@ struct MarketplaceRealView: View {
 
 struct BannerCard: View {
     let banner: BannerDTO
+    private let bannerHeight: CGFloat = 180
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            Group {
-                if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
-                    LoopingVideoView(url: url)
-                } else if let url = banner.mediaURL, !url.isEmpty {
-                    RemoteImage(url: url)
-                } else {
-                    LinearGradient(colors: [Brand.purple, Brand.purpleDark], startPoint: .leading, endPoint: .trailing)
-                }
+        // A definite-size box (Color.clear locked to 180pt) with the media as an
+        // overlay. Overlays can NEVER resize their parent, so the banner height is
+        // fixed regardless of the image's real (often portrait) dimensions — the
+        // `.fill` image just gets cropped by `.clipShape`.
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: bannerHeight)
+            .overlay { media }
+            .overlay {
+                LinearGradient(colors: [.clear, .black.opacity(0.55)],
+                               startPoint: .top, endPoint: .bottom)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
+            .overlay(alignment: .bottomLeading) { caption }
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .padding(.horizontal, 2)
+    }
 
-            LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .top, endPoint: .bottom)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(banner.name ?? "").font(.system(size: 19, weight: .bold)).foregroundColor(.white)
-                Text(banner.description ?? "").font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
-                    .lineLimit(2)
-                HStack(spacing: 8) {
-                    Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
-                        .padding(.horizontal, 14).padding(.vertical, 7)
-                        .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
-                    Text("View Promotions").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
-                        .padding(.horizontal, 14).padding(.vertical, 7)
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white, lineWidth: 1))
-                }
-                .padding(.top, 6)
+    @ViewBuilder
+    private var media: some View {
+        Group {
+            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
+                LoopingVideoView(url: url)
+            } else if let url = banner.mediaURL, !url.isEmpty {
+                RemoteImage(url: url)
+            } else {
+                LinearGradient(colors: [Brand.purple, Brand.purpleDark],
+                               startPoint: .leading, endPoint: .trailing)
             }
-            .padding(16)
         }
-        .frame(maxWidth: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .padding(.horizontal, 2)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var caption: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(banner.name ?? "").font(.system(size: 19, weight: .bold)).foregroundColor(.white)
+            Text(banner.description ?? "").font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
+                .lineLimit(2)
+            HStack(spacing: 8) {
+                Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                    .padding(.horizontal, 14).padding(.vertical, 7)
+                    .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
+                Text("View Promotions").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 7)
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white, lineWidth: 1))
+            }
+            .padding(.top, 6)
+        }
+        .padding(16)
     }
 }
 
