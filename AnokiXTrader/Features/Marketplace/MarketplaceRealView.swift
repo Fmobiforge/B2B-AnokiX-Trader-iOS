@@ -517,30 +517,43 @@ struct MarketCard: View {
 
 // MARK: - Cart toolbar button (mirrors Android activity_marketplace.xml cartBadge)
 
-/// 48×48 hit target, 18 pt badge at top-trailing — same layout as Android's
-/// `cartButton` / `cartBadge` FrameLayout (badge hidden when count is 0).
+/// Red `#DC2626` pill with white label — matches Android `bg_pill_new` / `@color/danger`.
+private struct CartCountBadge: View {
+    let count: Int
+
+    var body: some View {
+        Text(count > 99 ? "99+" : "\(count)")
+            .font(.system(size: 11, weight: .bold))
+            .monospacedDigit()
+            .foregroundColor(.white)
+            .padding(.horizontal, count > 9 ? 5 : 0)
+            .frame(minWidth: 20, minHeight: 20)
+            .background(Capsule().fill(Brand.danger))
+            .overlay(Capsule().stroke(Color.white, lineWidth: 2))
+            .shadow(color: .black.opacity(0.28), radius: 2, x: 0, y: 1)
+    }
+}
+
+/// 48×48 hit target with a high-contrast badge at the cart icon corner.
 struct CartToolbarButton: View {
     let count: Int
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            ZStack(alignment: .topTrailing) {
-                Image(systemName: "cart")
-                    .font(.system(size: 22))
-                    .frame(width: 28, height: 28)
-                if count > 0 {
-                    Text(count > 99 ? "99+" : "\(count)")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(minWidth: 18, minHeight: 18)
-                        .background(Brand.danger)
-                        .clipShape(Circle())
-                        .offset(x: 4, y: -2)
+            Image(systemName: "cart")
+                .font(.system(size: 22, weight: .medium))
+                .foregroundColor(Brand.textPrimary)
+                .overlay(alignment: .topTrailing) {
+                    if count > 0 {
+                        CartCountBadge(count: count)
+                            .offset(x: 10, y: -10)
+                    }
                 }
-            }
-            .frame(width: 48, height: 48)
-            .contentShape(Rectangle())
+                .frame(width: 36, height: 36)
+                .padding(.top, 8)
+                .padding(.trailing, 6)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
