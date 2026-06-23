@@ -6,33 +6,37 @@ struct MainTabView: View {
     @StateObject private var posCart = Cart()
 
     var body: some View {
-        ZStack(alignment: .leading) {
-            TabView(selection: $router.tab) {
-                NavigationStack { DashboardView() }
-                    .tabItem { Label("Home", systemImage: "house.fill") }.tag(Tab.home)
+        TabView(selection: $router.tab) {
+            NavigationStack { DashboardView() }
+                .tabItem { Label("Home", systemImage: "house.fill") }.tag(Tab.home)
 
-                NavigationStack { SellView() }
-                    .tabItem { Label("Sell", systemImage: "cart.fill") }.tag(Tab.sell)
+            NavigationStack { SellView() }
+                .tabItem { Label("Sell", systemImage: "cart.fill") }.tag(Tab.sell)
 
-                NavigationStack { OrdersView() }
-                    .tabItem { Label("Orders", systemImage: "shippingbox.fill") }.tag(Tab.orders)
+            NavigationStack { OrdersView() }
+                .tabItem { Label("Orders", systemImage: "shippingbox.fill") }.tag(Tab.orders)
 
-                NavigationStack { WalletView() }
-                    .tabItem { Label("Wallet", systemImage: "wallet.pass.fill") }.tag(Tab.wallet)
+            NavigationStack { WalletView() }
+                .tabItem { Label("Wallet", systemImage: "wallet.pass.fill") }.tag(Tab.wallet)
 
-                NavigationStack { MoreView() }
-                    .tabItem { Label("More", systemImage: "ellipsis") }.tag(Tab.more)
-            }
-
-            // Drawer overlay
+            NavigationStack { MoreView() }
+                .tabItem { Label("More", systemImage: "ellipsis") }.tag(Tab.more)
+        }
+        .tint(Brand.purple)
+        .toolbarBackground(.visible, for: .tabBar)
+        .toolbarBackground(Color.white, for: .tabBar)
+        .overlay {
             if router.drawerOpen {
-                Color.black.opacity(0.45)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { router.drawerOpen = false } }
-                DrawerView()
-                    .frame(width: 300)
-                    .transition(.move(edge: .leading))
+                ZStack(alignment: .leading) {
+                    Color.black.opacity(0.45)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.easeOut(duration: 0.2)) { router.drawerOpen = false }
+                        }
+                    DrawerView()
+                        .frame(width: 300)
+                }
+                .transition(.opacity)
             }
         }
         .animation(.easeOut(duration: 0.22), value: router.drawerOpen)
