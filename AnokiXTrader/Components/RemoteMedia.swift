@@ -22,11 +22,7 @@ struct RemoteImage: View {
     }
 }
 
-/// First-frame poster for video banners inside scroll views.
-///
-/// Inline `AVPlayerLayer` playback corrupts compositing when nested in a vertical
-/// `ScrollView` (common on VMware / nested iOS simulators). A static thumbnail
-/// avoids hardware-layer ghosting while still showing the video's opening frame.
+/// First-frame poster shown while a video banner is off-screen (keeps scroll compositing stable).
 struct VideoThumbnailView: View {
     let url: URL
     @State private var thumbnail: UIImage?
@@ -66,8 +62,10 @@ struct VideoThumbnailView: View {
     }
 }
 
-/// Muted, auto-looping inline video — not used inside scroll views; kept for
-/// potential full-screen playback. See `VideoThumbnailView` for banner posters.
+/// Muted, auto-looping inline video for marketplace banners.
+///
+/// Paired with viewport tracking in `BannerCard` so the player layer is removed
+/// when the banner scrolls off-screen (avoids ghost frames in nested scroll views).
 struct LoopingVideoView: UIViewRepresentable {
     let url: URL
     var isActive: Bool = true
