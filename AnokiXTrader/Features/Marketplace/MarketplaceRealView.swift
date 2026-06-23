@@ -452,33 +452,30 @@ struct MarketplaceRealView: View {
 struct BannerCard: View {
     let banner: BannerDTO
     private let bannerHeight: CGFloat = 180
-    @State private var isInViewport = true
 
     var body: some View {
-        Color.clear
-            .frame(maxWidth: .infinity)
-            .frame(height: bannerHeight)
-            .overlay { media.compositingGroup() }
-            .overlay {
-                LinearGradient(colors: [.clear, .black.opacity(0.55)],
-                               startPoint: .top, endPoint: .bottom)
-            }
-            .overlay(alignment: .bottomLeading) { caption }
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .padding(.horizontal, 2)
-            .trackViewportVisibility($isInViewport)
+        ZStack(alignment: .bottomLeading) {
+            media
+            LinearGradient(colors: [.clear, .black.opacity(0.55)],
+                           startPoint: .top, endPoint: .bottom)
+            caption
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: bannerHeight)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .padding(.horizontal, 2)
     }
 
     @ViewBuilder
     private var media: some View {
         Group {
-            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
-                if isInViewport {
-                    LoopingVideoView(url: url)
-                } else {
+            if banner.isVideo, let url = MediaUrls.url(banner.mediaURL) {
+                ZStack {
                     VideoThumbnailView(url: url)
+                    LoopingVideoView(url: url)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            } else if let url = banner.mediaURL, !url.isEmpty {
+            } else if let url = MediaUrls.resolve(banner.mediaURL), !url.isEmpty {
                 RemoteImage(url: url)
             } else {
                 bannerPlaceholder

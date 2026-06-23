@@ -3,6 +3,28 @@ import UIKit
 import AVFoundation
 import Kingfisher
 
+// MARK: - Media URL normalisation (Android `MediaUrls`)
+
+enum MediaUrls {
+    private static let baseURL = "http://155.117.20.51/ax/"
+
+    static func resolve(_ raw: String?) -> String? {
+        guard var url = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !url.isEmpty else { return nil }
+        if (url.hasPrefix("\"") && url.hasSuffix("\"")) || (url.hasPrefix("'") && url.hasSuffix("'")) {
+            url = String(url.dropFirst().dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        guard !url.isEmpty else { return nil }
+        if url.hasPrefix("http://") || url.hasPrefix("https://") { return url }
+        let base = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
+        if url.hasPrefix("/") { return base + url }
+        return baseURL + url
+    }
+
+    static func url(_ raw: String?) -> URL? {
+        resolve(raw).flatMap { URL(string: $0) }
+    }
+}
+
 /// Cached remote image — drop-in replacement for SwiftUI's `AsyncImage`, backed by
 /// **Kingfisher** (in-memory + on-disk cache, so images load instantly on repeat
 /// views and survive relaunches). Always resizable with a surface placeholder; the
@@ -44,7 +66,8 @@ struct VideoThumbnailView: View {
     }
 
     private static func generateThumbnail(from url: URL) async -> UIImage? {
-        let asset = AVURLAsset(url: url)
+        let resolved = MediaUrls.url(url.absoluteString) ?? url
+        let asset = AVURLAsset(url: resolved)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
         generator.maximumSize = CGSize(width: 960, height: 540)
@@ -63,21 +86,18 @@ struct VideoThumbnailView: View {
 }
 
 /// Muted, auto-looping inline video for marketplace banners.
-///
-/// Paired with viewport tracking in `BannerCard` so the player layer is removed
-/// when the banner scrolls off-screen (avoids ghost frames in nested scroll views).
 struct LoopingVideoView: UIViewRepresentable {
     let url: URL
-    var isActive: Bool = true
 
     func makeUIView(context: Context) -> PlayerContainerView {
-        let view = PlayerContainerView(url: url)
-        view.setActive(isActive)
+        let resolved = MediaUrls.url(url.absoluteString) ?? url
+        let view = PlayerContainerView(url: resolved)
         return view
     }
 
     func updateUIView(_ uiView: PlayerContainerView, context: Context) {
-        uiView.setActive(isActive)
+        let resolved = MediaUrls.url(url.absoluteString) ?? url
+        uiView.loadIfNeeded(resolved)
     }
 
     static func dismantleUIView(_ uiView: PlayerContainerView, coordinator: ()) {
@@ -88,55 +108,86 @@ struct LoopingVideoView: UIViewRepresentable {
         private let playerLayer = AVPlayerLayer()
         private var queuePlayer: AVQueuePlayer?
         private var looper: AVPlayerLooper?
-        private var isActive = true
+        private var statusObserver: NSKeyValueObservation?
+        private var loadedURL: URL?
 
         init(url: URL) {
             super.init(frame: .zero)
             clipsToBounds = true
             layer.masksToBounds = true
             backgroundColor = UIColor(red: 91 / 255, green: 33 / 255, blue: 182 / 255, alpha: 1)
-
-            let item = AVPlayerItem(url: url)
-            let player = AVQueuePlayer(playerItem: item)
-            player.isMuted = true
-            player.actionAtItemEnd = .none
-            looper = AVPlayerLooper(player: player, templateItem: item)
-            playerLayer.player = player
             playerLayer.videoGravity = .resizeAspectFill
+            playerLayer.backgroundColor = backgroundColor?.cgColor
             layer.addSublayer(playerLayer)
-            queuePlayer = player
-            player.play()
+            Self.prepareAudioSession()
+            loadIfNeeded(url)
         }
 
         required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            guard !playerLayer.isHidden else { return }
-            playerLayer.frame = bounds
+        func loadIfNeeded(_ url: URL) {
+            guard loadedURL != url else {
+                queuePlayer?.play()
+                return
+            }
+            teardown(keepLayer: true)
+            loadedURL = url
+
+            let asset = AVURLAsset(url: url, options: [
+                AVURLAssetAllowsCellularAccessKey: true
+            ])
+            let template = AVPlayerItem(asset: asset)
+
+            let player = AVQueuePlayer()
+            player.isMuted = true
+            player.actionAtItemEnd = .none
+            player.automaticallyWaitsToMinimizeStalling = false
+            player.preventsDisplaySleepDuringVideoPlayback = false
+
+            looper = AVPlayerLooper(player: player, templateItem: template)
+            queuePlayer = player
+            playerLayer.player = player
+
+            statusObserver = template.observe(\.status, options: [.new]) { [weak player] item, _ in
+                guard item.status == .readyToPlay else { return }
+                DispatchQueue.main.async { player?.play() }
+            }
+            player.play()
         }
 
-        func setActive(_ active: Bool) {
-            guard isActive != active else { return }
-            isActive = active
-            if active {
-                playerLayer.player = queuePlayer
-                playerLayer.isHidden = false
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            if bounds.width > 0, bounds.height > 0 {
                 playerLayer.frame = bounds
-                queuePlayer?.play()
-            } else {
-                queuePlayer?.pause()
-                playerLayer.player = nil
-                playerLayer.isHidden = true
             }
         }
 
+        /// Full teardown when the SwiftUI view is removed (e.g. carousel page change).
         func stop() {
+            teardown(keepLayer: false)
+        }
+
+        private func teardown(keepLayer: Bool) {
+            statusObserver?.invalidate()
+            statusObserver = nil
             queuePlayer?.pause()
-            playerLayer.player = nil
-            playerLayer.removeFromSuperlayer()
-            queuePlayer = nil
+            looper?.disableLooping()
             looper = nil
+            queuePlayer = nil
+            playerLayer.player = nil
+            loadedURL = nil
+            if !keepLayer {
+                playerLayer.removeFromSuperlayer()
+            }
+        }
+
+        private static var audioPrepared = false
+        private static func prepareAudioSession() {
+            guard !audioPrepared else { return }
+            audioPrepared = true
+            let session = AVAudioSession.sharedInstance()
+            try? session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try? session.setActive(true)
         }
     }
 }

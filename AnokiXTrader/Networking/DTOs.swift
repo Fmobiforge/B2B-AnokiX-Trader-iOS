@@ -110,8 +110,8 @@ struct BannerDTO: Decodable, Identifiable, Hashable {
     let video_file: MediaDTO?
 
     var mediaURL: String? {
-        if let v = video_file?.file_url, !v.isEmpty { return v }
-        return banner_file?.file_url
+        if let v = video_file?.file_url, !v.isEmpty { return MediaUrls.resolve(v) }
+        return MediaUrls.resolve(banner_file?.file_url)
     }
     var isVideo: Bool { (video_file?.file_url?.isEmpty == false) }
 }
