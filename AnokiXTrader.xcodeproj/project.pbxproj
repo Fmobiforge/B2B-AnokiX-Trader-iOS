@@ -45,6 +45,7 @@
 		BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */; };
 		BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F35932C814CC82ABBC7B893 /* ListModules.swift */; };
 		CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */; };
+		E7A1B2C3D4E5F67890123456 /* ScrollVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B2C3D4E5F6789012345678 /* ScrollVisibility.swift */; };
 		CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DE3F070404C0632ED5C5B /* Rows.swift */; };
 		DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD2 /* RewardsView.swift */; };
 		E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578A29E /* ReportsView.swift */; };
@@ -69,6 +70,7 @@
 		51A7CB16714ECF11A5961575 /* Charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Charts.swift; sourceTree = "<group>"; };
 		5F35932C814CC82ABBC7B893 /* ListModules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListModules.swift; sourceTree = "<group>"; };
 		5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMedia.swift; sourceTree = "<group>"; };
+		F8B2C3D4E5F6789012345678 /* ScrollVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollVisibility.swift; sourceTree = "<group>"; };
 		608FEEC642C83E3A7CB04209 /* SupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportView.swift; sourceTree = "<group>"; };
 		626A29BDE53D18E971A04DB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnokiXTraderApp.swift; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				A54A20C9413C35FB20B0B107 /* FormControls.swift */,
 				34C23167F101A111EA84DC70 /* ImagePicker.swift */,
 				5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */,
+				F8B2C3D4E5F6789012345678 /* ScrollVisibility.swift */,
 				8D9DE3F070404C0632ED5C5B /* Rows.swift */,
 			);
 			path = Components;
@@ -530,6 +533,7 @@
 				4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */,
 				779D758D64356A4B138522C7 /* RegisterView.swift in Sources */,
 				CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */,
+				E7A1B2C3D4E5F67890123456 /* ScrollVisibility.swift in Sources */,
 				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
 				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
 				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,

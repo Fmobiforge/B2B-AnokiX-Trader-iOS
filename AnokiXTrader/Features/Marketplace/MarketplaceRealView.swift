@@ -54,6 +54,7 @@ struct MarketplaceRealView: View {
                 }
                 .padding(16)
             }
+            .scrollContentBackground(.hidden)
         }
         .background(Brand.background)
         .overlay { if store.loading && store.data == nil { ProgressView() } }
@@ -313,15 +314,18 @@ struct MarketplaceRealView: View {
             VStack(alignment: .leading, spacing: 10) {
                 SectionHeader(title: "Categories", actionTitle: "View All") {}
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
+                    HStack(alignment: .top, spacing: 14) {
                         ForEach(store.parentCategories) { c in
                             VStack(spacing: 6) {
                                 Image(systemName: "square.grid.2x2").font(.system(size: 18)).foregroundColor(Brand.purple)
                                     .frame(width: 48, height: 48).background(Brand.purpleLight)
                                     .clipShape(RoundedRectangle(cornerRadius: 14))
                                 Text(c.title).font(.system(size: 10)).foregroundColor(Brand.textPrimary)
-                                    .multilineTextAlignment(.center).frame(width: 64).lineLimit(2)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .frame(width: 64, alignment: .top)
                             }
+                            .frame(width: 64, alignment: .top)
                         }
                     }
                 }
@@ -411,16 +415,13 @@ struct MarketplaceRealView: View {
 struct BannerCard: View {
     let banner: BannerDTO
     private let bannerHeight: CGFloat = 180
+    @State private var isInViewport = true
 
     var body: some View {
-        // A definite-size box (Color.clear locked to 180pt) with the media as an
-        // overlay. Overlays can NEVER resize their parent, so the banner height is
-        // fixed regardless of the image's real (often portrait) dimensions — the
-        // `.fill` image just gets cropped by `.clipShape`.
         Color.clear
             .frame(maxWidth: .infinity)
             .frame(height: bannerHeight)
-            .overlay { media }
+            .overlay { media.compositingGroup() }
             .overlay {
                 LinearGradient(colors: [.clear, .black.opacity(0.55)],
                                startPoint: .top, endPoint: .bottom)
@@ -428,21 +429,29 @@ struct BannerCard: View {
             .overlay(alignment: .bottomLeading) { caption }
             .clipShape(RoundedRectangle(cornerRadius: 18))
             .padding(.horizontal, 2)
+            .trackViewportVisibility($isInViewport)
     }
 
     @ViewBuilder
     private var media: some View {
         Group {
-            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
-                LoopingVideoView(url: url)
+            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }), isInViewport {
+                LoopingVideoView(url: url, isActive: isInViewport)
+            } else if banner.isVideo {
+                bannerPlaceholder
             } else if let url = banner.mediaURL, !url.isEmpty {
                 RemoteImage(url: url)
             } else {
-                LinearGradient(colors: [Brand.purple, Brand.purpleDark],
-                               startPoint: .leading, endPoint: .trailing)
+                bannerPlaceholder
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
+    }
+
+    private var bannerPlaceholder: some View {
+        LinearGradient(colors: [Brand.purple, Brand.purpleDark],
+                       startPoint: .leading, endPoint: .trailing)
     }
 
     private var caption: some View {
