@@ -8,6 +8,8 @@ target 'AnokiXTrader' do
   # step uses MapKit and GoogleMaps needs an API key; add it here if needed.)
   pod 'Alamofire', '~> 5.9'
   pod 'SwiftyJSON', '~> 5.0'
+  # Powerful image loading + memory & disk caching (smooth, robust remote images).
+  pod 'Kingfisher', '~> 7.0'
 end
 
 post_install do |installer|

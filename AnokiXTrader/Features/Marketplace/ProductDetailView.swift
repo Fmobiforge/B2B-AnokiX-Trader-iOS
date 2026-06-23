@@ -82,14 +82,9 @@ struct ProductDetailView: View {
     }
 
     @ViewBuilder private var image: some View {
-        if let url = product.imageURL, let u = URL(string: url) {
-            AsyncImage(url: u) { img in img.resizable().scaledToFill() }
-                placeholder: { Brand.surfaceVariant }
-                .frame(height: 240).frame(maxWidth: .infinity).clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-        } else {
-            Brand.surfaceVariant.frame(height: 240).clipShape(RoundedRectangle(cornerRadius: 14))
-        }
+        RemoteImage(url: product.imageURL)
+            .frame(height: 240).frame(maxWidth: .infinity).clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private var stepper: some View {

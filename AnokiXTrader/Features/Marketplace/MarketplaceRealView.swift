@@ -1,5 +1,4 @@
 import SwiftUI
-import AVKit
 
 /// Trader Marketplace wired to GET /api/trader/marketplace — the iOS counterpart
 /// of the Android `MarketplaceActivity`. Hosted inside `ModuleHost`'s navigation
@@ -414,15 +413,18 @@ struct BannerCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            if banner.isVideo, let url = banner.mediaURL, let u = URL(string: url) {
-                VideoPlayer(player: AVPlayer(url: u))
-            } else if let url = banner.mediaURL, let u = URL(string: url) {
-                AsyncImage(url: u) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: { Brand.purple }
-            } else {
-                LinearGradient(colors: [Brand.purple, Brand.purpleDark], startPoint: .leading, endPoint: .trailing)
+            Group {
+                if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
+                    LoopingVideoView(url: url)
+                } else if let url = banner.mediaURL, !url.isEmpty {
+                    RemoteImage(url: url)
+                } else {
+                    LinearGradient(colors: [Brand.purple, Brand.purpleDark], startPoint: .leading, endPoint: .trailing)
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+
             LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .top, endPoint: .bottom)
             VStack(alignment: .leading, spacing: 4) {
                 Text(banner.name ?? "").font(.system(size: 19, weight: .bold)).foregroundColor(.white)
@@ -452,9 +454,8 @@ struct PromotionCard: View {
     let promo: PromotionDTO
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let url = promo.mediaURL, !promo.isVideo, let u = URL(string: url) {
-                AsyncImage(url: u) { image in image.resizable().scaledToFill() }
-                    placeholder: { Brand.surfaceVariant }
+            if let url = promo.mediaURL, !promo.isVideo, !url.isEmpty {
+                RemoteImage(url: url)
                     .frame(height: 130).frame(maxWidth: .infinity).clipped()
             }
             VStack(alignment: .leading, spacing: 4) {
@@ -479,13 +480,8 @@ struct MarketCard: View {
     var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 0) {
-                if let url = product.imageURL, let u = URL(string: url) {
-                    AsyncImage(url: u) { image in image.resizable().scaledToFill() }
-                        placeholder: { Brand.surfaceVariant }
-                        .frame(width: 150, height: 120).clipped()
-                } else {
-                    Brand.surfaceVariant.frame(width: 150, height: 120)
-                }
+                RemoteImage(url: product.imageURL)
+                    .frame(width: 150, height: 120).clipped()
                 VStack(alignment: .leading, spacing: 6) {
                     Text(product.name ?? "").font(.system(size: 12, weight: .semibold))
                         .foregroundColor(Brand.textPrimary).lineLimit(2)

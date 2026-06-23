@@ -107,13 +107,8 @@ struct CartRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            if let url = line.imageURL, let u = URL(string: url) {
-                AsyncImage(url: u) { img in img.resizable().scaledToFill() }
-                    placeholder: { Brand.surfaceVariant }
-                    .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
-            } else {
-                Brand.surfaceVariant.frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
-            }
+            RemoteImage(url: line.imageURL)
+                .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 6) {
                 Text(line.name).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(2)
                 Text(CurrencyFmt.format(line.unitPrice, symbol: currency))
