@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Trader Marketplace wired to GET /api/trader/marketplace — the iOS counterpart
 /// of the Android `MarketplaceActivity`. Hosted inside `ModuleHost`'s navigation
@@ -60,7 +61,8 @@ struct MarketplaceRealView: View {
         .overlay { if store.loading && store.data == nil { ProgressView() } }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                CartToolbarButton(count: store.cartBadgeCount) { activeSheet = .cart }
+                CartBarButton(count: store.cartBadgeCount) { activeSheet = .cart }
+                    .frame(width: 44, height: 44)
             }
         }
         .task {
@@ -517,44 +519,96 @@ struct MarketCard: View {
 
 // MARK: - Cart toolbar button (mirrors Android activity_marketplace.xml cartBadge)
 
-/// Red `#DC2626` pill with white label — matches Android `bg_pill_new` / `@color/danger`.
-private struct CartCountBadge: View {
-    let count: Int
+/// UIKit cart + badge — SwiftUI toolbar styling strips custom badge colours, so we
+/// paint the red pill in UIKit (same as Android `bg_pill_new` / `#DC2626`).
+struct CartBarButton: UIViewRepresentable {
+    var count: Int
+    var action: () -> Void
 
-    var body: some View {
-        Text(count > 99 ? "99+" : "\(count)")
-            .font(.system(size: 11, weight: .bold))
-            .monospacedDigit()
-            .foregroundColor(.white)
-            .padding(.horizontal, count > 9 ? 5 : 0)
-            .frame(minWidth: 20, minHeight: 20)
-            .background(Capsule().fill(Brand.danger))
-            .overlay(Capsule().stroke(Color.white, lineWidth: 2))
-            .shadow(color: .black.opacity(0.28), radius: 2, x: 0, y: 1)
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    func makeUIView(context: Context) -> CartButtonControl {
+        let control = CartButtonControl()
+        control.addTarget(context.coordinator, action: #selector(Coordinator.tapped), for: .touchUpInside)
+        control.count = count
+        return control
+    }
+
+    func updateUIView(_ uiView: CartButtonControl, context: Context) {
+        context.coordinator.action = action
+        uiView.count = count
+    }
+
+    final class Coordinator: NSObject {
+        var action: () -> Void
+        init(action: @escaping () -> Void) { self.action = action }
+        @objc func tapped() { action() }
     }
 }
 
-/// 48×48 hit target with a high-contrast badge at the cart icon corner.
-struct CartToolbarButton: View {
-    let count: Int
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: "cart")
-                .font(.system(size: 22, weight: .medium))
-                .foregroundColor(Brand.textPrimary)
-                .overlay(alignment: .topTrailing) {
-                    if count > 0 {
-                        CartCountBadge(count: count)
-                            .offset(x: 10, y: -10)
-                    }
-                }
-                .frame(width: 36, height: 36)
-                .padding(.top, 8)
-                .padding(.trailing, 6)
-                .contentShape(Rectangle())
+/// 44×44 control with cart icon + red count badge (white text, white ring).
+final class CartButtonControl: UIControl {
+    var count: Int = 0 {
+        didSet {
+            badgeLabel.text = count > 99 ? "99+" : "\(count)"
+            badgeLabel.isHidden = count <= 0
+            setNeedsLayout()
         }
-        .buttonStyle(.plain)
     }
+
+    private let imageView = UIImageView()
+    private let badgeLabel = UILabel()
+    private static let badgeRed = UIColor(red: 220 / 255, green: 38 / 255, blue: 38 / 255, alpha: 1)
+    private static let iconTint = UIColor(red: 15 / 255, green: 23 / 255, blue: 42 / 255, alpha: 1)
+
+    override init(frame: CGRect) {
+        super.init(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        let config = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
+        imageView.image = UIImage(systemName: "cart", withConfiguration: config)
+        imageView.tintColor = Self.iconTint
+        imageView.contentMode = .scaleAspectFit
+        imageView.isUserInteractionEnabled = false
+        addSubview(imageView)
+
+        badgeLabel.font = .systemFont(ofSize: 11, weight: .bold)
+        badgeLabel.textColor = .white
+        badgeLabel.textAlignment = .center
+        badgeLabel.backgroundColor = Self.badgeRed
+        badgeLabel.layer.borderWidth = 2
+        badgeLabel.layer.borderColor = UIColor.white.cgColor
+        badgeLabel.clipsToBounds = true
+        badgeLabel.isHidden = true
+        badgeLabel.isUserInteractionEnabled = false
+        addSubview(badgeLabel)
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let iconSide: CGFloat = 24
+        imageView.frame = CGRect(
+            x: (bounds.width - iconSide) / 2,
+            y: (bounds.height - iconSide) / 2,
+            width: iconSide,
+            height: iconSide
+        )
+
+        guard !badgeLabel.isHidden else { return }
+        let badgeH: CGFloat = 20
+        let text = badgeLabel.text ?? ""
+        let textW = (text as NSString).size(withAttributes: [.font: badgeLabel.font!]).width
+        let badgeW = max(20, ceil(textW) + 10)
+        badgeLabel.frame = CGRect(
+            x: bounds.width - badgeW + 2,
+            y: 2,
+            width: badgeW,
+            height: badgeH
+        )
+        badgeLabel.layer.cornerRadius = badgeH / 2
+    }
+
+    override var intrinsicContentSize: CGSize { CGSize(width: 44, height: 44) }
 }
