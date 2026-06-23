@@ -1,9 +1,8 @@
 import SwiftUI
-import UIKit
 
 /// Trader Marketplace wired to GET /api/trader/marketplace — the iOS counterpart
-/// of the Android `MarketplaceActivity`. Hosted inside `ModuleHost`'s navigation
-/// stack (which supplies the title + Close button); this view adds the cart action.
+/// of the Android `MarketplaceActivity`. Uses a custom purple header (same as
+/// `activity_marketplace.xml`) so the cart badge is not affected by nav-bar tinting.
 struct MarketplaceRealView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var store: MarketStore
@@ -32,45 +31,41 @@ struct MarketplaceRealView: View {
     private let summaryGrid = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    Group {
-                        distributorCard
-                        bannerSlider
-                        insightsSection
-                        searchRow
-                        menuSection(proxy)
+        VStack(spacing: 0) {
+            marketplaceHeader
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        Group {
+                            distributorCard
+                            bannerSlider
+                            insightsSection
+                            searchRow
+                            menuSection(proxy)
+                        }
+                        Group {
+                            categoriesSection
+                            opportunitiesCard
+                            productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
+                                           products: store.data?.recommended)
+                            promotionsSection.id("promotions")
+                            productSection(title: "Best Sellers", subtitle: nil,
+                                           products: store.data?.best_sellers)
+                            featureStrip
+                        }
                     }
-                    Group {
-                        categoriesSection
-                        opportunitiesCard
-                        productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
-                                       products: store.data?.recommended)
-                        promotionsSection.id("promotions")
-                        productSection(title: "Best Sellers", subtitle: nil,
-                                       products: store.data?.best_sellers)
-                        featureStrip
-                    }
+                    .padding(16)
                 }
-                .padding(16)
+                .scrollContentBackground(.hidden)
             }
-            .scrollContentBackground(.hidden)
         }
         .background(Brand.background)
         .overlay { if store.loading && store.data == nil { ProgressView() } }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                CartBarButton(count: store.cartBadgeCount) { activeSheet = .cart }
-                    .frame(width: 44, height: 44)
-            }
-        }
         .task {
             if store.data == nil { await store.loadAll() }
             await store.refreshCart()
         }
         .onAppear {
-            // Mirrors Android MarketplaceActivity.onResume → refreshCart().
             Task { await store.refreshCart() }
         }
         .sheet(item: $activeSheet) { sheet in
@@ -88,7 +83,57 @@ struct MarketplaceRealView: View {
         .toast($toastMsg)
     }
 
-    // MARK: - Feature strip
+    // MARK: - Header (Android activity_marketplace.xml)
+
+    private var marketplaceHeader: some View {
+        HStack(spacing: 4) {
+            Button { router.presented = nil } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+            }
+            .buttonStyle(.plain)
+
+            Text("Marketplace")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            marketplaceCartButton
+        }
+        .padding(.horizontal, 8)
+        .frame(minHeight: 44)
+        .background(
+            LinearGradient(colors: [Brand.purpleDark, Brand.purple],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
+    }
+
+    private var marketplaceCartButton: some View {
+        Button { activeSheet = .cart } label: {
+            ZStack(alignment: .topTrailing) {
+                Image(systemName: "cart")
+                    .font(.system(size: 22))
+                    .foregroundColor(.white)
+                    .frame(width: 24, height: 24)
+                if store.cartBadgeCount > 0 {
+                    Text(store.cartBadgeCount > 99 ? "99+" : "\(store.cartBadgeCount)")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 18, minHeight: 18)
+                        .background(Brand.danger)
+                        .clipShape(Capsule())
+                        .offset(x: 6, y: -6)
+                }
+            }
+            .frame(width: 48, height: 48)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Distributor card
 
     private var distributorCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -515,100 +560,4 @@ struct MarketCard: View {
         }
         .buttonStyle(.plain)
     }
-}
-
-// MARK: - Cart toolbar button (mirrors Android activity_marketplace.xml cartBadge)
-
-/// UIKit cart + badge — SwiftUI toolbar styling strips custom badge colours, so we
-/// paint the red pill in UIKit (same as Android `bg_pill_new` / `#DC2626`).
-struct CartBarButton: UIViewRepresentable {
-    var count: Int
-    var action: () -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(action: action)
-    }
-
-    func makeUIView(context: Context) -> CartButtonControl {
-        let control = CartButtonControl()
-        control.addTarget(context.coordinator, action: #selector(Coordinator.tapped), for: .touchUpInside)
-        control.count = count
-        return control
-    }
-
-    func updateUIView(_ uiView: CartButtonControl, context: Context) {
-        context.coordinator.action = action
-        uiView.count = count
-    }
-
-    final class Coordinator: NSObject {
-        var action: () -> Void
-        init(action: @escaping () -> Void) { self.action = action }
-        @objc func tapped() { action() }
-    }
-}
-
-/// 44×44 control with cart icon + red count badge (white text, white ring).
-final class CartButtonControl: UIControl {
-    var count: Int = 0 {
-        didSet {
-            badgeLabel.text = count > 99 ? "99+" : "\(count)"
-            badgeLabel.isHidden = count <= 0
-            setNeedsLayout()
-        }
-    }
-
-    private let imageView = UIImageView()
-    private let badgeLabel = UILabel()
-    private static let badgeRed = UIColor(red: 220 / 255, green: 38 / 255, blue: 38 / 255, alpha: 1)
-    private static let iconTint = UIColor(red: 15 / 255, green: 23 / 255, blue: 42 / 255, alpha: 1)
-
-    override init(frame: CGRect) {
-        super.init(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
-        let config = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
-        imageView.image = UIImage(systemName: "cart", withConfiguration: config)
-        imageView.tintColor = Self.iconTint
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = false
-        addSubview(imageView)
-
-        badgeLabel.font = .systemFont(ofSize: 11, weight: .bold)
-        badgeLabel.textColor = .white
-        badgeLabel.textAlignment = .center
-        badgeLabel.backgroundColor = Self.badgeRed
-        badgeLabel.layer.borderWidth = 2
-        badgeLabel.layer.borderColor = UIColor.white.cgColor
-        badgeLabel.clipsToBounds = true
-        badgeLabel.isHidden = true
-        badgeLabel.isUserInteractionEnabled = false
-        addSubview(badgeLabel)
-    }
-
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        let iconSide: CGFloat = 24
-        imageView.frame = CGRect(
-            x: (bounds.width - iconSide) / 2,
-            y: (bounds.height - iconSide) / 2,
-            width: iconSide,
-            height: iconSide
-        )
-
-        guard !badgeLabel.isHidden else { return }
-        let badgeH: CGFloat = 20
-        let text = badgeLabel.text ?? ""
-        let textW = (text as NSString).size(withAttributes: [.font: badgeLabel.font!]).width
-        let badgeW = max(20, ceil(textW) + 10)
-        badgeLabel.frame = CGRect(
-            x: bounds.width - badgeW + 2,
-            y: 2,
-            width: badgeW,
-            height: badgeH
-        )
-        badgeLabel.layer.cornerRadius = badgeH / 2
-    }
-
-    override var intrinsicContentSize: CGSize { CGSize(width: 44, height: 44) }
 }

@@ -53,9 +53,12 @@ struct MainTabView: View {
 }
 
 /// Hosts a secondary module full-screen with a navigation bar + Close button.
+/// Marketplace uses its own header (matches Android `activity_marketplace.xml`).
 struct ModuleHost: View {
     let module: Module
     @EnvironmentObject var router: Router
+
+    private var hidesSystemNavBar: Bool { module == .marketplace }
 
     var body: some View {
         NavigationStack {
@@ -75,11 +78,14 @@ struct ModuleHost: View {
                 case .support:       SupportView()
                 }
             }
-            .navigationTitle(module.title)
+            .navigationTitle(hidesSystemNavBar ? "" : module.title)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(hidesSystemNavBar ? .hidden : .visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { router.presented = nil }
+                if !hidesSystemNavBar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Close") { router.presented = nil }
+                    }
                 }
             }
         }
