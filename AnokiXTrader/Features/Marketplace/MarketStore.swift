@@ -29,7 +29,12 @@ struct MarketCartLine: Identifiable, Hashable {
 }
 
 /// Loads the trader marketplace from the API and holds the local cart.
+/// Process-wide singleton — mirrors Android `MarketCart` (badge + My Cart source of truth).
 final class MarketStore: ObservableObject {
+    static let shared = MarketStore()
+
+    private init() {}
+
     @Published var data: MarketplaceData?
     @Published var categories: [ProductCategoryDTO] = []
     @Published var loading = false
@@ -80,18 +85,23 @@ final class MarketStore: ObservableObject {
 
     /// Pull the authoritative cart from GET /api/trader/cart and rebuild the local
     /// lines (so the badge, My Cart, and totals reflect the server, and each line
-    /// carries its server-assigned cart item id).
+    /// carries its server-assigned cart item id). Keeps the local mirror on failure,
+    /// matching Android `MarketplaceActivity.refreshCart()`.
     func refreshCart() async {
-        guard let data = try? await APIClient.shared.getCart() else { return }
-        let lines: [MarketCartLine] = data.lines.compactMap { item in
-            guard item.quantity > 0 else { return nil }
-            let p = item.product
-            let pid = p?.id ?? item.productId ?? item.id
-            return MarketCartLine(id: pid, name: p?.name ?? "",
-                                  imageURL: p?.image_url, barcode: p?.barcode, sku: p?.sku,
-                                  unitPrice: item.unitPrice, qty: item.quantity, cartItemId: item.id)
+        do {
+            let data = try await APIClient.shared.getCart()
+            let lines: [MarketCartLine] = data.lines.compactMap { item in
+                guard item.quantity > 0 else { return nil }
+                let p = item.product
+                let pid = p?.id ?? item.productId ?? item.id
+                return MarketCartLine(id: pid, name: p?.name ?? "",
+                                      imageURL: p?.image_url, barcode: p?.barcode, sku: p?.sku,
+                                      unitPrice: item.unitPrice, qty: item.quantity, cartItemId: item.id)
+            }
+            await MainActor.run { self.cart = lines }
+        } catch {
+            // Keep the local mirror on failure (same as Android).
         }
-        await MainActor.run { self.cart = lines }
     }
 
     @discardableResult

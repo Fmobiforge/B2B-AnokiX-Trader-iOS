@@ -215,7 +215,8 @@ struct CartData {
     var lines: [CartItemDTO] { items }
 
     init(json: JSON) {
-        items = json["items"].arrayValue.map(CartItemDTO.init(json:))
+        let rawItems = json["items"].array ?? json["cart_items"].array ?? []
+        items = rawItems.map(CartItemDTO.init(json:))
         let cart = json["cart"]
         itemsCount = cart["items_count"].int ?? items.count
         totalQuantity = cart["total_quantity"].int ?? items.reduce(0) { $0 + $1.quantity }

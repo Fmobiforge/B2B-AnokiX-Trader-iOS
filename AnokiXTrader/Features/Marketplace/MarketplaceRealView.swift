@@ -5,7 +5,7 @@ import SwiftUI
 /// stack (which supplies the title + Close button); this view adds the cart action.
 struct MarketplaceRealView: View {
     @EnvironmentObject var router: Router
-    @StateObject private var store = MarketStore()
+    @ObservedObject private var store = MarketStore.shared
 
     @State private var search = ""
     @State private var activeSheet: ActiveSheet?
@@ -64,6 +64,10 @@ struct MarketplaceRealView: View {
         .task {
             if store.data == nil { await store.loadAll() }
             await store.refreshCart()
+        }
+        .onAppear {
+            // Mirrors Android MarketplaceActivity.onResume → refreshCart().
+            Task { await store.refreshCart() }
         }
         .sheet(item: $activeSheet) { sheet in
             switch sheet {
