@@ -1,4 +1,5 @@
 import Foundation
+import SwiftyJSON
 
 // MARK: - Login
 
@@ -199,41 +200,32 @@ struct ProductDTO: Decodable, Identifiable, Hashable {
 
 // MARK: - Cart (GET /api/trader/cart)
 
-/// Note: the cart endpoint returns numeric `id` / prices (e.g. `id: 24`,
+/// The cart endpoint returns numeric `id` / prices (e.g. `id: 24`,
 /// `selling_price: 20`), whereas the marketplace endpoint returns them as
-/// strings. Swift's JSONDecoder will not coerce between the two, so these DTOs
-/// decode each numeric-ish field leniently (number *or* numeric string).
-struct CartData: Decodable {
-    let items: [CartItemDTO]?
-    let cart: CartSummaryDTO?
+/// strings. SwiftyJSON's `.stringValue` / `.intValue` / `.doubleValue` coerce
+/// either representation transparently, so these are read directly from JSON
+/// rather than via Codable (no custom number-vs-string decoders needed).
+struct CartData {
+    let items: [CartItemDTO]
+    let itemsCount: Int
+    let totalQuantity: Int
+    let subtotal: Double
+    let currencySymbol: String
 
-    var lines: [CartItemDTO] { items ?? [] }
-    var itemsCount: Int { cart?.items_count ?? lines.count }
-    var totalQuantity: Int { cart?.total_quantity ?? lines.reduce(0) { $0 + $1.quantity } }
-    var subtotal: Double { cart?.subtotal ?? lines.reduce(0) { $0 + $1.lineTotal } }
-    var currencySymbol: String {
-        if let s = cart?.currency?.symbol, !s.isEmpty { return s }
-        return "R"
+    var lines: [CartItemDTO] { items }
+
+    init(json: JSON) {
+        items = json["items"].arrayValue.map(CartItemDTO.init(json:))
+        let cart = json["cart"]
+        itemsCount = cart["items_count"].int ?? items.count
+        totalQuantity = cart["total_quantity"].int ?? items.reduce(0) { $0 + $1.quantity }
+        subtotal = cart["subtotal"].double ?? items.reduce(0) { $0 + $1.lineTotal }
+        let symbol = cart["currency"]["symbol"].string
+        currencySymbol = (symbol?.isEmpty == false) ? symbol! : "R"
     }
 }
 
-struct CartSummaryDTO: Decodable {
-    let items_count: Int?
-    let total_quantity: Int?
-    let subtotal: Double?
-    let currency: CurrencyDTO?
-
-    enum CodingKeys: String, CodingKey { case items_count, total_quantity, subtotal, currency }
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        items_count = c.flexInt(.items_count)
-        total_quantity = c.flexInt(.total_quantity)
-        subtotal = c.flexDouble(.subtotal)
-        currency = try? c.decode(CurrencyDTO.self, forKey: .currency)
-    }
-}
-
-struct CartItemDTO: Decodable {
+struct CartItemDTO {
     let id: String              // cart item id (used for update/delete)
     let productId: String?
     let quantity: Int
@@ -244,25 +236,21 @@ struct CartItemDTO: Decodable {
     let product: CartProductDTO?
     let distributor: CartDistributorDTO?
 
-    enum CodingKeys: String, CodingKey {
-        case id, cart_item_id, product_id, quantity, unit_price, line_total
-        case in_stock, stock_quantity, product, distributor
-    }
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = c.flexString(.id) ?? c.flexString(.cart_item_id) ?? ""
-        productId = c.flexString(.product_id)
-        quantity = c.flexInt(.quantity) ?? 0
-        product = try? c.decode(CartProductDTO.self, forKey: .product)
-        unitPrice = c.flexDouble(.unit_price) ?? product?.priceValue ?? 0
-        lineTotal = c.flexDouble(.line_total) ?? (unitPrice * Double(quantity))
-        inStock = (try? c.decode(Bool.self, forKey: .in_stock)) ?? true
-        stockQuantity = c.flexInt(.stock_quantity) ?? 0
-        distributor = try? c.decode(CartDistributorDTO.self, forKey: .distributor)
+    init(json: JSON) {
+        id = json["cart_item_id"].string ?? json["id"].stringValue
+        productId = json["product_id"].exists() ? json["product_id"].stringValue : nil
+        quantity = json["quantity"].intValue
+        let p = json["product"].exists() ? CartProductDTO(json: json["product"]) : nil
+        product = p
+        unitPrice = json["unit_price"].double ?? p?.priceValue ?? 0
+        lineTotal = json["line_total"].double ?? (unitPrice * Double(quantity))
+        inStock = json["in_stock"].bool ?? true
+        stockQuantity = json["stock_quantity"].intValue
+        distributor = json["distributor"].exists() ? CartDistributorDTO(json: json["distributor"]) : nil
     }
 }
 
-struct CartProductDTO: Decodable {
+struct CartProductDTO {
     let id: String?
     let name: String?
     let sku: String?
@@ -274,22 +262,17 @@ struct CartProductDTO: Decodable {
     let selling_price: Double?
     let promotion_price: Double?
 
-    enum CodingKeys: String, CodingKey {
-        case id, name, sku, barcode, brand_name, category_title
-        case parent_category_title, image_url, selling_price, promotion_price
-    }
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = c.flexString(.id)
-        name = try? c.decode(String.self, forKey: .name)
-        sku = c.flexString(.sku)
-        barcode = c.flexString(.barcode)
-        brand_name = try? c.decode(String.self, forKey: .brand_name)
-        category_title = try? c.decode(String.self, forKey: .category_title)
-        parent_category_title = try? c.decode(String.self, forKey: .parent_category_title)
-        image_url = try? c.decode(String.self, forKey: .image_url)
-        selling_price = c.flexDouble(.selling_price)
-        promotion_price = c.flexDouble(.promotion_price)
+    init(json: JSON) {
+        id = json["id"].exists() ? json["id"].stringValue : nil
+        name = json["name"].string
+        sku = json["sku"].exists() ? json["sku"].stringValue : nil
+        barcode = json["barcode"].exists() ? json["barcode"].stringValue : nil
+        brand_name = json["brand_name"].string
+        category_title = json["category_title"].string
+        parent_category_title = json["parent_category_title"].string
+        image_url = json["image_url"].string
+        selling_price = json["selling_price"].double
+        promotion_price = json["promotion_price"].double
     }
 
     var priceValue: Double {
@@ -298,34 +281,13 @@ struct CartProductDTO: Decodable {
     }
 }
 
-struct CartDistributorDTO: Decodable {
+struct CartDistributorDTO {
     let id: Int?
     let display_name: String?
-}
 
-/// Lenient decoders: tolerate a JSON value being a number *or* a numeric string.
-private extension KeyedDecodingContainer {
-    func flexDouble(_ key: Key) -> Double? {
-        if let d = try? decode(Double.self, forKey: key) { return d }
-        if let s = try? decode(String.self, forKey: key) { return Double(s) }
-        return nil
-    }
-    func flexInt(_ key: Key) -> Int? {
-        if let i = try? decode(Int.self, forKey: key) { return i }
-        if let d = try? decode(Double.self, forKey: key) { return Int(d) }
-        if let s = try? decode(String.self, forKey: key) {
-            if let i = Int(s) { return i }
-            if let d = Double(s) { return Int(d) }
-        }
-        return nil
-    }
-    func flexString(_ key: Key) -> String? {
-        if let s = try? decode(String.self, forKey: key) { return s }
-        if let i = try? decode(Int.self, forKey: key) { return String(i) }
-        if let d = try? decode(Double.self, forKey: key) {
-            return d == d.rounded() ? String(Int(d)) : String(d)
-        }
-        return nil
+    init(json: JSON) {
+        id = json["id"].int
+        display_name = json["display_name"].string
     }
 }
 

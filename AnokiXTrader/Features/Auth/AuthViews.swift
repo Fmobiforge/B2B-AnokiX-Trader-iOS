@@ -1,6 +1,43 @@
 import SwiftUI
 import UIKit
 
+// MARK: - Shared welcome/login chrome (mirrors the Distributor iOS app)
+
+/// Blue → indigo → purple pill, matching the Distributor's `GradientButton`
+/// (bg_welcome_login_gradient).
+struct WelcomeGradientButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 16, weight: .bold))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(
+                LinearGradient(colors: [Color(hex: "#3B82F6"), Color(hex: "#6366F1"), Color(hex: "#A855F7")],
+                               startPoint: .leading, endPoint: .trailing)
+            )
+            .clipShape(Capsule())
+            .opacity(configuration.isPressed ? 0.9 : 1)
+    }
+}
+
+private enum AuthPalette {
+    static let tagline = Color(hex: "#8A93B2")
+    static let createBorder = Color(hex: "#2B3B63")
+    static let link = Color(hex: "#5B8DEF")
+}
+
+private let supportEmail = "support@anokix.com"
+private let supportSubject = "Support Request – anokiX Trader"
+
+private func openSupportMail() {
+    let subject = supportSubject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+    if let url = URL(string: "mailto:\(supportEmail)?subject=\(subject)"),
+       UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+    }
+}
+
 // MARK: - Splash
 
 struct SplashView: View {
@@ -11,16 +48,14 @@ struct SplashView: View {
     var body: some View {
         ZStack {
             Brand.loginBg.ignoresSafeArea()
-            VStack(spacing: 18) {
-                BrandMark(size: 92)
-                Text("AnokiX Trader")
-                    .font(.system(size: 26, weight: .bold))
+            VStack(spacing: 16) {
+                Image("LogoWhite")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 210, height: 76)
+                Text("Trader App")
+                    .font(.system(size: 17))
                     .foregroundColor(.white)
-                Text("Africa's Commerce, Payments & Merchant Growth Ecosystem")
-                    .font(.system(size: 13))
-                    .foregroundColor(Brand.purpleTextLt)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 48)
             }
             .scaleEffect(scale)
             .opacity(opacity)
@@ -34,7 +69,8 @@ struct SplashView: View {
     }
 }
 
-/// The anokiX rounded-square logo mark with an "aX" monogram.
+/// The anokiX rounded-square logo mark with an "aX" monogram. Still used by the
+/// side drawer; the auth screens now use the real LogoWhite artwork instead.
 struct BrandMark: View {
     var size: CGFloat = 64
     var body: some View {
@@ -61,42 +97,46 @@ struct WelcomeView: View {
             Brand.loginBg.ignoresSafeArea()
             VStack(spacing: 0) {
                 Spacer()
-                BrandMark(size: 96)
+                Image("welcome_storefront")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 150)
                 Text("Welcome to anokiX")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
-                    .padding(.top, 24)
+                    .padding(.top, 22)
                 Text("Africa's Commerce, Payments & Merchant Growth Ecosystem")
-                    .font(.system(size: 14))
-                    .foregroundColor(Brand.purpleTextLt)
+                    .font(.system(size: 15))
+                    .foregroundColor(AuthPalette.tagline)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .padding(.top, 10)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 12)
                 Spacer()
 
-                VStack(spacing: 14) {
+                VStack(spacing: 16) {
                     Button("Login") { session.stage = .login }
-                        .buttonStyle(PrimaryButtonStyle())
+                        .buttonStyle(WelcomeGradientButtonStyle())
 
-                    Button {
-                        session.stage = .register
-                    } label: {
+                    Button { session.stage = .register } label: {
                         Text("Create Account")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(Brand.success)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.4), lineWidth: 1))
+                            .frame(height: 56)
+                            .overlay(Capsule().stroke(AuthPalette.createBorder, lineWidth: 1.5))
                     }
 
-                    HStack(spacing: 4) {
-                        Text("Need Help?").foregroundColor(Brand.purpleTextLt)
-                        Text("Support Centre").foregroundColor(.white).fontWeight(.semibold)
+                    Button { openSupportMail() } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "headphones").foregroundColor(AuthPalette.tagline)
+                            Text("Need Help? ").foregroundColor(AuthPalette.tagline)
+                                + Text("Support Centre").foregroundColor(AuthPalette.link).bold()
+                        }
+                        .font(.system(size: 14))
                     }
-                    .font(.system(size: 13))
                     .padding(.top, 6)
                 }
-                .padding(.horizontal, 28)
+                .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
         }
@@ -110,29 +150,37 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
+    @State private var emailTab = true
+    @State private var toastMsg: String?
 
     var body: some View {
         ZStack {
             Brand.loginBg.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 0) {
-                    BrandMark(size: 76).padding(.top, 60)
+                    Image("LogoWhite")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 190, height: 60)
+                        .padding(.top, 56)
                     Text("Welcome back")
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
-                        .padding(.top, 20)
+                        .padding(.top, 22)
                     Text("Sign in to your trader account")
                         .font(.system(size: 14))
-                        .foregroundColor(Brand.purpleTextLt)
+                        .foregroundColor(AuthPalette.tagline)
                         .padding(.top, 6)
 
                     VStack(spacing: 16) {
+                        tabs
+
                         field(title: "Email", text: $email, placeholder: "you@business.co.za",
                               keyboard: .emailAddress)
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Password").font(.system(size: 13, weight: .medium))
-                                .foregroundColor(Brand.purpleTextLt)
+                                .foregroundColor(AuthPalette.tagline)
                             HStack {
                                 Group {
                                     if showPassword { TextField("••••••••", text: $password) }
@@ -141,7 +189,7 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                                 Button { showPassword.toggle() } label: {
                                     Image(systemName: showPassword ? "eye.slash" : "eye")
-                                        .foregroundColor(Brand.purpleTextLt)
+                                        .foregroundColor(AuthPalette.tagline)
                                 }
                             }
                             .padding(14)
@@ -153,18 +201,18 @@ struct LoginView: View {
                         Button("Sign In") {
                             session.signIn(email: email, password: password)
                         }
-                        .buttonStyle(PrimaryButtonStyle())
+                        .buttonStyle(WelcomeGradientButtonStyle())
                         .padding(.top, 4)
 
-                        Text("Forgot password?")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(Brand.purpleTextLt)
+                        Button { toastMsg = "Password reset coming soon" } label: {
+                            Text("Forgot password?")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(AuthPalette.tagline)
+                        }
 
-                        Button {
-                            session.stage = .register
-                        } label: {
+                        Button { session.stage = .register } label: {
                             HStack(spacing: 4) {
-                                Text("New to anokiX?").foregroundColor(Brand.purpleTextLt)
+                                Text("New to anokiX?").foregroundColor(AuthPalette.tagline)
                                 Text("Create Account").foregroundColor(.white).fontWeight(.semibold)
                             }
                             .font(.system(size: 13))
@@ -178,13 +226,39 @@ struct LoginView: View {
                     .padding(.top, 28)
                 }
             }
+            .toast($toastMsg)
+        }
+    }
+
+    private var tabs: some View {
+        HStack(spacing: 0) {
+            tabButton("Email", active: emailTab) { emailTab = true }
+            tabButton("Phone", active: !emailTab) {
+                emailTab = false
+                toastMsg = "Phone login coming soon"
+            }
+        }
+        .padding(4)
+        .background(Color.white.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func tabButton(_ title: String, active: Bool, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(active ? .white : AuthPalette.tagline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(active ? Brand.purple : Color.clear)
+                .clipShape(RoundedRectangle(cornerRadius: 9))
         }
     }
 
     private func field(title: String, text: Binding<String>, placeholder: String,
                        keyboard: UIKeyboardType) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.purpleTextLt)
+            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(AuthPalette.tagline)
             TextField(placeholder, text: text)
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(.never)
