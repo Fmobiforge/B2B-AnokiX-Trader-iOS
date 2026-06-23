@@ -415,13 +415,12 @@ struct MarketplaceRealView: View {
 struct BannerCard: View {
     let banner: BannerDTO
     private let bannerHeight: CGFloat = 180
-    @State private var isInViewport = true
 
     var body: some View {
         Color.clear
             .frame(maxWidth: .infinity)
             .frame(height: bannerHeight)
-            .overlay { media.compositingGroup() }
+            .overlay { media }
             .overlay {
                 LinearGradient(colors: [.clear, .black.opacity(0.55)],
                                startPoint: .top, endPoint: .bottom)
@@ -429,16 +428,13 @@ struct BannerCard: View {
             .overlay(alignment: .bottomLeading) { caption }
             .clipShape(RoundedRectangle(cornerRadius: 18))
             .padding(.horizontal, 2)
-            .trackViewportVisibility($isInViewport)
     }
 
     @ViewBuilder
     private var media: some View {
         Group {
-            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }), isInViewport {
-                LoopingVideoView(url: url, isActive: isInViewport)
-            } else if banner.isVideo {
-                bannerPlaceholder
+            if banner.isVideo, let url = banner.mediaURL.flatMap({ URL(string: $0) }) {
+                VideoThumbnailView(url: url)
             } else if let url = banner.mediaURL, !url.isEmpty {
                 RemoteImage(url: url)
             } else {

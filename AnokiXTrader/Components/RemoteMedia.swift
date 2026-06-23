@@ -22,12 +22,52 @@ struct RemoteImage: View {
     }
 }
 
-/// Muted, auto-looping inline video for banners.
+/// First-frame poster for video banners inside scroll views.
 ///
-/// `AVPlayerLayer` must not stay active while its parent scrolls off-screen — on
-/// some GPUs (notably nested simulators) the layer keeps painting and causes
-/// overlap/noise. Pass `isActive = false` or remove this view from the hierarchy
-/// when the banner is not visible.
+/// Inline `AVPlayerLayer` playback corrupts compositing when nested in a vertical
+/// `ScrollView` (common on VMware / nested iOS simulators). A static thumbnail
+/// avoids hardware-layer ghosting while still showing the video's opening frame.
+struct VideoThumbnailView: View {
+    let url: URL
+    @State private var thumbnail: UIImage?
+
+    var body: some View {
+        Group {
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                LinearGradient(colors: [Brand.purple, Brand.purpleDark],
+                               startPoint: .leading, endPoint: .trailing)
+            }
+        }
+        .task(id: url) {
+            thumbnail = await Self.generateThumbnail(from: url)
+        }
+    }
+
+    private static func generateThumbnail(from url: URL) async -> UIImage? {
+        let asset = AVURLAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: 960, height: 540)
+        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+
+        return await withCheckedContinuation { continuation in
+            generator.generateCGImageAsynchronously(for: time) { cgImage, _, _ in
+                if let cgImage {
+                    continuation.resume(returning: UIImage(cgImage: cgImage))
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+}
+
+/// Muted, auto-looping inline video — not used inside scroll views; kept for
+/// potential full-screen playback. See `VideoThumbnailView` for banner posters.
 struct LoopingVideoView: UIViewRepresentable {
     let url: URL
     var isActive: Bool = true

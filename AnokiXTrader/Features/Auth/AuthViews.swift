@@ -38,35 +38,45 @@ private func openSupportMail() {
     }
 }
 
+// MARK: - Launch screen layout (shared with LaunchScreen.storyboard)
+
+/// Mirrors `LaunchScreen.storyboard`: #000920 background, LogoWhite at 60% width,
+/// "Trader App" 18 pt below the logo, vertically centred with a −40 pt offset.
+private struct LaunchScreenContent: View {
+    var body: some View {
+        ZStack {
+            Brand.loginBg.ignoresSafeArea()
+
+            GeometryReader { geo in
+                VStack(spacing: 16) {
+                    Image("LogoWhite")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width * 0.6)
+                    Text("Trader App")
+                        .font(.system(size: 18))
+                        .foregroundColor(.white)
+                }
+                .frame(width: geo.size.width)
+                .position(x: geo.size.width / 2, y: geo.size.height / 2 - 40)
+            }
+        }
+    }
+}
+
 // MARK: - Splash
 
 struct SplashView: View {
     @EnvironmentObject var session: Session
-    @State private var scale: CGFloat = 0.8
-    @State private var opacity: Double = 0
 
     var body: some View {
-        ZStack {
-            Brand.loginBg.ignoresSafeArea()
-            VStack(spacing: 16) {
-                Image("LogoWhite")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 210, height: 76)
-                Text("Trader App")
-                    .font(.system(size: 17))
-                    .foregroundColor(.white)
+        LaunchScreenContent()
+            .preferredColorScheme(.dark)
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    withAnimation { session.bootFinished() }
+                }
             }
-            .scaleEffect(scale)
-            .opacity(opacity)
-        }
-        .preferredColorScheme(.dark)   // white status bar text on the dark splash
-        .onAppear {
-            withAnimation(.easeOut(duration: 0.6)) { scale = 1; opacity = 1 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                withAnimation { session.bootFinished() }
-            }
-        }
     }
 }
 
@@ -141,7 +151,7 @@ struct WelcomeView: View {
                 .padding(.bottom, 40)
             }
         }
-        .preferredColorScheme(.dark)   // white status bar text on the dark welcome
+        .preferredColorScheme(.dark)
     }
 }
 
