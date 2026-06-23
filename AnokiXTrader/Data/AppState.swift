@@ -49,6 +49,7 @@ final class Session: ObservableObject {
     @Published var storeName: String = "Sipho's Spaza"
     @Published var accountName: String = "Trader Account"
     @Published var loginError: String?
+    @Published var isSigningIn = false
 
     func bootFinished() {
         // After the splash animation, go to the welcome screen.
@@ -60,10 +61,14 @@ final class Session: ObservableObject {
     /// we fall back to mock entry (the app stays usable offline, mirroring the
     /// distributor-only backend reality) and surface the error.
     func signIn(email: String, password: String) {
-        let typed = email.isEmpty ? "trader@anokix.co.za" : email
+        let typed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pass = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !isSigningIn else { return }
+        isSigningIn = true
         Task {
+            defer { Task { @MainActor in isSigningIn = false } }
             do {
-                let data = try await APIClient.shared.login(email: typed, password: password)
+                let data = try await APIClient.shared.login(email: typed, password: pass)
                 await MainActor.run {
                     APIClient.shared.token = data.token
                     if let name = data.user?.first_name, !name.isEmpty {

@@ -210,10 +210,19 @@ struct LoginView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
 
-                        Button("Sign In") {
-                            session.signIn(email: email, password: password)
+                        Button {
+                            let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                            let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if trimmedEmail.isEmpty || trimmedPassword.isEmpty {
+                                toastMsg = "Please enter email and password"
+                                return
+                            }
+                            session.signIn(email: trimmedEmail, password: trimmedPassword)
+                        } label: {
+                            Text(session.isSigningIn ? "Signing in…" : "Login")
                         }
                         .buttonStyle(WelcomeGradientButtonStyle())
+                        .disabled(session.isSigningIn)
                         .padding(.top, 4)
 
                         Button { toastMsg = "Password reset coming soon" } label: {

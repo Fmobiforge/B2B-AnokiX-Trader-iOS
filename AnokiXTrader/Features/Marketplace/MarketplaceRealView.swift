@@ -5,7 +5,7 @@ import SwiftUI
 /// stack (which supplies the title + Close button); this view adds the cart action.
 struct MarketplaceRealView: View {
     @EnvironmentObject var router: Router
-    @ObservedObject private var store = MarketStore.shared
+    @EnvironmentObject var store: MarketStore
 
     @State private var search = ""
     @State private var activeSheet: ActiveSheet?
@@ -59,7 +59,9 @@ struct MarketplaceRealView: View {
         .background(Brand.background)
         .overlay { if store.loading && store.data == nil { ProgressView() } }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { cartButton }
+            ToolbarItem(placement: .topBarTrailing) {
+                CartToolbarButton(count: store.cartBadgeCount) { activeSheet = .cart }
+            }
         }
         .task {
             if store.data == nil { await store.loadAll() }
@@ -84,24 +86,7 @@ struct MarketplaceRealView: View {
         .toast($toastMsg)
     }
 
-    // MARK: - Cart button (with badge)
-
-    private var cartButton: some View {
-        Button { activeSheet = .cart } label: {
-            ZStack(alignment: .topTrailing) {
-                Image(systemName: "cart")
-                if store.cartCount > 0 {
-                    Text(store.cartCount > 99 ? "99+" : "\(store.cartCount)")
-                        .font(.system(size: 10, weight: .bold)).foregroundColor(.white)
-                        .padding(.horizontal, 5).padding(.vertical, 1)
-                        .background(Brand.danger).clipShape(Capsule())
-                        .offset(x: 10, y: -8)
-                }
-            }
-        }
-    }
-
-    // MARK: - Distributor card
+    // MARK: - Feature strip
 
     private var distributorCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -525,6 +510,37 @@ struct MarketCard: View {
             .background(Brand.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Brand.border, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Cart toolbar button (mirrors Android activity_marketplace.xml cartBadge)
+
+/// 48×48 hit target, 18 pt badge at top-trailing — same layout as Android's
+/// `cartButton` / `cartBadge` FrameLayout (badge hidden when count is 0).
+struct CartToolbarButton: View {
+    let count: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ZStack(alignment: .topTrailing) {
+                Image(systemName: "cart")
+                    .font(.system(size: 22))
+                    .frame(width: 28, height: 28)
+                if count > 0 {
+                    Text(count > 99 ? "99+" : "\(count)")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 18, minHeight: 18)
+                        .background(Brand.danger)
+                        .clipShape(Circle())
+                        .offset(x: 4, y: -2)
+                }
+            }
+            .frame(width: 48, height: 48)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

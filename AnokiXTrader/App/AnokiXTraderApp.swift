@@ -9,6 +9,7 @@ struct AnokiXTraderApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(session)
+                .environmentObject(MarketStore.shared)
                 .tint(Brand.purple)
         }
     }

@@ -30,6 +30,7 @@ struct MarketCartLine: Identifiable, Hashable {
 
 /// Loads the trader marketplace from the API and holds the local cart.
 /// Process-wide singleton — mirrors Android `MarketCart` (badge + My Cart source of truth).
+@MainActor
 final class MarketStore: ObservableObject {
     static let shared = MarketStore()
 
@@ -41,9 +42,11 @@ final class MarketStore: ObservableObject {
     @Published var error: String?
     @Published var selectedDistributorId: String?
     @Published private(set) var cart: [MarketCartLine] = []
+    /// Header badge count — mirrors Android `MarketCart.itemCount()` / `total_quantity`.
+    @Published private(set) var cartBadgeCount = 0
 
     var currency: String { data?.currencySymbol ?? "R" }
-    var cartCount: Int { cart.reduce(0) { $0 + $1.qty } }
+    var cartCount: Int { cartBadgeCount }
     var cartSubtotal: Double { cart.reduce(0) { $0 + $1.lineTotal } }
     var parentCategories: [ProductCategoryDTO] { categories.filter { $0.parent_id == nil } }
 
@@ -53,24 +56,23 @@ final class MarketStore: ObservableObject {
     }
 
     func load(distributorId: String?) async {
-        await MainActor.run { loading = true; error = nil }
+        loading = true
+        error = nil
         do {
             let result = try await APIClient.shared.getMarketplace(distributorId: distributorId)
-            await MainActor.run {
-                data = result
-                if let sel = result.selected_distributor { selectedDistributorId = String(sel.id) }
-                loading = false
-            }
+            data = result
+            if let sel = result.selected_distributor { selectedDistributorId = String(sel.id) }
+            loading = false
         } catch {
             let msg = (error as? LocalizedError)?.errorDescription ?? "Could not load marketplace."
-            await MainActor.run { self.error = msg; loading = false }
+            self.error = msg
+            loading = false
         }
     }
 
     func loadCategories() async {
         if let ref = try? await APIClient.shared.getReference() {
-            let cats = ref.product_categories ?? []
-            await MainActor.run { categories = cats }
+            categories = ref.product_categories ?? []
         }
     }
 
@@ -98,10 +100,17 @@ final class MarketStore: ObservableObject {
                                       imageURL: p?.image_url, barcode: p?.barcode, sku: p?.sku,
                                       unitPrice: item.unitPrice, qty: item.quantity, cartItemId: item.id)
             }
-            await MainActor.run { self.cart = lines }
+            cart = lines
+            cartBadgeCount = data.totalQuantity > 0
+                ? data.totalQuantity
+                : lines.reduce(0) { $0 + $1.qty }
         } catch {
             // Keep the local mirror on failure (same as Android).
         }
+    }
+
+    private func syncBadgeFromCart() {
+        cartBadgeCount = cart.reduce(0) { $0 + $1.qty }
     }
 
     @discardableResult
@@ -111,6 +120,7 @@ final class MarketStore: ObservableObject {
             cart[idx].qty += qty
             cart[idx].unitPrice = price
             syncAdd(product, qty: qty, price: price)
+            syncBadgeFromCart()
             return cart[idx]
         }
         let line = MarketCartLine(id: product.id, name: product.name ?? "",
@@ -118,6 +128,7 @@ final class MarketStore: ObservableObject {
                                   sku: product.sku, unitPrice: price, qty: qty, cartItemId: nil)
         cart.append(line)
         syncAdd(product, qty: qty, price: price)
+        syncBadgeFromCart()
         return line
     }
 
@@ -130,12 +141,14 @@ final class MarketStore: ObservableObject {
             cart[idx].qty = qty
             syncUpdate(cart[idx])
         }
+        syncBadgeFromCart()
     }
 
     func remove(_ id: String) {
         guard let idx = cart.firstIndex(where: { $0.id == id }) else { return }
         let removed = cart.remove(at: idx)
         syncDelete(removed)
+        syncBadgeFromCart()
     }
 
     // Server sync, then re-pull so the local cart reconciles with the backend

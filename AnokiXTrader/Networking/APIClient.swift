@@ -27,18 +27,26 @@ struct MultipartFile {
 
 /// Thin async wrapper over **Alamofire** that mirrors the Android `ApiClient` /
 /// `Http`. Same base URL and endpoint paths; Bearer token attached when present.
-/// Every AX endpoint returns the envelope `{ status, message, data }`; we validate
-/// `status` once with **SwiftyJSON** and hand the `data` node to each endpoint.
-/// Codable DTOs are decoded from that node; the loosely-typed cart payload is read
-/// directly via SwiftyJSON (no number-vs-string coercion headaches).
+/// Token is persisted in UserDefaults (Android `SessionManager` / SharedPreferences).
 final class APIClient {
     static let shared = APIClient()
 
     /// Matches the Android `ApiClient.BASE_URL`.
     let baseURL = "http://155.117.20.51/ax/"
 
-    /// Set after a successful login; nil before.
-    var token: String?
+    private static let tokenKey = "auth_token"
+
+    /// Set after a successful login; restored on next launch.
+    var token: String? {
+        get { UserDefaults.standard.string(forKey: Self.tokenKey) }
+        set {
+            if let newValue, !newValue.isEmpty {
+                UserDefaults.standard.set(newValue, forKey: Self.tokenKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Self.tokenKey)
+            }
+        }
+    }
 
     private init() {}
 

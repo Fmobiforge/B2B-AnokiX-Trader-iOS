@@ -31,6 +31,7 @@ struct MainTabView: View {
             ModuleHost(module: module)
                 .environmentObject(router)
                 .environmentObject(session)
+                .environmentObject(MarketStore.shared)
         }
     }
 

@@ -200,6 +200,21 @@ struct ProductDTO: Decodable, Identifiable, Hashable {
 
 // MARK: - Cart (GET /api/trader/cart)
 
+private extension JSON {
+    /// Reads a JSON scalar as String whether the backend sent `"16"` or `16`.
+    var scalarString: String {
+        if let s = string { return s }
+        if type == .number { return stringValue }
+        return stringValue
+    }
+
+    var optionalScalarString: String? {
+        if type == .null || !exists() { return nil }
+        let v = scalarString
+        return v.isEmpty ? nil : v
+    }
+}
+
 /// The cart endpoint returns numeric `id` / prices (e.g. `id: 24`,
 /// `selling_price: 20`), whereas the marketplace endpoint returns them as
 /// strings. SwiftyJSON's `.stringValue` / `.intValue` / `.doubleValue` coerce
@@ -238,8 +253,8 @@ struct CartItemDTO {
     let distributor: CartDistributorDTO?
 
     init(json: JSON) {
-        id = json["cart_item_id"].string ?? json["id"].stringValue
-        productId = json["product_id"].exists() ? json["product_id"].stringValue : nil
+        id = json["cart_item_id"].optionalScalarString ?? json["id"].scalarString
+        productId = json["product_id"].optionalScalarString
         quantity = json["quantity"].intValue
         let p = json["product"].exists() ? CartProductDTO(json: json["product"]) : nil
         product = p
@@ -264,10 +279,10 @@ struct CartProductDTO {
     let promotion_price: Double?
 
     init(json: JSON) {
-        id = json["id"].exists() ? json["id"].stringValue : nil
+        id = json["id"].optionalScalarString
         name = json["name"].string
-        sku = json["sku"].exists() ? json["sku"].stringValue : nil
-        barcode = json["barcode"].exists() ? json["barcode"].stringValue : nil
+        sku = json["sku"].optionalScalarString
+        barcode = json["barcode"].optionalScalarString
         brand_name = json["brand_name"].string
         category_title = json["category_title"].string
         parent_category_title = json["parent_category_title"].string
