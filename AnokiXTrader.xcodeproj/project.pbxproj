@@ -6,256 +6,738 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		AX00000000000000000002 /* AnokiXTrader */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AnokiXTrader; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
+/* Begin PBXBuildFile section */
+		0095424E02EAEFB39A1D6877 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F75C1AF3A56E1801EF1281F /* Router.swift */; };
+		089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBED6C6 /* AirtimeView.swift */; };
+		2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */; };
+		2B0A5E1DE37F58E50443486D /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C719EC9CD9BDEABDF7BC9BD /* OrderDetailView.swift */; };
+		2BBB560DC6A5E17B88852897 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EC97510470126022012D6C /* MoreView.swift */; };
+		2E0B39DF03179E89939D61E9 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6DAFD016859ED78D8D45E23 /* CartView.swift */; };
+		2E51E622B0213BC63968E4D7 /* SellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7082192B3DDD613321065A12 /* SellView.swift */; };
+		3659A9B45D723EFE347AB8FE /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85815C108EB14B5430C3EA /* DashboardView.swift */; };
+		3725C1D11D64A40150C99D62 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CFF0CFD267320664843B8F /* AppState.swift */; };
+		3887FFC6ED09477F1F8C95F2 /* Charts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A7CB16714ECF11A5961575 /* Charts.swift */; };
+		3A2F4D5365967A41D93C6778 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */; };
+		41D6B2D1E0FEF1819044BA23 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51577DA880A26AF354B85026 /* OrdersView.swift */; };
+		43BB7263DC1BFDC76A26F7B5 /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65DC1F1908F16554337AF74 /* DTOs.swift */; };
+		458BC0E954255207E98812AC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B9CD271808E91C6276A68A /* Theme.swift */; };
+		47EB84CABA03F85959AFDC9E /* AuthViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40821D1A0F4B489085DF015 /* AuthViews.swift */; };
+		48B95C52921CAC08C9EF7EEB /* DrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53374834E1AC2497ECAEA4B /* DrawerView.swift */; };
+		4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33EB8CFD0367FAAB3893276F /* WalletView.swift */; };
+		4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06637A2B06D216E2F1B0658 /* RegisterStore.swift */; };
+		677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB04209 /* SupportView.swift */; };
+		6CA2E6E526E270A298991A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */; };
+		71844F7684117EB002D5CDBC /* Pods_AnokiXTrader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49EA0089CE0919B049A5A418 /* Pods_AnokiXTrader.framework */; };
+		721EE0D0B8ABD611948249E1 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */; };
+		779D758D64356A4B138522C7 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CCBD2699E321399EB3D035E /* RegisterView.swift */; };
+		7C8D94F78A8E396E4A838BBB /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */; };
+		8B2973FA1A1854CC67DC6532 /* MarketStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1651A2A75A0267F8B90A490 /* MarketStore.swift */; };
+		932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CD2B00377D56966727ED1C /* SettingsView.swift */; };
+		94177D83E04817A5B54F474E /* MarketplaceRealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */; };
+		98732CBDF84F3E17ABBBEEA5 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F612DF0751C5C28CA0A656 /* MockData.swift */; };
+		9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A20C9413C35FB20B0B107 /* FormControls.swift */; };
+		A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */; };
+		AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C23167F101A111EA84DC70 /* ImagePicker.swift */; };
+		AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */; };
+		B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45ABCF6DDF19CCCBC918459 /* APIClient.swift */; };
+		B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */; };
+		BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */; };
+		BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F35932C814CC82ABBC7B893 /* ListModules.swift */; };
+		CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DE3F070404C0632ED5C5B /* Rows.swift */; };
+		DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD2 /* RewardsView.swift */; };
+		E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578A29E /* ReportsView.swift */; };
+		FB273E1B2ED6995D98E62D35 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4F80FD3B29A95F61A789B4 /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		11CD2B00377D56966727ED1C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		1A47C4FD93E9A214C578A29E /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		30EC97510470126022012D6C /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		33EB8CFD0367FAAB3893276F /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
+		34C23167F101A111EA84DC70 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceView.swift; sourceTree = "<group>"; };
+		3D85815C108EB14B5430C3EA /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		3F4F80FD3B29A95F61A789B4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		3F75C1AF3A56E1801EF1281F /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		465CE43776F591B49FFE0E6C /* Pods-AnokiXTrader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.debug.xcconfig"; sourceTree = "<group>"; };
+		480ADE15FE92A9892833F379 /* AnokiXTrader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXTrader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		49EA0089CE0919B049A5A418 /* Pods_AnokiXTrader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXTrader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		51577DA880A26AF354B85026 /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
+		51A7CB16714ECF11A5961575 /* Charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Charts.swift; sourceTree = "<group>"; };
+		5F35932C814CC82ABBC7B893 /* ListModules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListModules.swift; sourceTree = "<group>"; };
+		608FEEC642C83E3A7CB04209 /* SupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportView.swift; sourceTree = "<group>"; };
+		626A29BDE53D18E971A04DB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnokiXTraderApp.swift; sourceTree = "<group>"; };
+		7082192B3DDD613321065A12 /* SellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SellView.swift; sourceTree = "<group>"; };
+		72B9CD271808E91C6276A68A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceRealView.swift; sourceTree = "<group>"; };
+		7CCBD2699E321399EB3D035E /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		81F612DF0751C5C28CA0A656 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
+		8D9DE3F070404C0632ED5C5B /* Rows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rows.swift; sourceTree = "<group>"; };
+		9C719EC9CD9BDEABDF7BC9BD /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
+		A40821D1A0F4B489085DF015 /* AuthViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViews.swift; sourceTree = "<group>"; };
+		A53374834E1AC2497ECAEA4B /* DrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerView.swift; sourceTree = "<group>"; };
+		A54A20C9413C35FB20B0B107 /* FormControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControls.swift; sourceTree = "<group>"; };
+		AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		B2A359960B6FAE485204DC48 /* Pods-AnokiXTrader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.release.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.release.xcconfig"; sourceTree = "<group>"; };
+		BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
+		C0CFF0CFD267320664843B8F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C1651A2A75A0267F8B90A490 /* MarketStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketStore.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBED6C6 /* AirtimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeView.swift; sourceTree = "<group>"; };
+		D6DAFD016859ED78D8D45E23 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
+		E06637A2B06D216E2F1B0658 /* RegisterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterStore.swift; sourceTree = "<group>"; };
+		E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E45ABCF6DDF19CCCBC918459 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		E65DC1F1908F16554337AF74 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
+		E9B441A49508967E56949CD2 /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
+		F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		AX00000000000000000003 /* Frameworks */ = {
+		6F3BCC5FA8583F68D63B5C8F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71844F7684117EB002D5CDBC /* Pods_AnokiXTrader.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AX00000000000000000001 = {
+		01ED189505919B549FB88CDF /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
-				AX00000000000000000002 /* AnokiXTrader */,
-				AX00000000000000000005 /* Products */,
+				FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		09BE5CAD536DA657D6AC516D /* Orders */ = {
+			isa = PBXGroup;
+			children = (
+				9C719EC9CD9BDEABDF7BC9BD /* OrderDetailView.swift */,
+				51577DA880A26AF354B85026 /* OrdersView.swift */,
+			);
+			path = Orders;
+			sourceTree = "<group>";
+		};
+		105F701C93DD7C184B88DA95 /* Airtime */ = {
+			isa = PBXGroup;
+			children = (
+				D3DE53611F2413423FBED6C6 /* AirtimeView.swift */,
+			);
+			path = Airtime;
+			sourceTree = "<group>";
+		};
+		34A76ECF5B4F0863E9AA3CEB /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3F4F80FD3B29A95F61A789B4 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		350A4D40187E3A7C5296A489 /* AnokiXTrader */ = {
+			isa = PBXGroup;
+			children = (
+				E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */,
+				626A29BDE53D18E971A04DB6 /* Info.plist */,
+				E6481AF9593DEE3047A7A741 /* App */,
+				91F34879D5A537B8E39490D3 /* Components */,
+				BC255FE294B6E5632FDB3737 /* Data */,
+				756C23A3BD8E77A123F7C68B /* Features */,
+				34A76ECF5B4F0863E9AA3CEB /* Models */,
+				35AF22190F39D1D86F1A19B4 /* Networking */,
+				8106EAE82BEF650216F6E54E /* Theme */,
+			);
+			path = AnokiXTrader;
+			sourceTree = "<group>";
+		};
+		358157AE6940D676FA4C820C /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				608FEEC642C83E3A7CB04209 /* SupportView.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		35AF22190F39D1D86F1A19B4 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				E45ABCF6DDF19CCCBC918459 /* APIClient.swift */,
+				E65DC1F1908F16554337AF74 /* DTOs.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		37528076F7B76F6F73F76291 = {
+			isa = PBXGroup;
+			children = (
+				350A4D40187E3A7C5296A489 /* AnokiXTrader */,
+				A03BFA308D2320DDBD9096FC /* Products */,
+				994B9528D7E9AD75DA80C7BB /* Pods */,
+				762407A4D76B44CAF0FC9E99 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		AX00000000000000000005 /* Products */ = {
+		3F6CB3A86AA2E93230228B79 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
-				AX00000000000000000007 /* AnokiXTrader.app */,
+				3D85815C108EB14B5430C3EA /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		5ADF866F96A128593D09FCCA /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		5AF9FA0D12B9D0669D4AA940 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				A53374834E1AC2497ECAEA4B /* DrawerView.swift */,
+				13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */,
+				30EC97510470126022012D6C /* MoreView.swift */,
+				3F75C1AF3A56E1801EF1281F /* Router.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		667B1DD49AD1B4A54DD61CB4 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				5F35932C814CC82ABBC7B893 /* ListModules.swift */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		6AFB62BB26E7825D3C7C5D67 /* Inventory */ = {
+			isa = PBXGroup;
+			children = (
+				AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */,
+			);
+			path = Inventory;
+			sourceTree = "<group>";
+		};
+		756C23A3BD8E77A123F7C68B /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				105F701C93DD7C184B88DA95 /* Airtime */,
+				5ADF866F96A128593D09FCCA /* Analytics */,
+				DAEA340379A1B59D9733D0F0 /* Auth */,
+				3F6CB3A86AA2E93230228B79 /* Dashboard */,
+				6AFB62BB26E7825D3C7C5D67 /* Inventory */,
+				5AF9FA0D12B9D0669D4AA940 /* Main */,
+				B05F20D1F87FD4B18FBB69ED /* Marketplace */,
+				667B1DD49AD1B4A54DD61CB4 /* Modules */,
+				01ED189505919B549FB88CDF /* Notifications */,
+				09BE5CAD536DA657D6AC516D /* Orders */,
+				C757C805EBF59FB2AFAA0F7F /* Reports */,
+				E92BF74EBA358C1F946B514D /* Rewards */,
+				C571E0BFEB3B5853FAB32160 /* Sell */,
+				79FBC6A258795BB76854C21E /* Settings */,
+				358157AE6940D676FA4C820C /* Support */,
+				9EDCB7D214B49EE4323357E9 /* Wallet */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		762407A4D76B44CAF0FC9E99 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				49EA0089CE0919B049A5A418 /* Pods_AnokiXTrader.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		79FBC6A258795BB76854C21E /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				11CD2B00377D56966727ED1C /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		8106EAE82BEF650216F6E54E /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				72B9CD271808E91C6276A68A /* Theme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		91F34879D5A537B8E39490D3 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				51A7CB16714ECF11A5961575 /* Charts.swift */,
+				A54A20C9413C35FB20B0B107 /* FormControls.swift */,
+				34C23167F101A111EA84DC70 /* ImagePicker.swift */,
+				8D9DE3F070404C0632ED5C5B /* Rows.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		994B9528D7E9AD75DA80C7BB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				465CE43776F591B49FFE0E6C /* Pods-AnokiXTrader.debug.xcconfig */,
+				B2A359960B6FAE485204DC48 /* Pods-AnokiXTrader.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		9EDCB7D214B49EE4323357E9 /* Wallet */ = {
+			isa = PBXGroup;
+			children = (
+				33EB8CFD0367FAAB3893276F /* WalletView.swift */,
+			);
+			path = Wallet;
+			sourceTree = "<group>";
+		};
+		A03BFA308D2320DDBD9096FC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				480ADE15FE92A9892833F379 /* AnokiXTrader.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B05F20D1F87FD4B18FBB69ED /* Marketplace */ = {
+			isa = PBXGroup;
+			children = (
+				D6DAFD016859ED78D8D45E23 /* CartView.swift */,
+				7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */,
+				38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */,
+				C1651A2A75A0267F8B90A490 /* MarketStore.swift */,
+				DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */,
+			);
+			path = Marketplace;
+			sourceTree = "<group>";
+		};
+		BC255FE294B6E5632FDB3737 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				C0CFF0CFD267320664843B8F /* AppState.swift */,
+				81F612DF0751C5C28CA0A656 /* MockData.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		C571E0BFEB3B5853FAB32160 /* Sell */ = {
+			isa = PBXGroup;
+			children = (
+				BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */,
+				7082192B3DDD613321065A12 /* SellView.swift */,
+			);
+			path = Sell;
+			sourceTree = "<group>";
+		};
+		C757C805EBF59FB2AFAA0F7F /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				1A47C4FD93E9A214C578A29E /* ReportsView.swift */,
+			);
+			path = Reports;
+			sourceTree = "<group>";
+		};
+		DAEA340379A1B59D9733D0F0 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				A40821D1A0F4B489085DF015 /* AuthViews.swift */,
+				E06637A2B06D216E2F1B0658 /* RegisterStore.swift */,
+				7CCBD2699E321399EB3D035E /* RegisterView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		E6481AF9593DEE3047A7A741 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E92BF74EBA358C1F946B514D /* Rewards */ = {
+			isa = PBXGroup;
+			children = (
+				E9B441A49508967E56949CD2 /* RewardsView.swift */,
+			);
+			path = Rewards;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AX00000000000000000006 /* AnokiXTrader */ = {
+		6F53E68F24F7CCB590DA2FDF /* AnokiXTrader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AX0000000000000000000A /* Build configuration list for PBXNativeTarget "AnokiXTrader" */;
+			buildConfigurationList = DC637E665592A8178E1D1211 /* Build configuration list for PBXNativeTarget "AnokiXTrader" */;
 			buildPhases = (
-				AX00000000000000000004 /* Sources */,
-				AX00000000000000000003 /* Frameworks */,
-				AX00000000000000000008 /* Resources */,
+				8F925C5CE94E192308CA025E /* [CP] Check Pods Manifest.lock */,
+				9B7ECE0C125BAB8B092E47CA /* Sources */,
+				052DFADCF26CAAC1E67112D3 /* Resources */,
+				6F3BCC5FA8583F68D63B5C8F /* Frameworks */,
+				64C5C7C80AD3CCCA98EC4EE4 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				AX00000000000000000002 /* AnokiXTrader */,
-			);
 			name = AnokiXTrader;
 			productName = AnokiXTrader;
-			productReference = AX00000000000000000007 /* AnokiXTrader.app */;
+			productReference = 480ADE15FE92A9892833F379 /* AnokiXTrader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		AX00000000000000000000 /* Project object */ = {
+		E2E37A104D6011EA741173B8 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					AX00000000000000000006 = {
-						CreatedOnToolsVersion = 16.0;
+					6F53E68F24F7CCB590DA2FDF = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = AX0000000000000000000D /* Build configuration list for PBXProject "AnokiXTrader" */;
-			compatibilityVersion = "Xcode 15.0";
+			buildConfigurationList = F86D5DE2CEE43B6E6F74299D /* Build configuration list for PBXProject "AnokiXTrader" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				en,
 			);
-			mainGroup = AX00000000000000000001;
-			productRefGroup = AX00000000000000000005 /* Products */;
+			mainGroup = 37528076F7B76F6F73F76291;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A03BFA308D2320DDBD9096FC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AX00000000000000000006 /* AnokiXTrader */,
+				6F53E68F24F7CCB590DA2FDF /* AnokiXTrader */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		AX00000000000000000008 /* Resources */ = {
+		052DFADCF26CAAC1E67112D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CA2E6E526E270A298991A49 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		64C5C7C80AD3CCCA98EC4EE4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8F925C5CE94E192308CA025E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AnokiXTrader-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		AX00000000000000000004 /* Sources */ = {
+		9B7ECE0C125BAB8B092E47CA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */,
+				089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */,
+				2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */,
+				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,
+				3725C1D11D64A40150C99D62 /* AppState.swift in Sources */,
+				47EB84CABA03F85959AFDC9E /* AuthViews.swift in Sources */,
+				2E0B39DF03179E89939D61E9 /* CartView.swift in Sources */,
+				3887FFC6ED09477F1F8C95F2 /* Charts.swift in Sources */,
+				7C8D94F78A8E396E4A838BBB /* CheckoutView.swift in Sources */,
+				43BB7263DC1BFDC76A26F7B5 /* DTOs.swift in Sources */,
+				3659A9B45D723EFE347AB8FE /* DashboardView.swift in Sources */,
+				48B95C52921CAC08C9EF7EEB /* DrawerView.swift in Sources */,
+				9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */,
+				AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */,
+				B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */,
+				BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */,
+				3A2F4D5365967A41D93C6778 /* MainTabView.swift in Sources */,
+				8B2973FA1A1854CC67DC6532 /* MarketStore.swift in Sources */,
+				94177D83E04817A5B54F474E /* MarketplaceRealView.swift in Sources */,
+				721EE0D0B8ABD611948249E1 /* MarketplaceView.swift in Sources */,
+				98732CBDF84F3E17ABBBEEA5 /* MockData.swift in Sources */,
+				FB273E1B2ED6995D98E62D35 /* Models.swift in Sources */,
+				2BBB560DC6A5E17B88852897 /* MoreView.swift in Sources */,
+				BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */,
+				2B0A5E1DE37F58E50443486D /* OrderDetailView.swift in Sources */,
+				41D6B2D1E0FEF1819044BA23 /* OrdersView.swift in Sources */,
+				AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */,
+				4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */,
+				779D758D64356A4B138522C7 /* RegisterView.swift in Sources */,
+				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
+				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
+				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,
+				CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */,
+				2E51E622B0213BC63968E4D7 /* SellView.swift in Sources */,
+				932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */,
+				677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */,
+				458BC0E954255207E98812AC /* Theme.swift in Sources */,
+				4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		AX0000000000000000000B /* Debug */ = {
+		0464EAD31C31DA38F728A6A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 465CE43776F591B49FFE0E6C /* Pods-AnokiXTrader.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AnokiXTrader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.trader;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BD5476E3E29C05D58D7A2B76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B2A359960B6FAE485204DC48 /* Pods-AnokiXTrader.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AnokiXTrader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.trader;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BF6E63B0C4BD30355368752A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
 				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		AX0000000000000000000C /* Release */ = {
+		ED0B67D1D6AE7DEAA5F55355 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		AX0000000000000000000E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AnokiXTrader/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.trader;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		AX0000000000000000000F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AnokiXTrader/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.trader;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AX0000000000000000000A /* Build configuration list for PBXNativeTarget "AnokiXTrader" */ = {
+		DC637E665592A8178E1D1211 /* Build configuration list for PBXNativeTarget "AnokiXTrader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AX0000000000000000000E /* Debug */,
-				AX0000000000000000000F /* Release */,
+				0464EAD31C31DA38F728A6A3 /* Debug */,
+				BD5476E3E29C05D58D7A2B76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		AX0000000000000000000D /* Build configuration list for PBXProject "AnokiXTrader" */ = {
+		F86D5DE2CEE43B6E6F74299D /* Build configuration list for PBXProject "AnokiXTrader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AX0000000000000000000B /* Debug */,
-				AX0000000000000000000C /* Release */,
+				BF6E63B0C4BD30355368752A /* Debug */,
+				ED0B67D1D6AE7DEAA5F55355 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = AX00000000000000000000 /* Project object */;
+	rootObject = E2E37A104D6011EA741173B8 /* Project object */;
 }
