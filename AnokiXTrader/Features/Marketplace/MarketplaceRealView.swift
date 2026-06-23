@@ -27,7 +27,7 @@ struct MarketplaceRealView: View {
         }
     }
 
-    private let bannerTimer = Timer.publish(every: 4.5, on: .main, in: .common).autoconnect()
+    private let bannerTimer = Timer.publish(every: 8.0, on: .main, in: .common).autoconnect()
     private let summaryGrid = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
 
     var body: some View {
