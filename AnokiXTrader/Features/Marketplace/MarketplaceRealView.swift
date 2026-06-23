@@ -174,19 +174,38 @@ struct MarketplaceRealView: View {
 
     // MARK: - Banner slider
 
+    /// Custom carousel. A page-style `TabView` inside a vertical `ScrollView`
+    /// renders corrupted and overlaps neighbouring content, so we show one banner
+    /// at a time (cross-fade on `.id` change), auto-advance on the timer, and put
+    /// tappable page dots in their own row *below* the banner (never overlapping).
     @ViewBuilder
     private var bannerSlider: some View {
         if let banners = store.data?.banners, !banners.isEmpty {
-            TabView(selection: $bannerIndex) {
-                ForEach(Array(banners.enumerated()), id: \.offset) { idx, banner in
-                    BannerCard(banner: banner).tag(idx)
+            let safeIndex = max(0, min(bannerIndex, banners.count - 1))
+            VStack(spacing: 12) {
+                BannerCard(banner: banners[safeIndex])
+                    .frame(height: 180)
+                    .frame(maxWidth: .infinity)
+                    .id(safeIndex)
+                    .transition(.opacity)
+
+                if banners.count > 1 {
+                    HStack(spacing: 6) {
+                        ForEach(0..<banners.count, id: \.self) { i in
+                            Capsule()
+                                .fill(i == safeIndex ? Brand.purple : Brand.border)
+                                .frame(width: i == safeIndex ? 20 : 7, height: 7)
+                                .onTapGesture {
+                                    withAnimation(.easeInOut) { bannerIndex = i }
+                                }
+                        }
+                    }
+                    .animation(.easeInOut, value: safeIndex)
                 }
             }
-            .frame(height: 185)
-            .tabViewStyle(.page(indexDisplayMode: .automatic))
             .onReceive(bannerTimer) { _ in
                 guard banners.count > 1 else { return }
-                withAnimation { bannerIndex = (bannerIndex + 1) % banners.count }
+                withAnimation(.easeInOut) { bannerIndex = (safeIndex + 1) % banners.count }
             }
         }
     }

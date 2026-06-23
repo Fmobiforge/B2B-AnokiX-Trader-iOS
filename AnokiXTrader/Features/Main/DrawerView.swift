@@ -8,19 +8,19 @@ struct DrawerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
-            HStack(spacing: 12) {
-                BrandMark(size: 44)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("AnokiX").font(.system(size: 17, weight: .bold)).foregroundColor(.white)
-                    Text("Trader Portal")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Brand.purpleTextLt)
-                        .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(Color.white.opacity(0.08))
-                        .clipShape(Capsule())
-                }
-                Spacer()
+            VStack(alignment: .leading, spacing: 10) {
+                Image("LogoWhite")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 30)
+                Text("Trader Portal")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Brand.purpleTextLt)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(Capsule())
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(20)
 
             Divider().background(Color.white.opacity(0.1))
