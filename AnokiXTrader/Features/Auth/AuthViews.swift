@@ -60,6 +60,7 @@ struct SplashView: View {
             .scaleEffect(scale)
             .opacity(opacity)
         }
+        .preferredColorScheme(.dark)   // white status bar text on the dark splash
         .onAppear {
             withAnimation(.easeOut(duration: 0.6)) { scale = 1; opacity = 1 }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
@@ -140,6 +141,7 @@ struct WelcomeView: View {
                 .padding(.bottom, 40)
             }
         }
+        .preferredColorScheme(.dark)   // white status bar text on the dark welcome
     }
 }
 
@@ -228,6 +230,7 @@ struct LoginView: View {
             }
             .toast($toastMsg)
         }
+        .preferredColorScheme(.dark)   // white status bar text on the dark login
     }
 
     private var tabs: some View {

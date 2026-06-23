@@ -287,6 +287,9 @@ struct MarketplaceRealView: View {
                     .buttonStyle(.plain)
                 }
             }
+            // Top room so the Promotions "NEW" badge (offset above the icon) isn't
+            // clipped by the horizontal ScrollView's content bounds.
+            .padding(.top, 8)
         }
     }
 
