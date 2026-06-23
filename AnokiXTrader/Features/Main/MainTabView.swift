@@ -6,37 +6,22 @@ struct MainTabView: View {
     @StateObject private var posCart = Cart()
 
     var body: some View {
-        TabView(selection: $router.tab) {
-            NavigationStack { DashboardView() }
-                .tabItem { Label("Home", systemImage: "house.fill") }.tag(Tab.home)
+        ZStack(alignment: .leading) {
+            VStack(spacing: 0) {
+                tabContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            NavigationStack { SellView() }
-                .tabItem { Label("Sell", systemImage: "cart.fill") }.tag(Tab.sell)
+                BottomTabBar(selection: $router.tab)
+            }
 
-            NavigationStack { OrdersView() }
-                .tabItem { Label("Orders", systemImage: "shippingbox.fill") }.tag(Tab.orders)
-
-            NavigationStack { WalletView() }
-                .tabItem { Label("Wallet", systemImage: "wallet.pass.fill") }.tag(Tab.wallet)
-
-            NavigationStack { MoreView() }
-                .tabItem { Label("More", systemImage: "ellipsis") }.tag(Tab.more)
-        }
-        .tint(Brand.purple)
-        .toolbarBackground(.visible, for: .tabBar)
-        .toolbarBackground(Color.white, for: .tabBar)
-        .overlay {
             if router.drawerOpen {
-                ZStack(alignment: .leading) {
-                    Color.black.opacity(0.45)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(.easeOut(duration: 0.2)) { router.drawerOpen = false }
-                        }
-                    DrawerView()
-                        .frame(width: 300)
-                }
-                .transition(.opacity)
+                Color.black.opacity(0.45)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { router.drawerOpen = false } }
+                DrawerView()
+                    .frame(width: 300)
+                    .transition(.move(edge: .leading))
             }
         }
         .animation(.easeOut(duration: 0.22), value: router.drawerOpen)
@@ -46,6 +31,22 @@ struct MainTabView: View {
             ModuleHost(module: module)
                 .environmentObject(router)
                 .environmentObject(session)
+        }
+    }
+
+    @ViewBuilder
+    private var tabContent: some View {
+        switch router.tab {
+        case .home:
+            NavigationStack { DashboardView() }
+        case .sell:
+            NavigationStack { SellView() }
+        case .orders:
+            NavigationStack { OrdersView() }
+        case .wallet:
+            NavigationStack { WalletView() }
+        case .more:
+            NavigationStack { MoreView() }
         }
     }
 }

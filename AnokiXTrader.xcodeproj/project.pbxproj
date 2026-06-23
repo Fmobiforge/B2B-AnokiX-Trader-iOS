@@ -41,6 +41,7 @@
 		AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C23167F101A111EA84DC70 /* ImagePicker.swift */; };
 		AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */; };
 		B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45ABCF6DDF19CCCBC918459 /* APIClient.swift */; };
+		C4E8F2A1B3D5678901234ABC /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F9A3B2C4E6789012345DEF /* BottomTabBar.swift */; };
 		B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */; };
 		BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */; };
 		BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F35932C814CC82ABBC7B893 /* ListModules.swift */; };
@@ -64,6 +65,7 @@
 		3D85815C108EB14B5430C3EA /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		3F4F80FD3B29A95F61A789B4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		3F75C1AF3A56E1801EF1281F /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		D5F9A3B2C4E6789012345DEF /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		480ADE15FE92A9892833F379 /* AnokiXTrader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXTrader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		51577DA880A26AF354B85026 /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		51A7CB16714ECF11A5961575 /* Charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Charts.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 		5AF9FA0D12B9D0669D4AA940 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				D5F9A3B2C4E6789012345DEF /* BottomTabBar.swift */,
 				A53374834E1AC2497ECAEA4B /* DrawerView.swift */,
 				13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */,
 				30EC97510470126022012D6C /* MoreView.swift */,
@@ -502,6 +505,7 @@
 				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,
 				3725C1D11D64A40150C99D62 /* AppState.swift in Sources */,
 				47EB84CABA03F85959AFDC9E /* AuthViews.swift in Sources */,
+				C4E8F2A1B3D5678901234ABC /* BottomTabBar.swift in Sources */,
 				2E0B39DF03179E89939D61E9 /* CartView.swift in Sources */,
 				3887FFC6ED09477F1F8C95F2 /* Charts.swift in Sources */,
 				7C8D94F78A8E396E4A838BBB /* CheckoutView.swift in Sources */,
