@@ -38,3 +38,68 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
+
+// MARK: - Image source picker sheet (SwiftUI — reliable light styling)
+
+/// Bottom sheet for choosing Photo Library / file. Uses SwiftUI (not UIKit
+/// `UIAlertController`) because the registration wizard forces a dark scene color
+/// scheme for the status bar, which breaks native action-sheet text colours.
+struct ImageSourcePickerSheet: View {
+    var includeFileOption: Bool = false
+    var onPhotoLibrary: () -> Void
+    var onFile: (() -> Void)? = nil
+    var onCancel: (() -> Void)? = nil
+    @Environment(\.dismiss) private var dismiss
+
+    private let actionBlue = Color(UIColor.systemBlue)
+    private let sheetBG = Color(UIColor.systemGroupedBackground)
+
+    var body: some View {
+        VStack(spacing: 8) {
+            VStack(spacing: 0) {
+                optionButton("Photo Library", action: onPhotoLibrary)
+                if includeFileOption, let onFile {
+                    Divider()
+                    optionButton("Choose File", action: onFile)
+                }
+            }
+            .background(Brand.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            Button {
+                if let onCancel { onCancel() } else { dismiss() }
+            } label: {
+                Text("Cancel")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(actionBlue)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Brand.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .background(sheetBG.ignoresSafeArea())
+        .preferredColorScheme(.light)
+    }
+
+    private func optionButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 17))
+                .foregroundColor(actionBlue)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Compact detent height for the options shown.
+    static func detentHeight(includeFileOption: Bool) -> CGFloat {
+        includeFileOption ? 204 : 148
+    }
+}

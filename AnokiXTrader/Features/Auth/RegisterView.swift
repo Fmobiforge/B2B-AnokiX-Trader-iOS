@@ -42,9 +42,7 @@ struct RegisterView: View {
                 // White status bar text/icons over the dark purple header: SwiftUI couples
                 // the status-bar style to the scene's color scheme, so we put the SCENE in
                 // dark (same trick as Login/Welcome) but keep the form itself light with an
-                // explicit environment override. The sheets/pickers each force
-                // `.preferredColorScheme(.light)` and the source choosers are opaque Menus,
-                // so the dialogs stay clear.
+                // explicit environment override. Sheets/pickers force `.preferredColorScheme(.light)`.
                 .environment(\.colorScheme, .light)
                 .preferredColorScheme(.dark)
         }
@@ -233,13 +231,14 @@ private struct BusinessStep: View {
     @ObservedObject var store: RegisterStore
     @State private var logoStage: LogoStage?
 
-    /// Single modal driving the logo flow: pick a source → crop. One `.sheet(item:)`
-    /// (instead of an action sheet + two stacked sheets, which renders unreliably).
+    /// Single modal driving the logo flow: source picker → library/camera → crop.
     private enum LogoStage: Identifiable {
+        case sourcePicker
         case picker(UIImagePickerController.SourceType)
         case crop(UIImage)
         var id: Int {
             switch self {
+            case .sourcePicker:  return -2
             case .picker(let t): return t.rawValue
             case .crop:          return -1
             }
@@ -251,16 +250,7 @@ private struct BusinessStep: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Company Logo (Optional)").font(.system(size: 13, weight: .medium))
                     .foregroundColor(Brand.textSecondary)
-                Menu {
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        Button { logoStage = .picker(.camera) } label: {
-                            Label("Take photo", systemImage: "camera")
-                        }
-                    }
-                    Button { logoStage = .picker(.photoLibrary) } label: {
-                        Label("Choose from gallery", systemImage: "photo")
-                    }
-                } label: {
+                Button { logoStage = .sourcePicker } label: {
                     ZStack {
                         if let logo = store.logo {
                             Image(uiImage: logo).resizable().scaledToFill()
@@ -293,6 +283,13 @@ private struct BusinessStep: View {
         }
         .sheet(item: $logoStage) { stage in
             switch stage {
+            case .sourcePicker:
+                ImageSourcePickerSheet(
+                    onPhotoLibrary: { logoStage = .picker(.photoLibrary) },
+                    onCancel: { logoStage = nil }
+                )
+                .presentationDetents([.height(ImageSourcePickerSheet.detentHeight(includeFileOption: false))])
+                .presentationDragIndicator(.hidden)
             case .picker(let type):
                 // Pick raw (no system crop) → our own scale/rotate cropper. Defer so the
                 // picker sheet finishes dismissing before the crop sheet presents.
@@ -508,8 +505,19 @@ private struct LocationStep: View {
 private struct DocumentsStep: View {
     @ObservedObject var store: RegisterStore
     @State private var activeField: String?
-    @State private var imageSource: UIImagePickerController.SourceType?
+    @State private var docSheet: DocSheet?
     @State private var showFileImporter = false
+
+    private enum DocSheet: Identifiable {
+        case sourcePicker
+        case imagePicker(UIImagePickerController.SourceType)
+        var id: String {
+            switch self {
+            case .sourcePicker: return "source"
+            case .imagePicker(let t): return "picker-\(t.rawValue)"
+            }
+        }
+    }
 
     private var rows: [(field: String, label: String, sub: String, required: Bool)] {
         RegisterStore.requiredDocs.map { ($0.field, $0.label, $0.sub, true) }
@@ -534,24 +542,16 @@ private struct DocumentsStep: View {
                         }
                     }
                     Spacer()
-                    Menu {
-                        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                            Button { activeField = row.field; imageSource = .camera } label: {
-                                Label("Take photo", systemImage: "camera")
-                            }
-                        }
-                        Button { activeField = row.field; imageSource = .photoLibrary } label: {
-                            Label("Choose from gallery", systemImage: "photo")
-                        }
-                        Button { activeField = row.field; showFileImporter = true } label: {
-                            Label("Choose PDF", systemImage: "doc")
-                        }
+                    Button {
+                        activeField = row.field
+                        docSheet = .sourcePicker
                     } label: {
                         Text(store.documents[row.field] != nil ? "Replace" : "Upload")
                             .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
                             .padding(.horizontal, 16).padding(.vertical, 9)
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
                     }
+                    .buttonStyle(.plain)
                 }
                 .padding(12).card(padding: 12)
             }
@@ -559,15 +559,27 @@ private struct DocumentsStep: View {
                 .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .sheet(item: Binding(get: { imageSource.map { SourceWrap(type: $0) } },
-                             set: { imageSource = $0?.type })) { wrap in
-            ImagePicker(sourceType: wrap.type, allowsEditing: false) { img in
-                // Downscale before upload — full-res photos make the multipart body
-                // huge and trip the upload timeout.
-                if let field = activeField,
-                   let data = img.downscaledJPEG(maxDimension: 1440, quality: 0.6) {
-                    store.documents[field] = RegDocument(fileName: "\(field).jpg",
-                                                         mimeType: "image/jpeg", data: data)
+        .sheet(item: $docSheet) { sheet in
+            switch sheet {
+            case .sourcePicker:
+                ImageSourcePickerSheet(
+                    includeFileOption: true,
+                    onPhotoLibrary: { docSheet = .imagePicker(.photoLibrary) },
+                    onFile: {
+                        docSheet = nil
+                        DispatchQueue.main.async { showFileImporter = true }
+                    },
+                    onCancel: { docSheet = nil }
+                )
+                .presentationDetents([.height(ImageSourcePickerSheet.detentHeight(includeFileOption: true))])
+                .presentationDragIndicator(.hidden)
+            case .imagePicker(let type):
+                ImagePicker(sourceType: type, allowsEditing: false) { img in
+                    if let field = activeField,
+                       let data = img.downscaledJPEG(maxDimension: 1440, quality: 0.6) {
+                        store.documents[field] = RegDocument(fileName: "\(field).jpg",
+                                                             mimeType: "image/jpeg", data: data)
+                    }
                 }
             }
         }
