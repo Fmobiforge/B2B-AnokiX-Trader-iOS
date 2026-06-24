@@ -50,6 +50,23 @@ final class APIClient {
 
     private init() {}
 
+    /// Dedicated session for multipart uploads (Create Account KYC docs + logo).
+    ///
+    /// Uploads to this backend are slow (~40s per MB measured against the live server).
+    /// `timeoutIntervalForRequest` is an *idle* timer that only resets when data is
+    /// **received** — during a long upload nothing comes back, so a slow-but-progressing
+    /// upload trips -1001 "request timed out" on the default 60s session even while it is
+    /// still sending. We give uploads a very generous idle window (300s) and a 10-minute
+    /// resource cap so the body has time to finish (parity with the Distributor app's
+    /// `Http.multipartSession`).
+    private let uploadSession: Session = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 300
+        config.timeoutIntervalForResource = 600
+        config.waitsForConnectivity = true
+        return Session(configuration: config)
+    }()
+
     private var authHeaders: HTTPHeaders {
         var headers: HTTPHeaders = ["Accept": "application/json"]
         if let token, !token.isEmpty {
@@ -170,7 +187,8 @@ final class APIClient {
     /// Multipart upload where only `status`/`message` matter.
     private func uploadStatus(_ path: String, fields: [String: String],
                               files: [MultipartFile]) async throws {
-        let request = AF.upload(multipartFormData: { form in
+        // Use the dedicated long-idle-timeout session so slow KYC uploads don't trip -1001.
+        let request = uploadSession.upload(multipartFormData: { form in
             for (key, value) in fields {
                 form.append(Data(value.utf8), withName: key)
             }

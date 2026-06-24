@@ -1,8 +1,20 @@
 import SwiftUI
 import UIKit
+import GoogleMaps
+
+/// Registers the Google Maps SDK key at launch (parity with the Distributor app's
+/// `AppDelegate`, which the SwiftUI lifecycle reaches via `UIApplicationDelegateAdaptor`).
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        GMSServices.provideAPIKey(GoogleMapsConfig.apiKey)
+        return true
+    }
+}
 
 @main
 struct AnokiXTraderApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var session = Session()
 
     var body: some Scene {

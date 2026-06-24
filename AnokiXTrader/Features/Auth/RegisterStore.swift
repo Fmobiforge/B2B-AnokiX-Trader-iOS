@@ -17,7 +17,8 @@ final class RegisterStore: ObservableObject {
     @Published var lastName = ""
     @Published var idNumber = ""
     @Published var passportNumber = ""
-    @Published var mobile = ""            // local digits (country code 27 prepended)
+    @Published var mobile = ""            // national digits (country dial code prepended on submit)
+    @Published var mobileCountry = Countries.default
     @Published var email = ""
     @Published var password = ""
     @Published var confirmPassword = ""
@@ -28,6 +29,7 @@ final class RegisterStore: ObservableObject {
     @Published var tradingName = ""
     @Published var businessRegNumber = ""
     @Published var businessPhone = ""
+    @Published var businessPhoneCountry = Countries.default
     @Published var businessEmail = ""
 
     // Step 3 — classification
@@ -66,9 +68,9 @@ final class RegisterStore: ObservableObject {
     @Published var submitting = false
 
     static let allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    // Labels + codes match the Android trader app (PAYMENT_LABELS / PAYMENT_CODES).
     static let paymentOptions: [(code: String, label: String)] = [
-        ("wallet", "anokiX Wallet"), ("eft", "EFT / Bank Transfer"),
-        ("cash", "Cash on Delivery"), ("card", "Card")
+        ("wallet", "Wallet"), ("eft", "EFT"), ("cash", "Cash"), ("card", "Card")
     ]
     static let requiredDocs: [(field: String, label: String, sub: String)] = [
         ("business_registration_document", "Business Registration Document", "CIPC, Business Permit, etc."),
@@ -164,14 +166,18 @@ final class RegisterStore: ObservableObject {
 
     // MARK: - Submit
 
-    var fullMobile: String { normalizePhone(mobile) }
-    var fullBusinessPhone: String { normalizePhone(businessPhone) }
+    var fullMobile: String { fullPhone(country: mobileCountry, raw: mobile) }
+    var fullBusinessPhone: String { fullPhone(country: businessPhoneCountry, raw: businessPhone) }
 
-    private func normalizePhone(_ raw: String) -> String {
+    /// Country dial code (digits only) + national number, leading 0 dropped, no '+'
+    /// — matches the Android `ccp.getFullNumber()` format (e.g. "27821234567").
+    private func fullPhone(country: Country, raw: String) -> String {
         var digits = raw.filter { $0.isNumber }
+        if digits.isEmpty { return "" }
         if digits.hasPrefix("0") { digits = String(digits.dropFirst()) }
-        if digits.hasPrefix("27") { return digits }
-        return "27" + digits
+        let code = country.dialDigits
+        if digits.hasPrefix(code) { return digits }
+        return code + digits
     }
 
     func submit() async throws {
@@ -204,9 +210,10 @@ final class RegisterStore: ObservableObject {
         }
 
         var files: [MultipartFile] = []
-        if let logo, let data = logo.pngData() {
-            files.append(MultipartFile(field: "company_logo", fileName: "logo.png",
-                                       mimeType: "image/png", data: data))
+        // JPEG (not PNG) and downscaled — a full-size PNG logo alone can be several MB.
+        if let logo, let data = logo.downscaledJPEG(maxDimension: 600, quality: 0.85) {
+            files.append(MultipartFile(field: "company_logo", fileName: "company_logo.jpg",
+                                       mimeType: "image/jpeg", data: data))
         }
         for (field, doc) in documents {
             files.append(MultipartFile(field: field, fileName: doc.fileName,

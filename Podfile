@@ -4,12 +4,14 @@ inhibit_all_warnings!
 
 target 'AnokiXTrader' do
   # Same networking/JSON stack the Distributor app uses, so both projects work
-  # the same way. (GoogleMaps is intentionally omitted — the Trader location
-  # step uses MapKit and GoogleMaps needs an API key; add it here if needed.)
+  # the same way.
   pod 'Alamofire', '~> 5.9'
   pod 'SwiftyJSON', '~> 5.0'
   # Powerful image loading + memory & disk caching (smooth, robust remote images).
   pod 'Kingfisher', '~> 7.0'
+  # Google Maps for the Create Account location step (same SDK/key as the
+  # Distributor iOS app). Run `pod install` after adding this.
+  pod 'GoogleMaps', '~> 9.0'
 end
 
 post_install do |installer|

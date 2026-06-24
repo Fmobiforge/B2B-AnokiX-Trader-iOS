@@ -51,6 +51,12 @@
 		FB273E1B2ED6995D98E62D35 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4F80FD3B29A95F61A789B4 /* Models.swift */; };
 		FC37BF24EFA18891EF006B1F /* ScrollVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FBF424F9F984CD97815E7B /* ScrollVisibility.swift */; };
 		FC943FC175D07228A3F837C8 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC260DDC3352A2C5183A6AB /* BottomTabBar.swift */; };
+		FF20000000000000000B0001 /* Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0001 /* Countries.swift */; };
+		FF20000000000000000B0002 /* CountryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0002 /* CountryPicker.swift */; };
+		FF20000000000000000B0003 /* LogoCrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0003 /* LogoCrop.swift */; };
+		FF20000000000000000B0004 /* GoogleMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0004 /* GoogleMapView.swift */; };
+		FF20000000000000000B0005 /* ImageCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0005 /* ImageCompression.swift */; };
+		FF20000000000000000B0006 /* GoogleMapsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF10000000000000000C0006 /* GoogleMapsConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,6 +108,12 @@
 		E9B441A49508967E56949CD2 /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
 		F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0001 /* Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countries.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0002 /* CountryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryPicker.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0003 /* LogoCrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoCrop.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0004 /* GoogleMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapView.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0005 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
+		FF10000000000000000C0006 /* GoogleMapsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,6 +191,7 @@
 			children = (
 				E45ABCF6DDF19CCCBC918459 /* APIClient.swift */,
 				E65DC1F1908F16554337AF74 /* DTOs.swift */,
+				FF10000000000000000C0006 /* GoogleMapsConfig.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -303,6 +316,11 @@
 				5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */,
 				8D9DE3F070404C0632ED5C5B /* Rows.swift */,
 				06FBF424F9F984CD97815E7B /* ScrollVisibility.swift */,
+				FF10000000000000000C0001 /* Countries.swift */,
+				FF10000000000000000C0002 /* CountryPicker.swift */,
+				FF10000000000000000C0003 /* LogoCrop.swift */,
+				FF10000000000000000C0004 /* GoogleMapView.swift */,
+				FF10000000000000000C0005 /* ImageCompression.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -503,6 +521,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */,
+				FF20000000000000000B0001 /* Countries.swift in Sources */,
+				FF20000000000000000B0002 /* CountryPicker.swift in Sources */,
+				FF20000000000000000B0003 /* LogoCrop.swift in Sources */,
+				FF20000000000000000B0004 /* GoogleMapView.swift in Sources */,
+				FF20000000000000000B0005 /* ImageCompression.swift in Sources */,
+				FF20000000000000000B0006 /* GoogleMapsConfig.swift in Sources */,
 				089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */,
 				2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */,
 				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,

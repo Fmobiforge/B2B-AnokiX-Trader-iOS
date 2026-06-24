@@ -33,12 +33,18 @@ struct RegisterView: View {
     private let lastStep = 7
 
     var body: some View {
-        if submitted {
-            RegisterCompletedView { session.stage = .login }
-        } else {
-            wizard
-                .task { await store.loadReference() }
+        Group {
+            if submitted {
+                RegisterCompletedView { session.stage = .login }
+            } else {
+                wizard
+                    .task { await store.loadReference() }
+            }
         }
+        // Keep the form light, but make the status bar white over the dark header
+        // (same mechanism the Login/Welcome screens use).
+        .environment(\.colorScheme, .light)
+        .preferredColorScheme(.dark)
     }
 
     private var wizard: some View {
@@ -164,7 +170,8 @@ private struct OwnerStep: View {
             InfoBox(title: "Account sign-in",
                     text: "Your email address and password will be used to log in to your trader account. Mobile number is required for verification.")
 
-            PhoneField(title: "Mobile Number", text: $store.mobile, placeholder: "Mobile number")
+            PhoneField(title: "Mobile Number", country: $store.mobileCountry, text: $store.mobile,
+                       placeholder: "Mobile number")
             LabeledField(title: "Email Address", text: $store.email, placeholder: "Enter email address",
                          keyboard: .emailAddress, autocap: .never, disableAutocorrect: true)
             LabeledSecureField(title: "Password", text: $store.password, placeholder: "Enter password")
@@ -175,12 +182,14 @@ private struct OwnerStep: View {
     }
 }
 
-// MARK: - Phone field (fixed +27 prefix + number) shared by Owner / Business steps
+// MARK: - Phone field (country picker + number) shared by Owner / Business steps
 
 private struct PhoneField: View {
     let title: String
+    @Binding var country: Country
     @Binding var text: String
     var placeholder: String = "Phone number"
+    @State private var showPicker = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -188,10 +197,16 @@ private struct PhoneField: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack(spacing: 8) {
-                HStack(spacing: 4) {
-                    Text("🇿🇦").font(.system(size: 15))
-                    Text("+27").font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                Button { showPicker = true } label: {
+                    HStack(spacing: 4) {
+                        Text(country.flag).font(.system(size: 15))
+                        Text(country.dialCode).font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(Brand.textPrimary)
+                        Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(Brand.textSecondary)
+                    }
                 }
+                .buttonStyle(.plain)
                 Rectangle().fill(Brand.border).frame(width: 1, height: 24)
                 TextField(placeholder, text: $text)
                     .keyboardType(.phonePad)
@@ -203,6 +218,9 @@ private struct PhoneField: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+        .sheet(isPresented: $showPicker) {
+            CountryPickerSheet(selection: $country)
+        }
     }
 }
 
@@ -212,6 +230,7 @@ private struct BusinessStep: View {
     @ObservedObject var store: RegisterStore
     @State private var source: UIImagePickerController.SourceType?
     @State private var showSourceDialog = false
+    @State private var cropImage: UIImage?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -243,24 +262,40 @@ private struct BusinessStep: View {
             LabeledField(title: "Trading Name", text: $store.tradingName, placeholder: "Enter trading name")
             LabeledField(title: "Business Registration Number (Optional)", text: $store.businessRegNumber,
                          placeholder: "Enter registration number")
-            PhoneField(title: "Business Phone Number", text: $store.businessPhone,
-                       placeholder: "Business phone number")
+            PhoneField(title: "Business Phone Number", country: $store.businessPhoneCountry,
+                       text: $store.businessPhone, placeholder: "Business phone number")
             LabeledField(title: "Business Email Address", text: $store.businessEmail,
                          placeholder: "Enter business email", keyboard: .emailAddress,
                          autocap: .never, disableAutocorrect: true)
         }
-        .confirmationDialog("Choose image source", isPresented: $showSourceDialog, titleVisibility: .visible) {
+        .confirmationDialog("Choose source", isPresented: $showSourceDialog, titleVisibility: .visible) {
             if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button("Camera") { source = .camera }
+                Button("Take photo") { source = .camera }
             }
-            Button("Photo Library") { source = .photoLibrary }
+            Button("Choose from gallery") { source = .photoLibrary }
             Button("Cancel", role: .cancel) {}
         }
         .sheet(item: Binding(get: { source.map { SourceWrap(type: $0) } },
                              set: { source = $0?.type })) { wrap in
-            ImagePicker(sourceType: wrap.type, allowsEditing: true) { img in store.logo = img }
+            // Pick raw (no system crop) → our own scale/rotate cropper. Defer so the
+            // picker sheet finishes dismissing before the crop sheet presents.
+            ImagePicker(sourceType: wrap.type, allowsEditing: false) { img in
+                DispatchQueue.main.async { cropImage = img }
+            }
+        }
+        .sheet(item: Binding(get: { cropImage.map { ImageWrap(image: $0) } },
+                             set: { cropImage = $0?.image })) { wrap in
+            LogoCropSheet(image: wrap.image,
+                          onConfirm: { store.logo = $0 },
+                          onUploadNew: { showSourceDialog = true })
         }
     }
+}
+
+/// Identifiable wrapper so a picked UIImage can drive `.sheet(item:)` for the cropper.
+struct ImageWrap: Identifiable {
+    let id = UUID()
+    let image: UIImage
 }
 
 /// Identifiable wrapper so a UIImagePickerController.SourceType can drive `.sheet(item:)`.
@@ -379,14 +414,7 @@ private struct LocationStep: View {
     @State private var query = ""
     @State private var suggestions: [AddressSuggestion] = []
     @State private var searching = false
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: -33.9249, longitude: 18.4241),
-        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-
-    private var pins: [LocationPin] {
-        guard let lat = store.latitude, let lng = store.longitude else { return [] }
-        return [LocationPin(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lng))]
-    }
+    @State private var focus: CLLocationCoordinate2D?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -426,11 +454,10 @@ private struct LocationStep: View {
                 Text(store.address).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
             }
 
-            Map(coordinateRegion: $region, annotationItems: pins) { pin in
-                MapMarker(coordinate: pin.coordinate, tint: Brand.purple)
-            }
-            .frame(height: 280)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            GoogleMapView(latitude: $store.latitude, longitude: $store.longitude,
+                          address: $store.address, focus: $focus)
+                .frame(height: 320)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
 
             Text("Tap the map to drop a pin, or drag the pin to set the location.")
                 .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
@@ -456,21 +483,14 @@ private struct LocationStep: View {
                     store.placeId = s.place_id
                     store.latitude = coord.lat
                     store.longitude = coord.lng
-                    if let a = coord.resolvedAddress { store.address = a }
+                    if let a = coord.resolvedAddress { store.address = a; query = a }
                     if let lat = coord.lat, let lng = coord.lng {
-                        region = MKCoordinateRegion(
-                            center: CLLocationCoordinate2D(latitude: lat, longitude: lng),
-                            span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02))
+                        focus = CLLocationCoordinate2D(latitude: lat, longitude: lng)
                     }
                 }
             }
         }
     }
-}
-
-struct LocationPin: Identifiable {
-    let id = UUID()
-    let coordinate: CLLocationCoordinate2D
 }
 
 // MARK: - Step 5: Documents
@@ -530,7 +550,10 @@ private struct DocumentsStep: View {
         .sheet(item: Binding(get: { imageSource.map { SourceWrap(type: $0) } },
                              set: { imageSource = $0?.type })) { wrap in
             ImagePicker(sourceType: wrap.type, allowsEditing: false) { img in
-                if let field = activeField, let data = img.jpegData(compressionQuality: 0.85) {
+                // Downscale before upload — full-res photos make the multipart body
+                // huge and trip the upload timeout.
+                if let field = activeField,
+                   let data = img.downscaledJPEG(maxDimension: 1440, quality: 0.6) {
                     store.documents[field] = RegDocument(fileName: "\(field).jpg",
                                                          mimeType: "image/jpeg", data: data)
                 }
