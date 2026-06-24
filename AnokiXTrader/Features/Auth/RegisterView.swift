@@ -33,20 +33,21 @@ struct RegisterView: View {
     private let lastStep = 7
 
     var body: some View {
-        Group {
-            if submitted {
-                RegisterCompletedView { session.stage = .login }
-            } else {
-                wizard
-                    .task { await store.loadReference() }
-            }
+        if submitted {
+            // Light success screen — keep the default (dark) status bar so it stays readable.
+            RegisterCompletedView { session.stage = .login }
+        } else {
+            wizard
+                .task { await store.loadReference() }
+                // White status bar text/icons over the dark purple header: SwiftUI couples
+                // the status-bar style to the scene's color scheme, so we put the SCENE in
+                // dark (same trick as Login/Welcome) but keep the form itself light with an
+                // explicit environment override. The sheets/pickers each force
+                // `.preferredColorScheme(.light)` and the source choosers are opaque Menus,
+                // so the dialogs stay clear.
+                .environment(\.colorScheme, .light)
+                .preferredColorScheme(.dark)
         }
-        // Force Light for the whole Create Account flow so every sheet, action sheet,
-        // picker and slider renders with a clear light theme — even when the device is
-        // in Dark Mode. (SwiftUI couples the status-bar style to the scene's color
-        // scheme, so we keep the status bar on a light strip rather than darkening
-        // every dialog to tint it.)
-        .preferredColorScheme(.light)
     }
 
     private var wizard: some View {
@@ -89,7 +90,7 @@ struct RegisterView: View {
         .padding(.horizontal, 12)
         .padding(.top, 12)
         .padding(.bottom, 10)
-        .background(Brand.purpleDark)
+        .background(Brand.purpleDark.ignoresSafeArea(edges: .top))
     }
 
     private var footer: some View {
