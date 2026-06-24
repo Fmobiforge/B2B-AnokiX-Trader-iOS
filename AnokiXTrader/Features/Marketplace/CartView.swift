@@ -6,6 +6,7 @@ struct CartView: View {
     @ObservedObject var store: MarketStore
     @Environment(\.dismiss) private var dismiss
     @State private var toastMsg: String?
+    @State private var goToOrder = false
 
     private var currency: String { store.currency }
 
@@ -22,9 +23,20 @@ struct CartView: View {
             .navigationTitle(titleText)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Close") { dismiss() } } }
+            .navigationDestination(isPresented: $goToOrder) {
+                MakeOrderView(store: store) { dismiss() }
+            }
             .task { await store.refreshCart() }
             .toast($toastMsg)
         }
+    }
+
+    private func proceedToCheckout() {
+        guard !store.selectedLines.isEmpty else {
+            toastMsg = "Select at least one item to order."
+            return
+        }
+        goToOrder = true
     }
 
     private var titleText: String {
@@ -46,6 +58,7 @@ struct CartView: View {
                 VStack(spacing: 0) {
                     ForEach(store.cart) { line in
                         CartRow(line: line, currency: currency,
+                                onToggle: { store.toggleSelected(line.id) },
                                 onMinus: { store.setQty(line.id, line.qty - 1) },
                                 onPlus: { store.setQty(line.id, line.qty + 1) },
                                 onDelete: { store.remove(line.id) })
@@ -74,7 +87,7 @@ struct CartView: View {
             HStack {
                 Text("Subtotal").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
                 Spacer()
-                Text(CurrencyFmt.format(store.cartSubtotal, symbol: currency))
+                Text(CurrencyFmt.format(store.selectedSubtotal, symbol: currency))
                     .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
             }
             HStack {
@@ -90,7 +103,7 @@ struct CartView: View {
                     .font(.system(size: 20, weight: .bold)).foregroundColor(Brand.purple)
             }
             Text("Incl. VAT").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-            Button("Proceed to Checkout") { toastMsg = "Checkout coming soon." }
+            Button("Proceed to Checkout") { proceedToCheckout() }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(.top, 4)
         }
@@ -101,12 +114,19 @@ struct CartView: View {
 struct CartRow: View {
     let line: MarketCartLine
     let currency: String
+    let onToggle: () -> Void
     let onMinus: () -> Void
     let onPlus: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
+            Button(action: onToggle) {
+                Image(systemName: line.selected ? "checkmark.square.fill" : "square")
+                    .font(.system(size: 22))
+                    .foregroundColor(line.selected ? Brand.purple : Brand.textTertiary)
+            }
+            .padding(.top, 16)
             RemoteImage(url: line.imageURL)
                 .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 6) {

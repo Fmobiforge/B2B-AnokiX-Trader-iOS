@@ -6,13 +6,65 @@ import SwiftyJSON
 struct LoginData: Decodable {
     let token: String?
     let user: LoginUser?
+    let portal_type: String?
+    let portal_info: TraderPortalInfo?
 }
 
-struct LoginUser: Decodable {
+struct LoginUser: Codable {
+    let id: String?
     let first_name: String?
     let last_name: String?
     let email: String?
+    let phone_number: String?
+    let role_type: String?
     let role_label: String?
+
+    var displayName: String {
+        let full = [first_name, last_name]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        if !full.isEmpty { return full }
+        if let role_label, !role_label.isEmpty { return role_label }
+        return "Trader Account"
+    }
+}
+
+/// Trader profile from login when `portal_type` is `trader`.
+struct TraderPortalInfo: Codable {
+    let id: String?
+    let user_id: String?
+    let business_name: String?
+    let trading_name: String?
+    let company_logo: String?
+    let company_logo_url: String?
+    let id_number: String?
+    let passport_number: String?
+    let business_registration_number: String?
+    let business_phone_number: String?
+    let business_email: String?
+    let trader_type: String?
+    let primary_product_category_ids: String?
+    let trader_code: String?
+    let address: String?
+    let latitude: String?
+    let longitude: String?
+    let preferred_distributor_ids: String?
+    let recommended_distributor_id: String?
+    let preferred_delivery_days: String?
+    let payment_method: String?
+    let registration_status: String?
+    let status: String?
+
+    var displayStoreName: String {
+        if let trading_name, !trading_name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return trading_name.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if let business_name, !business_name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return business_name.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return ""
+    }
 }
 
 // MARK: - Reference (categories / distributors / trader types)
@@ -87,6 +139,7 @@ struct DistributorDTO: Decodable, Identifiable, Hashable {
     let trading_name: String?
     let display_name: String?
     let address: String?
+    let preferred_delivery_days: String?
 
     var displayName: String {
         if let d = display_name, !d.isEmpty { return d }
@@ -305,6 +358,115 @@ struct CartDistributorDTO {
         id = json["id"].int
         display_name = json["display_name"].string
     }
+}
+
+// MARK: - Orders (GET /api/trader/orders)
+
+/// data block of the orders list. The list endpoint returns numeric ids/amounts
+/// (e.g. `id: 5`, `subtotal: 80`) consistently, so these decode straight from Codable.
+struct OrdersData: Decodable {
+    let orders: [OrderDTO]
+    let pagination: PaginationDTO?
+    let status_counts: StatusCountsDTO?
+}
+
+struct OrderDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let order_number: String
+    let distributor_id: Int?
+    let status: String?
+    let status_key: String?
+    let subtotal: Double?
+    let total_amount: Double?
+    let delivery_date: String?
+    let delivery_start_time: String?
+    let delivery_end_time: String?
+    let notes: String?
+    let delivery_address: OrderAddressDTO?
+    let distributor: OrderDistributorDTO?
+    let created_at: String?
+    let updated_at: String?
+    let item_count: Int?
+    let line_count: Int?
+    let products: [String]?       // list endpoint
+    let items: [OrderItemDTO]?    // detail endpoint
+
+    var statusKey: String {
+        if let k = status_key, !k.isEmpty { return k }
+        return status?.lowercased() ?? "pending"
+    }
+    var distributorName: String {
+        if let n = distributor?.display_name, !n.isEmpty { return n }
+        return "Distributor"
+    }
+    var amount: Double { total_amount ?? subtotal ?? 0 }
+}
+
+struct OrderAddressDTO: Decodable, Hashable {
+    let business: String?
+    let address: String?
+    let latitude: Double?
+    let longitude: Double?
+}
+
+struct OrderDistributorDTO: Decodable, Hashable {
+    let id: Int?
+    let display_name: String?
+}
+
+struct OrderItemDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let product_id: Int?
+    let quantity: Int
+    let unit_price: Double?
+    let line_total: Double?
+    let status: String?
+    let product: OrderProductDTO?
+}
+
+struct OrderProductDTO: Decodable, Hashable {
+    let id: Int?
+    let name: String?
+    let sku: String?
+    let barcode: String?
+    let image_url: String?
+}
+
+struct PaginationDTO: Decodable, Hashable {
+    let page: Int
+    let per_page: Int
+    let total: Int
+    let total_pages: Int
+}
+
+struct StatusCountsDTO: Decodable, Hashable {
+    let all: Int
+    let pending: Int
+    let accepted: Int
+    let picking: Int
+    let packing: Int
+    let out_for_delivery: Int
+    let delivered: Int
+    let cancelled: Int
+
+    func count(for key: String) -> Int {
+        switch key {
+        case "all": return all
+        case "pending": return pending
+        case "accepted": return accepted
+        case "picking": return picking
+        case "packing": return packing
+        case "out_for_delivery": return out_for_delivery
+        case "delivered": return delivered
+        case "cancelled": return cancelled
+        default: return 0
+        }
+    }
+}
+
+/// data block of GET /api/trader/orders?id= (single order with items[]).
+struct OrderDetailData: Decodable {
+    let order: OrderDTO?
 }
 
 // MARK: - Dashboard (GET /api/trader/dashboard)

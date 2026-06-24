@@ -51,6 +51,41 @@ final class Session: ObservableObject {
     @Published var loginError: String?
     @Published var isSigningIn = false
 
+    init() {
+        restoreSavedSession()
+    }
+
+    private func restoreSavedSession() {
+        guard let saved = LoginSessionStore.load() else { return }
+        applySavedSession(saved, updateStage: false)
+    }
+
+    private func applySavedSession(_ saved: StoredLoginSession, updateStage: Bool) {
+        if let token = saved.token, !token.isEmpty {
+            APIClient.shared.token = token
+        }
+        if let store = saved.portal_info?.displayStoreName, !store.isEmpty {
+            storeName = store
+        }
+        if let user = saved.user {
+            accountName = user.displayName
+        }
+        if updateStage, APIClient.shared.token != nil {
+            stage = .main
+        }
+    }
+
+    private func persistLogin(_ data: LoginData) {
+        let stored = StoredLoginSession(
+            token: data.token,
+            user: data.user,
+            portal_type: data.portal_type,
+            portal_info: data.portal_info
+        )
+        LoginSessionStore.save(stored)
+        applySavedSession(stored, updateStage: false)
+    }
+
     func bootFinished() {
         // After the splash animation, go to the welcome screen.
         stage = .welcome
@@ -70,10 +105,7 @@ final class Session: ObservableObject {
             do {
                 let data = try await APIClient.shared.login(email: typed, password: pass)
                 await MainActor.run {
-                    APIClient.shared.token = data.token
-                    if let name = data.user?.first_name, !name.isEmpty {
-                        accountName = name
-                    } else { deriveName(from: typed) }
+                    persistLogin(data)
                     stage = .main
                 }
             } catch {
@@ -94,6 +126,9 @@ final class Session: ObservableObject {
 
     func signOut() {
         APIClient.shared.token = nil
+        LoginSessionStore.clear()
+        storeName = "Sipho's Spaza"
+        accountName = "Trader Account"
         stage = .welcome
     }
 }

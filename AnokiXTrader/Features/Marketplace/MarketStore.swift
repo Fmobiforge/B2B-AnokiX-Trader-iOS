@@ -24,6 +24,9 @@ struct MarketCartLine: Identifiable, Hashable {
     var unitPrice: Double
     var qty: Int
     var cartItemId: String?
+    var distributorId: String?
+    /// Whether this line is selected for checkout (default true).
+    var selected: Bool = true
 
     var lineTotal: Double { unitPrice * Double(qty) }
 }
@@ -49,6 +52,17 @@ final class MarketStore: ObservableObject {
     var cartCount: Int { cartBadgeCount }
     var cartSubtotal: Double { cart.reduce(0) { $0 + $1.lineTotal } }
     var parentCategories: [ProductCategoryDTO] { categories.filter { $0.parent_id == nil } }
+
+    // MARK: - Checkout selection
+
+    var selectedLines: [MarketCartLine] { cart.filter { $0.selected } }
+    var selectedSubtotal: Double { selectedLines.reduce(0) { $0 + $1.lineTotal } }
+
+    /// Toggle whether a line is included in the next order (kept in the cart either way).
+    func toggleSelected(_ id: String) {
+        guard let idx = cart.firstIndex(where: { $0.id == id }) else { return }
+        cart[idx].selected.toggle()
+    }
 
     func loadAll() async {
         await load(distributorId: selectedDistributorId)
@@ -96,9 +110,11 @@ final class MarketStore: ObservableObject {
                 guard item.quantity > 0 else { return nil }
                 let p = item.product
                 let pid = p?.id ?? item.productId ?? item.id
+                let distId = item.distributor?.id.map { String($0) }
                 return MarketCartLine(id: pid, name: p?.name ?? "",
                                       imageURL: p?.image_url, barcode: p?.barcode, sku: p?.sku,
-                                      unitPrice: item.unitPrice, qty: item.quantity, cartItemId: item.id)
+                                      unitPrice: item.unitPrice, qty: item.quantity,
+                                      cartItemId: item.id, distributorId: distId)
             }
             cart = lines
             cartBadgeCount = data.totalQuantity > 0

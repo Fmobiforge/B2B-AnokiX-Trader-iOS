@@ -142,6 +142,48 @@ final class APIClient {
         try await postFormStatus("api/trader/cart/delete", form: ["cart_item_id": cartItemId])
     }
 
+    /// Place an order from the selected cart lines (api/trader/orders/create).
+    /// `cartItemIds` is sent as a JSON array string (e.g. `[10,11]`); times are
+    /// `HH:mm:ss`. Only the envelope status/message decide success.
+    func createOrder(distributorId: String?, cartItemIds: [String], deliveryDate: String,
+                     startTime: String, endTime: String, notes: String,
+                     deliveryAddress: String, paymentMethod: String) async throws {
+        let form: [String: String] = [
+            "distributor_id": distributorId ?? "",
+            "cart_item_ids": "[" + cartItemIds.joined(separator: ",") + "]",
+            "delivery_date": deliveryDate,
+            "delivery_start_time": startTime,
+            "delivery_end_time": endTime,
+            "notes": notes,
+            "delivery_address": deliveryAddress,
+            "payment_method": paymentMethod
+        ]
+        try await postFormStatus("api/trader/orders/create", form: form)
+    }
+
+    /// List the trader's orders (api/trader/orders). All filters optional; a
+    /// {@code status} of "all" is omitted so the server returns every status.
+    func getOrders(distributorId: String?, search: String, dateFrom: String, dateTo: String,
+                   status: String, page: Int, perPage: Int) async throws -> OrdersData {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if let id = distributorId, !id.isEmpty { q["distributor_id"] = id }
+        let trimmed = search.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { q["search"] = trimmed }
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        if !status.isEmpty, status != "all" { q["status"] = status }
+        let data = try await get("api/trader/orders", query: q)
+        return try decode(data)
+    }
+
+    /// Full detail for one order (api/trader/orders?id=) — includes items[].
+    func getOrder(id: String) async throws -> OrderDTO {
+        let data = try await get("api/trader/orders", query: ["id": id])
+        let wrapper: OrderDetailData = try decode(data)
+        guard let order = wrapper.order else { throw APIError.decoding }
+        return order
+    }
+
     /// Public trader self-registration (multipart). No token required.
     func registerTrader(fields: [String: String], files: [MultipartFile]) async throws {
         try await uploadStatus("api/trader/register", fields: fields, files: files)
