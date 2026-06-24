@@ -5,27 +5,6 @@ import Foundation
 /// trader API yet, so the whole UI runs off these.
 enum MockData {
 
-    // MARK: Orders (placed by the trader to distributors)
-
-    static let orders: [OrderItem] = [
-        order("ORD-10548", "Tiger Brands", "Tiger Brands Distribution", "13 Jun 2026, 09:15", 12, "R 1,216.00", "pending", "Est. delivery 15 Jun 2026", "View Details", "#c62828"),
-        order("ORD-10547", "Unilever South Africa", "Unilever Distribution", "13 Jun 2026, 08:42", 8, "R 2,840.00", "accepted", "Est. delivery 14 Jun 2026", "Track Order", "#0d47a1"),
-        order("ORD-10546", "Coca-Cola Beverages", "Coca-Cola South Africa", "12 Jun 2026, 16:30", 18, "R 4,520.00", "picking", "Est. delivery 14 Jun 2026", "Track Order", "#e53935"),
-        order("ORD-10544", "Pioneer Foods", "Pioneer Foods Distribution", "11 Jun 2026, 14:05", 15, "R 1,890.00", "out_for_delivery", "Arriving today, 14:00–17:00", "Track Live", "#2e7d32"),
-        order("ORD-10543", "Tiger Brands", "Tiger Brands Distribution", "10 Jun 2026, 10:30", 10, "R 2,450.00", "delivered", "Delivered 11 Jun 2026", "View Invoice", "#c62828"),
-    ]
-
-    private static func order(_ id: String, _ name: String, _ subtitle: String, _ time: String,
-                              _ items: Int, _ amount: String, _ status: String,
-                              _ delivery: String, _ action: String, _ logo: String) -> OrderItem {
-        let initials = String(name.prefix(2)).uppercased()
-        return OrderItem(orderId: id, traderName: name, initials: initials, subtitle: subtitle,
-                         amount: amount, time: time, status: status, itemsCount: items,
-                         deliveryInfo: delivery, actionLabel: action, logoColor: logo)
-    }
-
-    static let statusFilters = ["All Orders", "Pending", "Accepted", "Picking", "Packing", "Out for Delivery", "Delivered", "Cancelled"]
-
     // MARK: Inventory
 
     static let inventory: [InventoryItem] = [

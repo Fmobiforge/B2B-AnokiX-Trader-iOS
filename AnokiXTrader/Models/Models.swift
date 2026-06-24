@@ -34,21 +34,6 @@ struct ProductItem: Identifiable, Hashable {
     var priceValue: Double { Double(price.filter { "0123456789.".contains($0) }) ?? 0 }
 }
 
-struct OrderItem: Identifiable, Hashable {
-    var id: String { orderId }
-    let orderId: String
-    let traderName: String
-    let initials: String
-    let subtitle: String
-    let amount: String
-    let time: String
-    let status: String       // pending | accepted | picking | packing | out_for_delivery | delivered | cancelled
-    let itemsCount: Int
-    let deliveryInfo: String
-    let actionLabel: String
-    let logoColor: String
-}
-
 struct InventoryItem: Identifiable, Hashable {
     let id = UUID()
     let name: String
