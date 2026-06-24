@@ -268,6 +268,7 @@ struct LogoCropSheet: View {
         .padding(20)
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Brand.surface.ignoresSafeArea())
+        .preferredColorScheme(.light)   // always render clear/light, even in Dark Mode
         .onAppear { controller.setImage(image) }
     }
 }

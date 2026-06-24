@@ -41,10 +41,12 @@ struct RegisterView: View {
                     .task { await store.loadReference() }
             }
         }
-        // Keep the form light, but make the status bar white over the dark header
-        // (same mechanism the Login/Welcome screens use).
-        .environment(\.colorScheme, .light)
-        .preferredColorScheme(.dark)
+        // Force Light for the whole Create Account flow so every sheet, action sheet,
+        // picker and slider renders with a clear light theme — even when the device is
+        // in Dark Mode. (SwiftUI couples the status-bar style to the scene's color
+        // scheme, so we keep the status bar on a light strip rather than darkening
+        // every dialog to tint it.)
+        .preferredColorScheme(.light)
     }
 
     private var wizard: some View {
@@ -87,7 +89,7 @@ struct RegisterView: View {
         .padding(.horizontal, 12)
         .padding(.top, 12)
         .padding(.bottom, 10)
-        .background(Brand.purpleDark.ignoresSafeArea(edges: .top))
+        .background(Brand.purpleDark)
     }
 
     private var footer: some View {
@@ -758,6 +760,7 @@ struct MultiSelectSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
         }
+        .preferredColorScheme(.light)   // always render clear/light, even in Dark Mode
     }
 }
 

@@ -49,5 +49,6 @@ struct CountryPickerSheet: View {
                 }
             }
         }
+        .preferredColorScheme(.light)   // always render clear/light, even in Dark Mode
     }
 }
