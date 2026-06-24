@@ -148,6 +148,180 @@ struct StepBar: View {
     }
 }
 
+// MARK: - Labeled wizard stepper (numbered circles + step names + connectors)
+
+/// Horizontal, auto-scrolling stepper mirroring the Android / Distributor Create
+/// Account chrome: a numbered circle and a step label for each step, joined by a
+/// short connector. Completed steps show a check; the current step is highlighted.
+struct WizardStepper: View {
+    let titles: [String]
+    let current: Int   // 0-based
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) {
+                    ForEach(titles.indices, id: \.self) { i in
+                        if i > 0 {
+                            Rectangle()
+                                .fill(Brand.border)
+                                .frame(width: 20, height: 1)
+                                .padding(.horizontal, 6)
+                        }
+                        item(i)
+                            .id(i)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+            .background(Brand.surface)
+            .onChange(of: current) { newValue in
+                withAnimation { proxy.scrollTo(newValue, anchor: .center) }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func item(_ i: Int) -> some View {
+        let state = stepState(i)
+        HStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .fill(state == .upcoming ? Brand.surface : Brand.purple)
+                    .overlay(Circle().stroke(state == .upcoming ? Brand.border : Brand.purple,
+                                             lineWidth: 1.5))
+                    .frame(width: 28, height: 28)
+                if state == .done {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.white)
+                } else {
+                    Text("\(i + 1)")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(state == .upcoming ? Brand.textSecondary : .white)
+                }
+            }
+            Text(titles[i])
+                .font(.system(size: 13, weight: state == .current ? .bold : .regular))
+                .foregroundColor(labelColor(state))
+                .fixedSize()
+        }
+        .padding(.horizontal, 6)
+    }
+
+    private enum StepState { case done, current, upcoming }
+
+    private func stepState(_ i: Int) -> StepState {
+        if i < current { return .done }
+        if i == current { return .current }
+        return .upcoming
+    }
+
+    private func labelColor(_ state: StepState) -> Color {
+        switch state {
+        case .done:     return Brand.textPrimary
+        case .current:  return Brand.purple
+        case .upcoming: return Brand.textSecondary
+        }
+    }
+}
+
+// MARK: - Step intro (navy heading + grey subtitle)
+
+/// The title/subtitle pair shown at the top of each Create Account step,
+/// matching the Android `top_title` heading + secondary subtitle.
+struct StepIntro: View {
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(Brand.topTitle)
+            Text(subtitle)
+                .font(.system(size: 13))
+                .foregroundColor(Brand.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Tinted information box (e.g. "Account sign-in")
+
+struct InfoBox: View {
+    let title: String
+    let text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(Brand.purple)
+            Text(text)
+                .font(.system(size: 12))
+                .foregroundColor(Brand.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Brand.purpleLight)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+// MARK: - Wrapping flow layout (chips that wrap onto multiple lines)
+
+/// A simple flow layout that places subviews left-to-right and wraps to a new
+/// line when the row is full — used for the delivery-day / tag chips.
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+    var lineSpacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var rowWidth: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if rowWidth > 0, rowWidth + spacing + size.width > maxWidth {
+                totalHeight += rowHeight + lineSpacing
+                totalWidth = max(totalWidth, rowWidth)
+                rowWidth = size.width
+                rowHeight = size.height
+            } else {
+                rowWidth += (rowWidth > 0 ? spacing : 0) + size.width
+                rowHeight = max(rowHeight, size.height)
+            }
+        }
+        totalHeight += rowHeight
+        totalWidth = max(totalWidth, rowWidth)
+        return CGSize(width: maxWidth == .infinity ? totalWidth : maxWidth, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x > bounds.minX, x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + lineSpacing
+                rowHeight = 0
+            }
+            view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+    }
+}
+
 // MARK: - Removable chip used for selected categories / distributors
 
 struct RemovableChip: View {

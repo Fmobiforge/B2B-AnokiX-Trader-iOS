@@ -45,6 +45,7 @@ enum Brand {
     static let textPrimary   = Color(hex: "#0F172A")
     static let textSecondary = Color(hex: "#64748B")
     static let textTertiary  = Color(hex: "#94A3B8")
+    static let topTitle      = Color(hex: "#1A237E")   // navy section headings (Android @color/top_title)
 
     static let border        = Color(hex: "#E2E8F0")
     static let divider       = Color(hex: "#E2E8F0")

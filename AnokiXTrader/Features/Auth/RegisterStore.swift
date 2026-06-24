@@ -70,12 +70,12 @@ final class RegisterStore: ObservableObject {
         ("wallet", "anokiX Wallet"), ("eft", "EFT / Bank Transfer"),
         ("cash", "Cash on Delivery"), ("card", "Card")
     ]
-    static let requiredDocs: [(field: String, label: String)] = [
-        ("business_registration_document", "Business Registration"),
-        ("owner_id_document", "Owner ID Document"),
-        ("proof_of_address", "Proof of Address"),
-        ("store_front_photo", "Store Front Photo"),
-        ("store_interior_photo", "Store Interior Photo")
+    static let requiredDocs: [(field: String, label: String, sub: String)] = [
+        ("business_registration_document", "Business Registration Document", "CIPC, Business Permit, etc."),
+        ("owner_id_document", "Owner ID Document", "ID or Passport"),
+        ("proof_of_address", "Proof of Address", "Municipal bill, Lease, etc."),
+        ("store_front_photo", "Store Front Photo", "Clear photo of your store"),
+        ("store_interior_photo", "Store Interior Photo", "Inside view of your store")
     ]
 
     /// Fallback trader types mirroring the Android design names (ids 1–8).
