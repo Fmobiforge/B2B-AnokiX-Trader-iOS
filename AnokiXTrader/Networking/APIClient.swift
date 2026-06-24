@@ -59,12 +59,13 @@ final class APIClient {
     /// still sending. We give uploads a very generous idle window (300s) and a 10-minute
     /// resource cap so the body has time to finish (parity with the Distributor app's
     /// `Http.multipartSession`).
-    private let uploadSession: Session = {
+    // `Alamofire.Session` (qualified — the app also has its own `Session` auth type).
+    private let uploadSession: Alamofire.Session = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 300
         config.timeoutIntervalForResource = 600
         config.waitsForConnectivity = true
-        return Session(configuration: config)
+        return Alamofire.Session(configuration: config)
     }()
 
     private var authHeaders: HTTPHeaders {
