@@ -81,6 +81,10 @@ struct MarketplaceRealView: View {
             }
         }
         .toast($toastMsg)
+        // White status-bar icons over the purple header (same trick as Login / Register).
+        // Keep scroll content in light mode; closing the screen restores the tab bar default.
+        .environment(\.colorScheme, .light)
+        .preferredColorScheme(.dark)
     }
 
     // MARK: - Header (Android activity_marketplace.xml)
@@ -103,10 +107,12 @@ struct MarketplaceRealView: View {
             marketplaceCartButton
         }
         .padding(.horizontal, 8)
+        .padding(.bottom, 8)
         .frame(minHeight: 44)
         .background(
             LinearGradient(colors: [Brand.purpleDark, Brand.purple],
                            startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea(edges: .top)
         )
     }
 
