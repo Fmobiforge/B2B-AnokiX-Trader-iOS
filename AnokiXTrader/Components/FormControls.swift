@@ -99,6 +99,45 @@ struct DropdownField: View {
     }
 }
 
+// MARK: - Dropdown backed by a Menu (reliable single-select, no action-sheet glitches)
+
+/// Same look as `DropdownField` but opens a native pull-down `Menu` instead of a
+/// `.confirmationDialog`. Menus render as opaque pop-ups, so they avoid the
+/// transparent-backdrop issue action sheets hit when stacked with other modals.
+struct MenuDropdown<MenuContent: View>: View {
+    let title: String
+    let value: String
+    var placeholder: String = "Select"
+    @ViewBuilder var menuContent: MenuContent
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Brand.textSecondary)
+            Menu {
+                menuContent
+            } label: {
+                HStack(spacing: 8) {
+                    Text(value.isEmpty ? placeholder : value)
+                        .font(.system(size: 15))
+                        .foregroundColor(value.isEmpty ? Brand.textTertiary : Brand.textPrimary)
+                        .lineLimit(1)
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Brand.textSecondary)
+                }
+                .padding(14)
+                .background(Brand.surface)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
 // MARK: - Selectable chip used in pickers and the categories/days steps
 
 struct SelectChip: View {

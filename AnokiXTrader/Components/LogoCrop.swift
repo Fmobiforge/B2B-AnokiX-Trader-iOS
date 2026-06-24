@@ -164,16 +164,17 @@ final class LogoCropView: UIView {
 }
 
 private extension UIImage {
-    /// Upright pixel image so crop math matches Android's raw bitmap dimensions.
+    /// Returns an upright (`.up`) image with the camera/EXIF orientation **baked into
+    /// the pixels**, so the cropper's pixel math matches what the user sees. We draw
+    /// `self` (which honours `imageOrientation`) into a context sized to the oriented
+    /// `size` — drawing the raw `cgImage` instead would discard the orientation and
+    /// flip portrait / 180°-rotated photos.
     func normalizedForEditing() -> UIImage {
-        guard let cgImage = cgImage else { return self }
-        if imageOrientation == .up, scale == 1 { return self }
-        let size = CGSize(width: cgImage.width, height: cgImage.height)
+        if imageOrientation == .up { return self }
         let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
+        format.scale = scale
         return UIGraphicsImageRenderer(size: size, format: format).image { _ in
-            UIImage(cgImage: cgImage, scale: 1, orientation: .up)
-                .draw(in: CGRect(origin: .zero, size: size))
+            draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }

@@ -230,16 +230,36 @@ private struct PhoneField: View {
 
 private struct BusinessStep: View {
     @ObservedObject var store: RegisterStore
-    @State private var source: UIImagePickerController.SourceType?
-    @State private var showSourceDialog = false
-    @State private var cropImage: UIImage?
+    @State private var logoStage: LogoStage?
+
+    /// Single modal driving the logo flow: pick a source → crop. One `.sheet(item:)`
+    /// (instead of an action sheet + two stacked sheets, which renders unreliably).
+    private enum LogoStage: Identifiable {
+        case picker(UIImagePickerController.SourceType)
+        case crop(UIImage)
+        var id: Int {
+            switch self {
+            case .picker(let t): return t.rawValue
+            case .crop:          return -1
+            }
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Company Logo (Optional)").font(.system(size: 13, weight: .medium))
                     .foregroundColor(Brand.textSecondary)
-                Button { showSourceDialog = true } label: {
+                Menu {
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button { logoStage = .picker(.camera) } label: {
+                            Label("Take photo", systemImage: "camera")
+                        }
+                    }
+                    Button { logoStage = .picker(.photoLibrary) } label: {
+                        Label("Choose from gallery", systemImage: "photo")
+                    }
+                } label: {
                     ZStack {
                         if let logo = store.logo {
                             Image(uiImage: logo).resizable().scaledToFill()
@@ -270,34 +290,21 @@ private struct BusinessStep: View {
                          placeholder: "Enter business email", keyboard: .emailAddress,
                          autocap: .never, disableAutocorrect: true)
         }
-        .confirmationDialog("Choose source", isPresented: $showSourceDialog, titleVisibility: .visible) {
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button("Take photo") { source = .camera }
+        .sheet(item: $logoStage) { stage in
+            switch stage {
+            case .picker(let type):
+                // Pick raw (no system crop) → our own scale/rotate cropper. Defer so the
+                // picker sheet finishes dismissing before the crop sheet presents.
+                ImagePicker(sourceType: type, allowsEditing: false) { img in
+                    DispatchQueue.main.async { logoStage = .crop(img) }
+                }
+            case .crop(let img):
+                LogoCropSheet(image: img,
+                              onConfirm: { store.logo = $0 },
+                              onUploadNew: { logoStage = .picker(.photoLibrary) })
             }
-            Button("Choose from gallery") { source = .photoLibrary }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(item: Binding(get: { source.map { SourceWrap(type: $0) } },
-                             set: { source = $0?.type })) { wrap in
-            // Pick raw (no system crop) → our own scale/rotate cropper. Defer so the
-            // picker sheet finishes dismissing before the crop sheet presents.
-            ImagePicker(sourceType: wrap.type, allowsEditing: false) { img in
-                DispatchQueue.main.async { cropImage = img }
-            }
-        }
-        .sheet(item: Binding(get: { cropImage.map { ImageWrap(image: $0) } },
-                             set: { cropImage = $0?.image })) { wrap in
-            LogoCropSheet(image: wrap.image,
-                          onConfirm: { store.logo = $0 },
-                          onUploadNew: { showSourceDialog = true })
         }
     }
-}
-
-/// Identifiable wrapper so a picked UIImage can drive `.sheet(item:)` for the cropper.
-struct ImageWrap: Identifiable {
-    let id = UUID()
-    let image: UIImage
 }
 
 /// Identifiable wrapper so a UIImagePickerController.SourceType can drive `.sheet(item:)`.
@@ -501,7 +508,6 @@ private struct DocumentsStep: View {
     @ObservedObject var store: RegisterStore
     @State private var activeField: String?
     @State private var imageSource: UIImagePickerController.SourceType?
-    @State private var showDialog = false
     @State private var showFileImporter = false
 
     private var rows: [(field: String, label: String, sub: String, required: Bool)] {
@@ -527,27 +533,30 @@ private struct DocumentsStep: View {
                         }
                     }
                     Spacer()
-                    Button(store.documents[row.field] != nil ? "Replace" : "Upload") {
-                        activeField = row.field
-                        showDialog = true
+                    Menu {
+                        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                            Button { activeField = row.field; imageSource = .camera } label: {
+                                Label("Take photo", systemImage: "camera")
+                            }
+                        }
+                        Button { activeField = row.field; imageSource = .photoLibrary } label: {
+                            Label("Choose from gallery", systemImage: "photo")
+                        }
+                        Button { activeField = row.field; showFileImporter = true } label: {
+                            Label("Choose PDF", systemImage: "doc")
+                        }
+                    } label: {
+                        Text(store.documents[row.field] != nil ? "Replace" : "Upload")
+                            .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
+                            .padding(.horizontal, 16).padding(.vertical, 9)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
                     }
-                    .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
-                    .padding(.horizontal, 16).padding(.vertical, 9)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
                 }
                 .padding(12).card(padding: 12)
             }
             Text("Accepted formats: JPG, PNG, PDF (Max 5MB)")
                 .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .confirmationDialog("Add document", isPresented: $showDialog, titleVisibility: .visible) {
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button("Camera") { imageSource = .camera }
-            }
-            Button("Photo Library") { imageSource = .photoLibrary }
-            Button("Choose PDF") { showFileImporter = true }
-            Button("Cancel", role: .cancel) {}
         }
         .sheet(item: Binding(get: { imageSource.map { SourceWrap(type: $0) } },
                              set: { imageSource = $0?.type })) { wrap in
@@ -579,7 +588,6 @@ private struct DocumentsStep: View {
 private struct DistributorsStep: View {
     @ObservedObject var store: RegisterStore
     @State private var showDistributors = false
-    @State private var showPayment = false
 
     static func fullDayName(_ abbr: String) -> String {
         switch abbr {
@@ -624,14 +632,12 @@ private struct DistributorsStep: View {
                 }
             }
 
-            DropdownField(title: "Preferred Payment Method", value: store.paymentLabel,
-                          placeholder: "Select payment method") { showPayment = true }
-        }
-        .confirmationDialog("Payment Method", isPresented: $showPayment, titleVisibility: .visible) {
-            ForEach(RegisterStore.paymentOptions, id: \.code) { opt in
-                Button(opt.label) { store.paymentMethod = opt.code }
+            MenuDropdown(title: "Preferred Payment Method", value: store.paymentLabel,
+                         placeholder: "Select payment method") {
+                ForEach(RegisterStore.paymentOptions, id: \.code) { opt in
+                    Button(opt.label) { store.paymentMethod = opt.code }
+                }
             }
-            Button("Cancel", role: .cancel) {}
         }
         .sheet(isPresented: $showDistributors) {
             MultiSelectSheet(title: "Preferred Distributors",
