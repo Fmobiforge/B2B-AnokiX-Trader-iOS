@@ -224,7 +224,7 @@ struct OrderRow: View {
                 .font(.system(size: 10, weight: .bold)).tracking(0.5).foregroundColor(Brand.textSecondary)
                 .padding(.top, 12)
 
-            FlowChips(items: order.products ?? []).padding(.top, 6)
+            WrappingTextChips(items: order.products ?? []).padding(.top, 6)
 
             Divider().padding(.top, 12)
 
@@ -248,21 +248,5 @@ struct OrderRow: View {
         let date = OrderFmt.deliveryDate(order.delivery_date)
         guard !date.isEmpty else { return "" }
         return (order.statusKey == "delivered" ? "Delivered " : "Est. delivery ") + date
-    }
-}
-
-/// Simple wrapping chip row for product names.
-struct FlowChips: View {
-    let items: [String]
-
-    var body: some View {
-        FlexibleWrap(items: items) { name in
-            Text(name)
-                .font(.system(size: 11)).foregroundColor(Brand.textPrimary)
-                .padding(.horizontal, 10).padding(.vertical, 5)
-                .background(Brand.surfaceVariant)
-                .overlay(Capsule().stroke(Brand.border, lineWidth: 1))
-                .clipShape(Capsule())
-        }
     }
 }

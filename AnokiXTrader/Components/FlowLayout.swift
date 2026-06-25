@@ -60,3 +60,40 @@ struct FlexibleWrap<Item: Hashable, Content: View>: View {
         }
     }
 }
+
+/// Wrapping capsule chips for plain text labels (e.g. order product names).
+struct WrappingTextChips: View {
+    let items: [String]
+
+    var body: some View {
+        FlexibleWrap(items: items) { name in
+            Text(name)
+                .font(.system(size: 11)).foregroundColor(Brand.textPrimary)
+                .padding(.horizontal, 10).padding(.vertical, 5)
+                .background(Brand.surfaceVariant)
+                .overlay(Capsule().stroke(Brand.border, lineWidth: 1))
+                .clipShape(Capsule())
+        }
+    }
+}
+
+/// Horizontal scroll of removable chips (register categories / distributors).
+struct HorizontalRemovableChips: View {
+    let items: [(Int, String)]
+    let onRemove: (Int) -> Void
+
+    init(_ items: [(Int, String)], onRemove: @escaping (Int) -> Void) {
+        self.items = items
+        self.onRemove = onRemove
+    }
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(items, id: \.0) { id, label in
+                    RemovableChip(label: label) { onRemove(id) }
+                }
+            }
+        }
+    }
+}

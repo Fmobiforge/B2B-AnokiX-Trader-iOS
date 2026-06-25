@@ -342,7 +342,7 @@ private struct ClassificationStep: View {
                                     .foregroundColor(Brand.textSecondary)
                             }
                         } else {
-                            FlowChips(store.parentCategories.filter { store.selectedCategoryIds.contains($0.id) }
+                            HorizontalRemovableChips(store.parentCategories.filter { store.selectedCategoryIds.contains($0.id) }
                                 .map { c in (c.id, c.title) }) { id in store.selectedCategoryIds.remove(id) }
                         }
                     }
@@ -389,28 +389,6 @@ private struct TraderTypeCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-    }
-}
-
-/// Wrapping rows of removable chips (used inside the categories / distributors fields).
-private struct FlowChips: View {
-    let items: [(Int, String)]
-    let onRemove: (Int) -> Void
-
-    init(_ items: [(Int, String)], onRemove: @escaping (Int) -> Void) {
-        self.items = items
-        self.onRemove = onRemove
-    }
-
-    var body: some View {
-        // Simple horizontal scroll of chips keeps the layout robust without a custom flow layout.
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(items, id: \.0) { id, label in
-                    RemovableChip(label: label) { onRemove(id) }
-                }
-            }
-        }
     }
 }
 
@@ -635,7 +613,7 @@ private struct DistributorsStep: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Preferred Delivery Days").font(.system(size: 13, weight: .medium))
                     .foregroundColor(Brand.textSecondary)
-                FlowLayout(spacing: 8, lineSpacing: 8) {
+                FlowLayout(hSpacing: 8, vSpacing: 8) {
                     ForEach(RegisterStore.allDays, id: \.self) { day in
                         SelectChip(label: Self.fullDayName(day), selected: store.deliveryDays.contains(day)) {
                             if store.deliveryDays.contains(day) { store.deliveryDays.remove(day) }
