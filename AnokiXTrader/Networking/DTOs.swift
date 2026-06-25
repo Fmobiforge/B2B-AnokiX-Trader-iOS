@@ -448,6 +448,7 @@ struct StatusCountsDTO: Decodable, Hashable {
     let out_for_delivery: Int
     let delivered: Int
     let cancelled: Int
+    let failed: Int
 
     func count(for key: String) -> Int {
         switch key {
@@ -459,6 +460,7 @@ struct StatusCountsDTO: Decodable, Hashable {
         case "out_for_delivery": return out_for_delivery
         case "delivered": return delivered
         case "cancelled": return cancelled
+        case "failed": return failed
         default: return 0
         }
     }

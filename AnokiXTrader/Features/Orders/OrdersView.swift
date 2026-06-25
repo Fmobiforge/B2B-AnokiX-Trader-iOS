@@ -7,9 +7,9 @@ struct OrdersView: View {
     @State private var showDatePicker = false
 
     private let statusKeys = ["all", "pending", "accepted", "picking", "packing",
-                              "out_for_delivery", "delivered", "cancelled"]
+                              "out_for_delivery", "delivered", "cancelled", "failed"]
     private let statusTitles = ["All Orders", "Pending", "Accepted", "Picking", "Packing",
-                                "Out for Delivery", "Delivered", "Cancelled"]
+                                "Out for Delivery", "Delivered", "Cancelled", "Failed"]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -193,6 +193,7 @@ func statusColor(_ key: String) -> Color {
     case "out_for_delivery": return Color(hex: "#EA580C")
     case "delivered":        return Brand.success
     case "cancelled":        return Brand.danger
+    case "failed":           return Brand.danger
     default:                 return Color(hex: "#64748B")
     }
 }
