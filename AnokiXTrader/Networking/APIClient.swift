@@ -184,6 +184,129 @@ final class APIClient {
         return order
     }
 
+    // MARK: Goods Received (GRV)
+
+    /// List the trader's Goods Received Vouchers + KPI summary (api/trader/grvs).
+    func getGrvs() async throws -> GrvListData {
+        let data = try await get("api/trader/grvs", query: [:])
+        return try decode(data)
+    }
+
+    /// Single GRV with line items (api/trader/grvs/{id}).
+    func getGrv(id: String) async throws -> GrvDTO {
+        let data = try await get("api/trader/grvs/\(id)", query: [:])
+        let wrapper: GrvDetailData = try decode(data)
+        return wrapper.grv
+    }
+
+    /// Confirm receipt of a GRV (api/trader/grvs/{id}/confirm). `items` is a list of
+    /// `["grv_item_id": .., "received_quantity": .., "damaged_quantity": ..]`; the
+    /// accepted quantity is added to inventory server-side. Returns the updated GRV.
+    @discardableResult
+    func confirmGrv(id: String, items: [[String: Int]], note: String) async throws -> GrvDTO {
+        let payload: [String: Any] = ["items": items, "note": note]
+        let data = try await postJSON("api/trader/grvs/\(id)/confirm", json: payload)
+        let wrapper: GrvDetailData = try decode(data)
+        return wrapper.grv
+    }
+
+    /// Generated GRV PDF (api/trader/grvs/{id}/pdf) — { filename, mime, base64 data }.
+    func getGrvPdf(id: String) async throws -> GrvPdfData {
+        let data = try await get("api/trader/grvs/\(id)/pdf", query: [:])
+        return try decode(data)
+    }
+
+    // MARK: Invoices
+
+    /// List the trader's invoices (api/trader/invoices).
+    func getInvoices() async throws -> InvoiceListData {
+        let data = try await get("api/trader/invoices", query: [:])
+        return try decode(data)
+    }
+
+    /// Generated invoice PDF (api/trader/invoices/{id}/pdf) — { filename, mime, base64 data }.
+    func getInvoicePdf(id: String) async throws -> InvoicePdfData {
+        let data = try await get("api/trader/invoices/\(id)/pdf", query: [:])
+        return try decode(data)
+    }
+
+    // MARK: Inventory
+
+    /// Live inventory dashboard (api/trader/inventory).
+    func getInventory() async throws -> InventoryData {
+        let data = try await get("api/trader/inventory", query: [:])
+        return try decode(data)
+    }
+
+    /// Adjust a product's stock (api/trader/inventory/adjust). `quantity` is signed
+    /// (positive adds, negative reduces).
+    func adjustInventory(productId: Int, quantity: Int, reason: String) async throws {
+        let payload: [String: Any] = ["product_id": productId, "quantity": quantity, "reason": reason]
+        _ = try await postJSON("api/trader/inventory/adjust", json: payload)
+    }
+
+    /// One product's snapshot + movement ledger (api/trader/inventory/history).
+    func getInventoryHistory(productId: Int) async throws -> InventoryHistoryData {
+        let data = try await get("api/trader/inventory/history", query: ["product_id": String(productId)])
+        return try decode(data)
+    }
+
+    /// Inventory analytics (api/trader/inventory/analytics): ageing, gross profit, reorder.
+    func getInventoryAnalytics(days: Int) async throws -> InventoryAnalyticsData {
+        let data = try await get("api/trader/inventory/analytics", query: ["days": String(days)])
+        return try decode(data)
+    }
+
+    // MARK: Goods Returns (GRN)
+
+    /// List the trader's Goods Returns + KPI summary (api/trader/returns).
+    func getReturns() async throws -> ReturnsListData {
+        let data = try await get("api/trader/returns", query: [:])
+        return try decode(data)
+    }
+
+    /// File a goods return (api/trader/returns). `items` is a list of
+    /// `["product_id": Int, "quantity": Int, "reason": String]`. Reduces stock
+    /// immediately; the distributor reviews and may issue a credit note.
+    func createReturn(items: [[String: Any]], reason: String, note: String, sourceGrvId: String?) async throws {
+        var payload: [String: Any] = ["items": items, "reason": reason, "note": note]
+        if let sourceGrvId, !sourceGrvId.isEmpty { payload["source_grv_id"] = sourceGrvId }
+        _ = try await postJSON("api/trader/returns", json: payload)
+    }
+
+    // MARK: POS (Pagamio)
+
+    /// Sellable POS products (api/trader/pos/products).
+    func getPosProducts() async throws -> [PosProductDTO] {
+        let data = try await get("api/trader/pos/products", query: [:])
+        let raw = try data["products"].rawData()
+        return (try? JSONDecoder().decode([PosProductDTO].self, from: raw)) ?? []
+    }
+
+    /// Complete a POS sale (api/trader/pos/sale, JSON). `items` is a list of
+    /// `["product_id": Int, "quantity": Int, "unit_price": Double]`; `paymentMethod`
+    /// is one of cash|wallet|card|qr|other. Returns the receipt.
+    @discardableResult
+    func createPosSale(items: [[String: Any]], paymentMethod: String, discount: Double) async throws -> PosSaleDTO {
+        let payload: [String: Any] = [
+            "items": items,
+            "payment_method": paymentMethod,
+            "discount": discount
+        ]
+        let data = try await postJSON("api/trader/pos/sale", json: payload)
+        let wrapper: PosSaleData = try decode(data)
+        return wrapper.sale
+    }
+
+    /// POS sales history + summary (api/trader/pos/sales). Filters optional.
+    func getPosSales(dateFrom: String, dateTo: String, page: Int, perPage: Int) async throws -> PosSalesData {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        let data = try await get("api/trader/pos/sales", query: q)
+        return try decode(data)
+    }
+
     /// Public trader self-registration (multipart). No token required.
     func registerTrader(fields: [String: String], files: [MultipartFile]) async throws {
         try await uploadStatus("api/trader/register", fields: fields, files: files)
@@ -216,6 +339,13 @@ final class APIClient {
         let params: Parameters = form
         let request = AF.request(baseURL + path, method: .post, parameters: params,
                                  encoding: URLEncoding.httpBody, headers: authHeaders)
+        return try await dataNode(request)
+    }
+
+    /// POST a JSON body → returns the validated `data` node as SwiftyJSON.
+    private func postJSON(_ path: String, json: [String: Any]) async throws -> JSON {
+        let request = AF.request(baseURL + path, method: .post, parameters: json,
+                                 encoding: JSONEncoding.default, headers: authHeaders)
         return try await dataNode(request)
     }
 

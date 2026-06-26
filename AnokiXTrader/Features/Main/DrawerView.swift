@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Dark side drawer mirroring the Trader Portal sidebar (exact 12 items + profile footer).
+/// Dark side drawer mirroring the Trader Portal sidebar (18 items + profile footer).
 struct DrawerView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var session: Session

@@ -64,7 +64,11 @@ struct ModuleHost: View {
         NavigationStack {
             Group {
                 switch module {
+                case .goodsReceived: GoodsReceivedView()
+                case .goodsReturns:  GoodsReturnsView()
                 case .inventory:     InventoryView()
+                case .sales:         SalesView()
+                case .invoices:      InvoicesView()
                 case .marketplace:   MarketplaceRealView()
                 case .payments:      PaymentsView()
                 case .airtime:       AirtimeView()

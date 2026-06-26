@@ -1,50 +1,84 @@
 import SwiftUI
 
-/// Cart review → VAT breakdown → payment method → receipt. Shared by POS sales
-/// (mirrors the Android CheckoutActivity reused for both sale & marketplace order).
+/// POS "Current Sale" / Complete Sale (Pagamio). Review lines (qty steppers + remove),
+/// apply a discount, pick a payment method, and commit the sale via
+/// `api/trader/pos/sale`. VAT (15%) is extracted from the inclusive total; on success
+/// a receipt sheet mirrors the portal's Sale Completed modal.
 struct CheckoutView: View {
     @EnvironmentObject var cart: Cart
     @Environment(\.dismiss) private var dismiss
-    @State private var paymentMethod = "Card"
-    @State private var showReceipt = false
+    @State private var discountText = ""
+    @State private var payment: PosPayment = .wallet
+    @State private var submitting = false
+    @State private var receipt: PosSaleDTO?
+    @State private var errorMsg: String?
 
-    private let methods = ["Card", "Cash", "anokiX Wallet", "QR / SnapScan"]
+    private var inclusive: Double { cart.subtotal }
+    private var discount: Double { min(max(0, Double(discountText) ?? 0), inclusive) }
+    private var total: Double { max(0, inclusive - discount) }
+    private var vat: Double { total * 0.15 / 1.15 }
+    private var subtotalExcl: Double { total - vat }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Line items with qty steppers
+                // Line items with qty steppers + remove
                 VStack(alignment: .leading, spacing: 6) {
-                    SectionHeader(title: "Order Items")
-                    VStack(spacing: 0) {
-                        ForEach(cart.lines) { line in
-                            HStack(spacing: 12) {
-                                InitialBadge(text: String(line.name.prefix(1)), color: Brand.purple, size: 40)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(line.name).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                                    Text(Money.rand(line.unitPrice)).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    SectionHeader(title: "Current Sale")
+                    if cart.isEmpty {
+                        Text("Your cart is empty. Add products to start a sale.")
+                            .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                            .frame(maxWidth: .infinity).padding(.vertical, 24)
+                    } else {
+                        VStack(spacing: 0) {
+                            ForEach(cart.lines) { line in
+                                HStack(spacing: 12) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(line.name).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                                        Text("\(Money.rand(line.unitPrice)) each").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                        Text(Money.rand(line.lineTotal)).font(.system(size: 13, weight: .bold)).foregroundColor(Brand.purple)
+                                    }
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 6) {
+                                        Button { cart.remove(line.id) } label: {
+                                            Image(systemName: "trash").foregroundColor(Brand.danger).font(.system(size: 15))
+                                        }
+                                        QtyStepper(qty: line.qty,
+                                                   dec: { cart.setQty(line.id, line.qty - 1) },
+                                                   inc: { cart.setQty(line.id, line.qty + 1) })
+                                    }
                                 }
-                                Spacer()
-                                QtyStepper(qty: line.qty,
-                                           dec: { cart.setQty(line.id, line.qty - 1) },
-                                           inc: { cart.setQty(line.id, line.qty + 1) })
+                                .padding(.vertical, 10)
+                                if line.id != cart.lines.last?.id { Divider() }
                             }
-                            .padding(.vertical, 10)
-                            if line.id != cart.lines.last?.id { Divider() }
                         }
                     }
                 }
                 .card()
 
-                // Totals
+                // Discount + totals
                 VStack(spacing: 10) {
-                    totalRow("Subtotal", Money.rand(cart.subtotal))
-                    totalRow("VAT (15%)", Money.rand(cart.vat))
+                    HStack {
+                        Text("Discount").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                        Spacer()
+                        TextField("0", text: $discountText)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .font(.system(size: 14, weight: .semibold))
+                            .frame(width: 90, height: 36)
+                            .padding(.horizontal, 10)
+                            .background(Brand.surfaceVariant)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    Divider()
+                    totalRow("Subtotal (excl. VAT)", Money.rand(subtotalExcl))
+                    totalRow("VAT (15%)", Money.rand(vat))
                     Divider()
                     HStack {
                         Text("Total").font(.system(size: 16, weight: .bold))
                         Spacer()
-                        Text(Money.rand(cart.total)).font(.system(size: 18, weight: .bold)).foregroundColor(Brand.purple)
+                        Text(Money.rand(total)).font(.system(size: 18, weight: .bold)).foregroundColor(Brand.purple)
                     }
                 }
                 .card()
@@ -52,38 +86,64 @@ struct CheckoutView: View {
                 // Payment method
                 VStack(alignment: .leading, spacing: 10) {
                     SectionHeader(title: "Payment Method")
-                    ForEach(methods, id: \.self) { m in
-                        Button { paymentMethod = m } label: {
-                            HStack {
-                                Image(systemName: paymentMethod == m ? "largecircle.fill.circle" : "circle")
-                                    .foregroundColor(paymentMethod == m ? Brand.purple : Brand.textTertiary)
-                                Text(m).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
-                                Spacer()
-                            }
-                            .padding(.vertical, 8).contentShape(Rectangle())
+                    Menu {
+                        ForEach(PosPayment.allCases) { m in
+                            Button(m.label) { payment = m }
                         }
-                        .buttonStyle(.plain)
+                    } label: {
+                        HStack {
+                            Text(payment.label).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                            Spacer()
+                            Image(systemName: "chevron.down").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        }
+                        .padding(.horizontal, 14).frame(height: 48)
+                        .background(Brand.surfaceVariant)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                 }
                 .card()
 
-                Button("Charge \(Money.rand(cart.total))") { showReceipt = true }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .disabled(cart.isEmpty)
+                Button(submitting ? "Processing…" : "Complete Sale · \(Money.rand(total))") {
+                    Task { await completeSale() }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(cart.isEmpty || submitting)
             }
             .padding(16)
         }
         .background(Brand.background)
-        .navigationTitle("Checkout")
+        .navigationTitle("Current Sale")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showReceipt) {
-            ReceiptView(total: cart.total, method: paymentMethod) {
+        .sheet(item: $receipt) { sale in
+            PosReceiptView(sale: sale) {
                 cart.clear()
-                showReceipt = false
+                receipt = nil
                 dismiss()
             }
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
         }
+        .alert("Sale failed", isPresented: .constant(errorMsg != nil)) {
+            Button("OK") { errorMsg = nil }
+        } message: {
+            Text(errorMsg ?? "")
+        }
+    }
+
+    private func completeSale() async {
+        guard !cart.isEmpty, !submitting else { return }
+        submitting = true
+        let items: [[String: Any]] = cart.lines.map {
+            ["product_id": Int($0.id) ?? 0, "quantity": $0.qty, "unit_price": $0.unitPrice]
+        }
+        do {
+            let sale = try await APIClient.shared.createPosSale(
+                items: items, paymentMethod: payment.rawValue, discount: discount)
+            receipt = sale
+        } catch {
+            errorMsg = (error as? LocalizedError)?.errorDescription ?? "Failed to complete sale."
+        }
+        submitting = false
     }
 
     private func totalRow(_ l: String, _ r: String) -> some View {
@@ -105,25 +165,5 @@ private struct QtyStepper: View {
             Text("\(qty)").font(.system(size: 15, weight: .bold)).frame(minWidth: 20)
             Button(action: inc) { Image(systemName: "plus.circle.fill").foregroundColor(Brand.purple) }
         }
-    }
-}
-
-struct ReceiptView: View {
-    let total: Double
-    let method: String
-    let onDone: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "checkmark.circle.fill").font(.system(size: 60)).foregroundColor(Brand.success).padding(.top, 30)
-            Text("Payment Successful").font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
-            Text("\(Money.rand(total)) · \(method)").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
-            Text("A receipt has been issued to the customer.").font(.system(size: 13)).foregroundColor(Brand.textTertiary)
-                .multilineTextAlignment(.center).padding(.horizontal, 30)
-            Spacer()
-            Button("Done", action: onDone).buttonStyle(PrimaryButtonStyle()).padding(.horizontal, 20).padding(.bottom, 20)
-        }
-        .frame(maxWidth: .infinity)
-        .background(Brand.background)
     }
 }

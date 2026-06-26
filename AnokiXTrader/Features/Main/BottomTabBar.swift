@@ -13,8 +13,8 @@ struct BottomTabBar: View {
     }
 
     private let items: [Item] = [
-        Item(tab: .home, title: "Home", icon: "house.fill"),
-        Item(tab: .sell, title: "Sell", icon: "cart.fill"),
+        Item(tab: .home, title: "Dashboard", icon: "house.fill"),
+        Item(tab: .sell, title: "POS", icon: "cart.fill"),
         Item(tab: .orders, title: "Orders", icon: "shippingbox.fill"),
         Item(tab: .wallet, title: "Wallet", icon: "wallet.pass.fill"),
         Item(tab: .more, title: "More", icon: "ellipsis"),

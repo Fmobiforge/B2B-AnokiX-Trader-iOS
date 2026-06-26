@@ -7,6 +7,9 @@ struct CartLine: Identifiable, Hashable {
     let name: String
     let unitPrice: Double
     var qty: Int
+    var imageUrl: String? = nil
+    var sku: String? = nil
+    var stock: Int = Int.max
 
     var lineTotal: Double { unitPrice * Double(qty) }
 }
@@ -26,9 +29,29 @@ final class Cart: ObservableObject {
         }
     }
 
+    /// Add one unit of a live POS product (clamped to on-hand stock).
+    func add(product: PosProductDTO) {
+        let key = String(product.id)
+        if let idx = lines.firstIndex(where: { $0.id == key }) {
+            if lines[idx].qty < lines[idx].stock { lines[idx].qty += 1 }
+        } else {
+            lines.append(CartLine(id: key, name: product.name ?? "", unitPrice: product.price,
+                                  qty: 1, imageUrl: MediaUrls.resolve(product.image_url),
+                                  sku: product.sku, stock: product.units))
+        }
+    }
+
     func setQty(_ id: String, _ qty: Int) {
         guard let idx = lines.firstIndex(where: { $0.id == id }) else { return }
-        if qty <= 0 { lines.remove(at: idx) } else { lines[idx].qty = qty }
+        if qty <= 0 {
+            lines.remove(at: idx)
+        } else {
+            lines[idx].qty = min(qty, lines[idx].stock)
+        }
+    }
+
+    func remove(_ id: String) {
+        lines.removeAll { $0.id == id }
     }
 
     func clear() { lines.removeAll() }

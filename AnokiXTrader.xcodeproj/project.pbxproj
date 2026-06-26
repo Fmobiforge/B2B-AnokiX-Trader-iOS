@@ -38,6 +38,14 @@
 		779D758D64356A4B138522C7 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CCBD2699E321399EB3D035E /* RegisterView.swift */; };
 		7C8D94F78A8E396E4A838BBB /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */; };
 		8B2973FA1A1854CC67DC6532 /* MarketStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1651A2A75A0267F8B90A490 /* MarketStore.swift */; };
+		FE01CA0000000000000000B2 /* GoodsReceivedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE01CA0000000000000000B1 /* GoodsReceivedStore.swift */; };
+		FE01CA0000000000000000C2 /* GoodsReceivedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE01CA0000000000000000C1 /* GoodsReceivedView.swift */; };
+		FE04CC0000000000000000B2 /* InvoicesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE04CC0000000000000000B1 /* InvoicesStore.swift */; };
+		FE04CC0000000000000000C2 /* InvoicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE04CC0000000000000000C1 /* InvoicesView.swift */; };
+		FE02CB0000000000000000B2 /* GoodsReturnsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE02CB0000000000000000B1 /* GoodsReturnsStore.swift */; };
+		FE02CB0000000000000000C2 /* GoodsReturnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE02CB0000000000000000C1 /* GoodsReturnsView.swift */; };
+		FE03DC0000000000000000B2 /* InventoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE03DC0000000000000000B1 /* InventoryStore.swift */; };
+		FE03DC0000000000000000C2 /* PosStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE03DC0000000000000000C1 /* PosStore.swift */; };
 		90E292E3B4DFC5149F07A2B0 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B7C23EF6695669B46657AB /* FlowLayout.swift */; };
 		932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CD2B00377D56966727ED1C /* SettingsView.swift */; };
 		94177D83E04817A5B54F474E /* MarketplaceRealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */; };
@@ -108,6 +116,14 @@
 		BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		C0CFF0CFD267320664843B8F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		C1651A2A75A0267F8B90A490 /* MarketStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketStore.swift; sourceTree = "<group>"; };
+		FE01CA0000000000000000B1 /* GoodsReceivedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReceivedStore.swift; sourceTree = "<group>"; };
+		FE01CA0000000000000000C1 /* GoodsReceivedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReceivedView.swift; sourceTree = "<group>"; };
+		FE04CC0000000000000000B1 /* InvoicesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesStore.swift; sourceTree = "<group>"; };
+		FE04CC0000000000000000C1 /* InvoicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesView.swift; sourceTree = "<group>"; };
+		FE02CB0000000000000000B1 /* GoodsReturnsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsStore.swift; sourceTree = "<group>"; };
+		FE02CB0000000000000000C1 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
+		FE03DC0000000000000000B1 /* InventoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStore.swift; sourceTree = "<group>"; };
+		FE03DC0000000000000000C1 /* PosStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosStore.swift; sourceTree = "<group>"; };
 		C1C6EFE6FE72F72F58C22DFC /* OrdersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersStore.swift; sourceTree = "<group>"; };
 		C6B7C23EF6695669B46657AB /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		CE42037E5EC246A2151C3F48 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
@@ -225,6 +241,33 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
+		FE01CA0000000000000000A1 /* GoodsReceived */ = {
+			isa = PBXGroup;
+			children = (
+				FE01CA0000000000000000B1 /* GoodsReceivedStore.swift */,
+				FE01CA0000000000000000C1 /* GoodsReceivedView.swift */,
+			);
+			path = GoodsReceived;
+			sourceTree = "<group>";
+		};
+		FE02CB0000000000000000A1 /* GoodsReturns */ = {
+			isa = PBXGroup;
+			children = (
+				FE02CB0000000000000000B1 /* GoodsReturnsStore.swift */,
+				FE02CB0000000000000000C1 /* GoodsReturnsView.swift */,
+			);
+			path = GoodsReturns;
+			sourceTree = "<group>";
+		};
+		FE04CC0000000000000000A1 /* Invoices */ = {
+			isa = PBXGroup;
+			children = (
+				FE04CC0000000000000000B1 /* InvoicesStore.swift */,
+				FE04CC0000000000000000C1 /* InvoicesView.swift */,
+			);
+			path = Invoices;
+			sourceTree = "<group>";
+		};
 		5ADF866F96A128593D09FCCA /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
@@ -256,6 +299,7 @@
 		6AFB62BB26E7825D3C7C5D67 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
+				FE03DC0000000000000000B1 /* InventoryStore.swift */,
 				AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */,
 			);
 			path = Inventory;
@@ -268,6 +312,9 @@
 				5ADF866F96A128593D09FCCA /* Analytics */,
 				DAEA340379A1B59D9733D0F0 /* Auth */,
 				3F6CB3A86AA2E93230228B79 /* Dashboard */,
+				FE01CA0000000000000000A1 /* GoodsReceived */,
+				FE02CB0000000000000000A1 /* GoodsReturns */,
+				FE04CC0000000000000000A1 /* Invoices */,
 				6AFB62BB26E7825D3C7C5D67 /* Inventory */,
 				5AF9FA0D12B9D0669D4AA940 /* Main */,
 				B05F20D1F87FD4B18FBB69ED /* Marketplace */,
@@ -372,6 +419,7 @@
 			children = (
 				BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */,
 				7082192B3DDD613321065A12 /* SellView.swift */,
+				FE03DC0000000000000000C1 /* PosStore.swift */,
 			);
 			path = Sell;
 			sourceTree = "<group>";
@@ -579,6 +627,14 @@
 				9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */,
 				2DE14A397F4632868B1C9C97 /* GoogleMapView.swift in Sources */,
 				A2CDDDB7DAAFE31A6826465F /* GoogleMapsConfig.swift in Sources */,
+				FE01CA0000000000000000B2 /* GoodsReceivedStore.swift in Sources */,
+				FE01CA0000000000000000C2 /* GoodsReceivedView.swift in Sources */,
+				FE04CC0000000000000000B2 /* InvoicesStore.swift in Sources */,
+				FE04CC0000000000000000C2 /* InvoicesView.swift in Sources */,
+				FE02CB0000000000000000B2 /* GoodsReturnsStore.swift in Sources */,
+				FE02CB0000000000000000C2 /* GoodsReturnsView.swift in Sources */,
+				FE03DC0000000000000000B2 /* InventoryStore.swift in Sources */,
+				FE03DC0000000000000000C2 /* PosStore.swift in Sources */,
 				F823FC6B4B535C5531F115B2 /* ImageCompression.swift in Sources */,
 				AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */,
 				B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */,

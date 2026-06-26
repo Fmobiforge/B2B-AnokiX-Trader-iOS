@@ -43,14 +43,23 @@ enum MockData {
 
     // MARK: Menus
 
+    // Drawer mirrors the Trader Portal sidebar (18 items, exact order). The five
+    // GRV/GRN/Sales/Invoices/Distributors entries have no screen yet — tapping is a
+    // no-op (Router.route falls through), matching the portal's nav for parity.
     static let drawerMenu: [MenuItem] = [
         MenuItem("home", "Dashboard", icon: "square.grid.2x2.fill"),
-        MenuItem("sell", "POS", subtitle: "Powered by Pagamio", icon: "cart.fill"),
-        MenuItem("orders", "Orders", icon: "shippingbox.fill"),
-        MenuItem("inventory", "Inventory", icon: "archivebox.fill"),
         MenuItem("marketplace", "Marketplace", icon: "storefront.fill"),
+        MenuItem("orders", "Orders", icon: "shippingbox.fill"),
+        MenuItem("goods_received", "Goods Received (GRV)", icon: "tray.and.arrow.down.fill"),
+        MenuItem("goods_returns", "Goods Returns (GRN)", icon: "arrow.uturn.backward.circle.fill"),
+        MenuItem("inventory", "Inventory", icon: "archivebox.fill"),
+        MenuItem("sell", "POS", subtitle: "Powered by Pagamio", icon: "cart.fill"),
+        MenuItem("sales", "Sales", icon: "banknote.fill"),
+        MenuItem("invoices", "Invoices", icon: "doc.plaintext.fill"),
+        MenuItem("distributors", "Distributors", icon: "building.2.fill"),
         MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
         MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
+        MenuItem("airtime", "Airtime & VAS", icon: "antenna.radiowaves.left.and.right"),
         MenuItem("analytics", "Analytics", icon: "chart.bar.fill"),
         MenuItem("reports", "Reports", icon: "doc.text.fill"),
         MenuItem("settings", "Settings", icon: "gearshape.fill"),
