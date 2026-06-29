@@ -5,7 +5,7 @@ enum Tab: Hashable { case home, sell, orders, wallet, more }
 /// Secondary modules reached from the drawer / More tab / quick actions.
 /// Presented as a full-screen cover over the tab bar (matches the Android Activities).
 enum Module: String, Identifiable, Hashable {
-    case inventory, marketplace, payments, airtime, rewards, sales, invoices
+    case inventory, marketplace, payments, airtime, rewards, sales, invoices, distributors
     case promotions, customers, analytics, reports, notifications, settings, support
     /// Raw values match the drawer keys so Router.route can resolve them.
     case goodsReceived = "goods_received"
@@ -23,6 +23,7 @@ enum Module: String, Identifiable, Hashable {
         case .rewards: return "anokiX Rewards"
         case .sales: return "Sales"
         case .invoices: return "Invoices"
+        case .distributors: return "Distributors"
         case .promotions: return "Promotions"
         case .customers: return "Customers"
         case .analytics: return "Analytics"

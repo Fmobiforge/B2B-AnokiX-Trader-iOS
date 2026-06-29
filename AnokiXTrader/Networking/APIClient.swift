@@ -184,6 +184,12 @@ final class APIClient {
         return order
     }
 
+    /// Purchase-order PDF (api/trader/orders/{id}/pdf) — { filename, mime, base64 data }.
+    func getOrderPdf(id: String) async throws -> GrvPdfData {
+        let data = try await get("api/trader/orders/\(id)/pdf", query: [:])
+        return try decode(data)
+    }
+
     // MARK: Goods Received (GRV)
 
     /// List the trader's Goods Received Vouchers + KPI summary (api/trader/grvs).
@@ -228,6 +234,21 @@ final class APIClient {
     func getInvoicePdf(id: String) async throws -> InvoicePdfData {
         let data = try await get("api/trader/invoices/\(id)/pdf", query: [:])
         return try decode(data)
+    }
+
+    // MARK: Distributors
+
+    /// List the distributors the trader is partnered with (api/trader/distributors).
+    func getDistributors() async throws -> DistributorsListData {
+        let data = try await get("api/trader/distributors", query: [:])
+        return try decode(data)
+    }
+
+    /// Request a change of distributor (api/trader/distributor/change-request).
+    /// Sends `current_distributor_id` + optional `reason`; only status/message matter.
+    func requestDistributorChange(currentDistributorId: String, reason: String) async throws {
+        let form = ["current_distributor_id": currentDistributorId, "reason": reason]
+        try await postFormStatus("api/trader/distributor/change-request", form: form)
     }
 
     // MARK: Inventory
@@ -322,6 +343,89 @@ final class APIClient {
     func coordinate(placeId: String) async throws -> CoordinateData {
         let data = try await get("api/common/get-coordinate-from-placeid", query: ["place_id": placeId])
         return try decode(data)
+    }
+
+    // MARK: Notifications (common)
+
+    /// Live unread-notification count (api/common/notifications/unread-count).
+    func getUnreadCount() async throws -> UnreadCountData {
+        let data = try await get("api/common/notifications/unread-count", query: [:])
+        return try decode(data)
+    }
+
+    /// Notification feed (api/common/notifications). `filter` is "all" (omitted) or
+    /// "unread"; paged by `page`/`perPage`.
+    func getNotifications(filter: String, page: Int, perPage: Int) async throws -> NotificationsListData {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !filter.isEmpty, filter != "all" { q["filter"] = filter }
+        let data = try await get("api/common/notifications", query: q)
+        return try decode(data)
+    }
+
+    /// Mark one notification read (api/common/notifications/read, id=).
+    func markNotificationRead(id: String) async throws {
+        try await postFormStatus("api/common/notifications/read", form: ["id": id])
+    }
+
+    /// Mark every notification read (api/common/notifications/read, all=true).
+    func markAllNotificationsRead() async throws {
+        try await postFormStatus("api/common/notifications/read", form: ["all": "true"])
+    }
+
+    // MARK: Settings (account / preferences / security)
+
+    /// Signed-in user for the Profile section (api/common/base-info → data.user).
+    func getProfileUser() async throws -> ProfileUser {
+        let data = try await get("api/common/base-info", query: [:])
+        return ProfileUser(json: data["user"])
+    }
+
+    /// Timezone option list for the Preferences screen (api/common/base-info → data.timezones).
+    func getTimezones() async throws -> [TimezoneOption] {
+        let data = try await get("api/common/base-info", query: [:])
+        return (data["timezones"].array ?? []).map(TimezoneOption.init(json:))
+    }
+
+    /// Display + format preferences incl. notification toggles (api/common/preferences).
+    func getPreferences() async throws -> PreferencesDTO {
+        let data = try await get("api/common/preferences", query: [:])
+        return PreferencesDTO(json: data["preferences"])
+    }
+
+    /// Read-only business profile incl. documents (api/trader/business/profile).
+    func getBusinessProfile() async throws -> BusinessProfileDTO {
+        let data = try await get("api/trader/business/profile", query: [:])
+        return BusinessProfileDTO(json: data["profile"])
+    }
+
+    /// Update the user's personal profile (api/common/profile/update).
+    func updateProfile(firstName: String, lastName: String, email: String, phone: String) async throws {
+        let payload: [String: Any] = [
+            "first_name": firstName, "last_name": lastName,
+            "email": email, "phone_number": phone,
+        ]
+        _ = try await postJSON("api/common/profile/update", json: payload)
+    }
+
+    /// Save the regional preferences only (api/common/preferences/update) — Preferences screen.
+    func updatePreferenceValues(language: String, currency: String, timezone: String,
+                                dateFormat: String) async throws {
+        let payload: [String: Any] = [
+            "language": language, "currency": currency,
+            "timezone": timezone, "date_format": dateFormat,
+        ]
+        _ = try await postJSON("api/common/preferences/update", json: payload)
+    }
+
+    /// Save the notification toggles only (api/common/preferences/update) — Notifications screen.
+    func updateNotifications(_ notifications: [String: Bool]) async throws {
+        _ = try await postJSON("api/common/preferences/update", json: ["notifications": notifications])
+    }
+
+    /// Change the account password (api/common/profile/password).
+    func changePassword(currentPassword: String, newPassword: String) async throws {
+        let payload: [String: Any] = ["current_password": currentPassword, "new_password": newPassword]
+        _ = try await postJSON("api/common/profile/password", json: payload)
     }
 
     // MARK: - Core requests (Alamofire)

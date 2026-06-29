@@ -7,6 +7,8 @@ struct OrderDetailView: View {
     let order: OrderDTO
     @State private var detail: OrderDTO?
     @State private var loading = true
+    @State private var pdfDoc: PDFDoc?
+    @State private var toastMsg: String?
 
     private let stageKeys = ["pending", "accepted", "picking", "packing", "out_for_delivery", "delivered"]
     private let stageLabels = ["Order Placed", "Accepted by Distributor", "Picking", "Packing",
@@ -16,6 +18,14 @@ struct OrderDetailView: View {
     private var o: OrderDTO { detail ?? order }
     private var currentIndex: Int { stageKeys.firstIndex(of: o.statusKey) ?? 0 }
     private var cancelled: Bool { o.statusKey == "cancelled" }
+
+    /// Total ordered units shown in the header ("3 items"). The detail endpoint
+    /// carries no `item_count`, so it is summed from the items' quantities; the
+    /// list endpoint's `item_count` is the fallback before items load.
+    private var itemUnitCount: Int {
+        if let items = o.items, !items.isEmpty { return items.reduce(0) { $0 + $1.quantity } }
+        return o.item_count ?? 0
+    }
 
     var body: some View {
         ScrollView {
@@ -31,6 +41,8 @@ struct OrderDetailView: View {
         .navigationTitle("Order Details")
         .navigationBarTitleDisplayMode(.inline)
         .task { await fetch() }
+        .sheet(item: $pdfDoc) { doc in GrvPdfView(doc: doc) }
+        .toast($toastMsg)
     }
 
     private func fetch() async {
@@ -41,25 +53,59 @@ struct OrderDetailView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        HStack(alignment: .top, spacing: 12) {
-            InitialBadge(text: OrderLogo.initials(o.distributorName),
-                         color: OrderLogo.color(o.distributor_id), size: 50)
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(o.order_number).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    StatusBadge(text: statusLabel(o.statusKey),
-                                fg: statusColor(o.statusKey), bg: statusColor(o.statusKey).opacity(0.14))
+        VStack(spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                InitialBadge(text: OrderLogo.initials(o.distributorName),
+                             color: OrderLogo.color(o.distributor_id), size: 50)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(o.order_number).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        StatusBadge(text: statusLabel(o.statusKey),
+                                    fg: statusColor(o.statusKey), bg: statusColor(o.statusKey).opacity(0.14))
+                    }
+                    Text(o.distributorName).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
                 }
-                Text(o.distributorName).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 3) {
+                    Text(OrderFmt.money(o.amount)).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.purple)
+                    Text("\(itemUnitCount) items")
+                        .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                }
             }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 3) {
-                Text(OrderFmt.money(o.amount)).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.purple)
-                Text("\(o.item_count ?? o.items?.count ?? 0) items")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            HStack {
+                Spacer()
+                Button { openPdf() } label: {
+                    Label("Purchase Order PDF", systemImage: "doc.text")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Brand.textPrimary)
+                        .padding(.horizontal, 14).padding(.vertical, 9)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
         }
         .card()
+    }
+
+    private func openPdf() {
+        toastMsg = "Generating PDF…"
+        Task {
+            do {
+                let pdf = try await APIClient.shared.getOrderPdf(id: String(o.id))
+                guard let b64 = pdf.data,
+                      let bytes = Data(base64Encoded: b64, options: .ignoreUnknownCharacters) else {
+                    toastMsg = "PDF unavailable."
+                    return
+                }
+                let name = (pdf.filename?.isEmpty == false) ? pdf.filename! : "\(o.order_number).pdf"
+                let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
+                try bytes.write(to: url)
+                toastMsg = nil
+                pdfDoc = PDFDoc(url: url, title: o.order_number)
+            } catch {
+                toastMsg = (error as? LocalizedError)?.errorDescription ?? "Couldn't open PDF."
+            }
+        }
     }
 
     // MARK: - Tracking timeline
@@ -174,6 +220,41 @@ struct OrderDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
+    }
+}
+
+/// Loads an order by id then shows `OrderDetailView`. Used for deep links that only
+/// carry an order id (e.g. tapping an order notification).
+struct OrderDetailLoader: View {
+    let orderId: Int
+    @State private var order: OrderDTO?
+    @State private var failed = false
+
+    var body: some View {
+        Group {
+            if let order {
+                OrderDetailView(order: order)
+            } else if failed {
+                VStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle").font(.system(size: 34)).foregroundColor(Brand.textTertiary)
+                    Text("Couldn't load this order.").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Brand.background)
+                .navigationTitle("Order Details")
+                .navigationBarTitleDisplayMode(.inline)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Brand.background)
+                    .navigationTitle("Order Details")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+        .task {
+            do { order = try await APIClient.shared.getOrder(id: String(orderId)) }
+            catch { failed = true }
+        }
     }
 }
 

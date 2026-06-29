@@ -69,6 +69,7 @@ struct ModuleHost: View {
                 case .inventory:     InventoryView()
                 case .sales:         SalesView()
                 case .invoices:      InvoicesView()
+                case .distributors:  DistributorsView()
                 case .marketplace:   MarketplaceRealView()
                 case .payments:      PaymentsView()
                 case .airtime:       AirtimeView()
@@ -102,6 +103,7 @@ struct ScreenHeader: View {
     let title: String
     var subtitle: String? = nil
     @EnvironmentObject var router: Router
+    @ObservedObject private var badge = NotificationBadge.shared
 
     var body: some View {
         HStack(spacing: 12) {
@@ -121,11 +123,22 @@ struct ScreenHeader: View {
                 Image(systemName: "bell")
                     .font(.system(size: 19, weight: .medium))
                     .foregroundColor(Brand.textPrimary)
-                    .overlay(Circle().fill(Brand.danger).frame(width: 7, height: 7).offset(x: 7, y: -7))
+                    .overlay(alignment: .topTrailing) {
+                        if badge.count > 0 {
+                            Text(badge.count > 9 ? "9+" : "\(badge.count)")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 4).padding(.vertical, 1)
+                                .background(Brand.danger)
+                                .clipShape(Capsule())
+                                .offset(x: 8, y: -8)
+                        }
+                    }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(Brand.surface)
+        .task { await badge.refresh() }
     }
 }

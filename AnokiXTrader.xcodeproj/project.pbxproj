@@ -42,6 +42,8 @@
 		FE01CA0000000000000000C2 /* GoodsReceivedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE01CA0000000000000000C1 /* GoodsReceivedView.swift */; };
 		FE04CC0000000000000000B2 /* InvoicesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE04CC0000000000000000B1 /* InvoicesStore.swift */; };
 		FE04CC0000000000000000C2 /* InvoicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE04CC0000000000000000C1 /* InvoicesView.swift */; };
+		FE05DD0000000000000000B2 /* DistributorsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE05DD0000000000000000B1 /* DistributorsStore.swift */; };
+		FE05DD0000000000000000C2 /* DistributorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE05DD0000000000000000C1 /* DistributorsView.swift */; };
 		FE02CB0000000000000000B2 /* GoodsReturnsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE02CB0000000000000000B1 /* GoodsReturnsStore.swift */; };
 		FE02CB0000000000000000C2 /* GoodsReturnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE02CB0000000000000000C1 /* GoodsReturnsView.swift */; };
 		FE03DC0000000000000000B2 /* InventoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE03DC0000000000000000B1 /* InventoryStore.swift */; };
@@ -59,6 +61,8 @@
 		B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45ABCF6DDF19CCCBC918459 /* APIClient.swift */; };
 		B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */; };
 		BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */; };
+		FE06EE0000000000000000B2 /* NotificationsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE06EE0000000000000000B1 /* NotificationsStore.swift */; };
+		FE06EE0000000000000000C2 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE06EE0000000000000000C1 /* SettingsStore.swift */; };
 		BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F35932C814CC82ABBC7B893 /* ListModules.swift */; };
 		CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */; };
 		CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DE3F070404C0632ED5C5B /* Rows.swift */; };
@@ -120,6 +124,8 @@
 		FE01CA0000000000000000C1 /* GoodsReceivedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReceivedView.swift; sourceTree = "<group>"; };
 		FE04CC0000000000000000B1 /* InvoicesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesStore.swift; sourceTree = "<group>"; };
 		FE04CC0000000000000000C1 /* InvoicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesView.swift; sourceTree = "<group>"; };
+		FE05DD0000000000000000B1 /* DistributorsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorsStore.swift; sourceTree = "<group>"; };
+		FE05DD0000000000000000C1 /* DistributorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorsView.swift; sourceTree = "<group>"; };
 		FE02CB0000000000000000B1 /* GoodsReturnsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsStore.swift; sourceTree = "<group>"; };
 		FE02CB0000000000000000C1 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
 		FE03DC0000000000000000B1 /* InventoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStore.swift; sourceTree = "<group>"; };
@@ -140,6 +146,8 @@
 		F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		FB6EE25B5CB9C63D4B189FE5 /* GoogleMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapView.swift; sourceTree = "<group>"; };
 		FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		FE06EE0000000000000000B1 /* NotificationsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsStore.swift; sourceTree = "<group>"; };
+		FE06EE0000000000000000C1 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +165,7 @@
 		01ED189505919B549FB88CDF /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
+				FE06EE0000000000000000B1 /* NotificationsStore.swift */,
 				FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */,
 			);
 			path = Notifications;
@@ -268,6 +277,15 @@
 			path = Invoices;
 			sourceTree = "<group>";
 		};
+		FE05DD0000000000000000A1 /* Distributors */ = {
+			isa = PBXGroup;
+			children = (
+				FE05DD0000000000000000B1 /* DistributorsStore.swift */,
+				FE05DD0000000000000000C1 /* DistributorsView.swift */,
+			);
+			path = Distributors;
+			sourceTree = "<group>";
+		};
 		5ADF866F96A128593D09FCCA /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
@@ -312,6 +330,7 @@
 				5ADF866F96A128593D09FCCA /* Analytics */,
 				DAEA340379A1B59D9733D0F0 /* Auth */,
 				3F6CB3A86AA2E93230228B79 /* Dashboard */,
+				FE05DD0000000000000000A1 /* Distributors */,
 				FE01CA0000000000000000A1 /* GoodsReceived */,
 				FE02CB0000000000000000A1 /* GoodsReturns */,
 				FE04CC0000000000000000A1 /* Invoices */,
@@ -335,6 +354,7 @@
 			isa = PBXGroup;
 			children = (
 				11CD2B00377D56966727ED1C /* SettingsView.swift */,
+				FE06EE0000000000000000C1 /* SettingsStore.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -631,6 +651,8 @@
 				FE01CA0000000000000000C2 /* GoodsReceivedView.swift in Sources */,
 				FE04CC0000000000000000B2 /* InvoicesStore.swift in Sources */,
 				FE04CC0000000000000000C2 /* InvoicesView.swift in Sources */,
+				FE05DD0000000000000000B2 /* DistributorsStore.swift in Sources */,
+				FE05DD0000000000000000C2 /* DistributorsView.swift in Sources */,
 				FE02CB0000000000000000B2 /* GoodsReturnsStore.swift in Sources */,
 				FE02CB0000000000000000C2 /* GoodsReturnsView.swift in Sources */,
 				FE03DC0000000000000000B2 /* InventoryStore.swift in Sources */,
@@ -650,6 +672,8 @@
 				FB273E1B2ED6995D98E62D35 /* Models.swift in Sources */,
 				2BBB560DC6A5E17B88852897 /* MoreView.swift in Sources */,
 				BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */,
+				FE06EE0000000000000000B2 /* NotificationsStore.swift in Sources */,
+				FE06EE0000000000000000C2 /* SettingsStore.swift in Sources */,
 				2B0A5E1DE37F58E50443486D /* OrderDetailView.swift in Sources */,
 				B2227D7A07E6D7951EE50C72 /* OrdersStore.swift in Sources */,
 				41D6B2D1E0FEF1819044BA23 /* OrdersView.swift in Sources */,
