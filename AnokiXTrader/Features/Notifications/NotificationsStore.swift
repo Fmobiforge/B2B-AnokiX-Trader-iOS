@@ -154,18 +154,11 @@ final class NotificationsStore: ObservableObject {
 }
 
 private extension NotificationDTO {
-    /// A copy flagged read (DTO is immutable / decoded).
+    /// A copy flagged read (DTO is immutable / decoded). Uses the compiler-synthesized
+    /// memberwise initializer.
     func readCopy() -> NotificationDTO {
         NotificationDTO(id: id, type: type, title: title, body: body, data: data,
                         read_at: read_at, created_at: created_at, is_read: true)
-    }
-}
-
-extension NotificationDTO {
-    init(id: String, type: String, title: String, body: String?, data: NotifPayload?,
-         read_at: String?, created_at: String?, is_read: Bool) {
-        self.id = id; self.type = type; self.title = title; self.body = body
-        self.data = data; self.read_at = read_at; self.created_at = created_at; self.is_read = is_read
     }
 }
 
