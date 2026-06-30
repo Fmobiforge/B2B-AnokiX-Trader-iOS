@@ -4,6 +4,7 @@ struct MainTabView: View {
     @EnvironmentObject var session: Session
     @StateObject private var router = Router()
     @StateObject private var posCart = Cart()
+    @ObservedObject private var push = PushManager.shared
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -33,6 +34,46 @@ struct MainTabView: View {
                 .environmentObject(session)
                 .environmentObject(MarketStore.shared)
         }
+        // Order deep link (from an order push) → full-screen order detail.
+        .fullScreenCover(item: $router.orderDetail) { route in
+            NavigationStack {
+                OrderDetailLoader(orderId: route.id)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") { router.orderDetail = nil }
+                        }
+                    }
+            }
+            .environmentObject(router)
+            .environmentObject(session)
+        }
+        // FCM: ask for the permission + register the token once the signed-in UI shows,
+        // then apply any route a notification tap is waiting to perform.
+        .onAppear {
+            PushManager.shared.requestAuthorization()
+            PushManager.shared.registerCurrentToken()
+            applyPendingRoute()
+        }
+        .onChange(of: push.pendingRoute) { _ in applyPendingRoute() }
+    }
+
+    /// Navigate where a tapped push points (parity with Android `PushManager.handleRouting`).
+    private func applyPendingRoute() {
+        guard let route = push.pendingRoute else { return }
+        switch route {
+        case .order(let id):
+            if let id {
+                router.presented = nil
+                router.orderDetail = OrderDetailRoute(id: id)   // open the specific order
+            } else {
+                router.presented = nil
+                router.tab = .orders
+            }
+        case .returns:       router.presented = .goodsReturns
+        case .inventory:     router.presented = .inventory
+        case .notifications: router.presented = .notifications
+        }
+        push.pendingRoute = nil
     }
 
     @ViewBuilder

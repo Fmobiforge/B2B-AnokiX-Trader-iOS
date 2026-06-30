@@ -65,7 +65,7 @@ private struct DistributorCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 14) {
-                InitialBadge(text: distributor.initial, color: Brand.purple, size: 48)
+                DistributorAvatar(logoUrl: distributor.logo_url, initial: distributor.initial, size: 48)
                 Text(distributor.displayName)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundColor(Brand.purple)
@@ -150,7 +150,7 @@ private struct DistributorDetailView: View {
 
     private var header: some View {
         HStack(alignment: .top, spacing: 14) {
-            InitialBadge(text: distributor.initial, color: Brand.purple, size: 56)
+            DistributorAvatar(logoUrl: distributor.logo_url, initial: distributor.initial, size: 56)
             VStack(alignment: .leading, spacing: 8) {
                 Text(distributor.displayName)
                     .font(.system(size: 20, weight: .bold))

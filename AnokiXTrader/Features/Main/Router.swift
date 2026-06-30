@@ -35,11 +35,19 @@ enum Module: String, Identifiable, Hashable {
     }
 }
 
+/// A deep link to one order's detail screen (e.g. from an order push notification).
+/// Wraps the id in an `Identifiable` so it can drive a `fullScreenCover(item:)`.
+struct OrderDetailRoute: Identifiable, Hashable {
+    let id: Int
+}
+
 /// Central navigation state shared by the whole main app.
 final class Router: ObservableObject {
     @Published var tab: Tab = .home
     @Published var drawerOpen = false
     @Published var presented: Module? = nil
+    /// Set to open a specific order's detail full-screen (push deep link).
+    @Published var orderDetail: OrderDetailRoute? = nil
 
     /// Route by the string keys used across MockData menus / quick actions.
     func route(_ key: String) {

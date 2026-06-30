@@ -372,6 +372,21 @@ final class APIClient {
         try await postFormStatus("api/common/notifications/read", form: ["all": "true"])
     }
 
+    // MARK: Push / device tokens (FCM)
+
+    /// Register this device's FCM token with the backend so the server can target it
+    /// with pushes (api/common/device-token). Best-effort: only status/message matter.
+    /// `platform` is "ios"; `deviceId` is the identifierForVendor.
+    func registerDeviceToken(_ token: String, deviceId: String) async throws {
+        try await postFormStatus("api/common/device-token",
+                                 form: ["token": token, "platform": "ios", "device_id": deviceId])
+    }
+
+    /// Remove this device's FCM token on logout (api/common/device-token/remove).
+    func unregisterDeviceToken(_ token: String) async throws {
+        try await postFormStatus("api/common/device-token/remove", form: ["token": token])
+    }
+
     // MARK: Settings (account / preferences / security)
 
     /// Signed-in user for the Profile section (api/common/base-info → data.user).

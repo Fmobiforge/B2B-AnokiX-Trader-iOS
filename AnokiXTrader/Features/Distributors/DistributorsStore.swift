@@ -17,6 +17,7 @@ struct TraderDistributorDTO: Decodable, Identifiable, Hashable {
     let company_legal_name: String?
     let trading_name: String?
     let display_name: String?
+    let logo_url: String?
     let company_email: String?
     let company_phone_number: String?
     let contact_name: String?
@@ -29,7 +30,7 @@ struct TraderDistributorDTO: Decodable, Identifiable, Hashable {
     let minimum_order: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, distributor_code, company_legal_name, trading_name, display_name
+        case id, distributor_code, company_legal_name, trading_name, display_name, logo_url
         case company_email, company_phone_number, contact_name, contact_email, contact_phone
         case address, status, preferred_delivery_days, products_available, minimum_order
     }
@@ -41,6 +42,7 @@ struct TraderDistributorDTO: Decodable, Identifiable, Hashable {
         company_legal_name = try c.decodeIfPresent(String.self, forKey: .company_legal_name)
         trading_name = try c.decodeIfPresent(String.self, forKey: .trading_name)
         display_name = try c.decodeIfPresent(String.self, forKey: .display_name)
+        logo_url = try c.decodeIfPresent(String.self, forKey: .logo_url)
         company_email = try c.decodeIfPresent(String.self, forKey: .company_email)
         company_phone_number = try c.decodeIfPresent(String.self, forKey: .company_phone_number)
         contact_name = try c.decodeIfPresent(String.self, forKey: .contact_name)

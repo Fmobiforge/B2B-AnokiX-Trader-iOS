@@ -44,6 +44,26 @@ struct RemoteImage: View {
     }
 }
 
+/// Circular distributor avatar: the distributor's `logo_url` image when present,
+/// otherwise the purple initial badge. Shared by the Distributors screen and the
+/// Marketplace distributor info / selector.
+struct DistributorAvatar: View {
+    let logoUrl: String?
+    let initial: String
+    var size: CGFloat = 48
+
+    var body: some View {
+        if let url = MediaUrls.resolve(logoUrl) {
+            RemoteImage(url: url)
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Brand.border, lineWidth: 1))
+        } else {
+            InitialBadge(text: initial, color: Brand.purple, size: size)
+        }
+    }
+}
+
 /// First-frame poster shown while a video banner is off-screen (keeps scroll compositing stable).
 struct VideoThumbnailView: View {
     let url: URL

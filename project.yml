@@ -20,12 +20,21 @@ targets:
     platform: iOS
     deploymentTarget: "16.0"
     sources:
+      # The entitlements file is referenced via CODE_SIGN_ENTITLEMENTS, not bundled.
+      # GoogleService-Info.plist must land in the Resources phase (it's a .plist, so
+      # pin its build phase explicitly rather than relying on the folder glob).
       - path: AnokiXTrader
+        excludes:
+          - "AnokiXTrader.entitlements"
+          - "GoogleService-Info.plist"
+      - path: AnokiXTrader/GoogleService-Info.plist
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.anokix.trader
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: AnokiXTrader/AnokiXTrader.entitlements
         ENABLE_PREVIEWS: YES
         # Merge approach: a checked-in Info.plist holds the ATS cleartext-HTTP
         # exception for 155.117.20.51, while GENERATE_INFOPLIST_FILE merges the

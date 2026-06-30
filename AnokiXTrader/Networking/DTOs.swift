@@ -138,13 +138,14 @@ struct DistributorDTO: Decodable, Identifiable, Hashable {
     let company_legal_name: String?
     let trading_name: String?
     let display_name: String?
+    let logo_url: String?
     let address: String?
     let preferred_delivery_days: String?
 
     var displayName: String {
+        if let c = company_legal_name, !c.isEmpty { return c }
         if let d = display_name, !d.isEmpty { return d }
         if let t = trading_name, !t.isEmpty { return t }
-        if let c = company_legal_name, !c.isEmpty { return c }
         return distributor_code ?? "Distributor"
     }
 }

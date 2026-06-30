@@ -144,8 +144,9 @@ struct MarketplaceRealView: View {
     private var distributorCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
-                InitialBadge(text: String((store.data?.selected_distributor?.displayName ?? "D").prefix(1)),
-                             color: Brand.purple, size: 44)
+                DistributorAvatar(logoUrl: store.data?.selected_distributor?.logo_url,
+                                  initial: String((store.data?.selected_distributor?.displayName ?? "D").prefix(1)),
+                                  size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Preferred Distributor").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
                     Text(store.data?.selected_distributor?.displayName ?? "—")
@@ -181,7 +182,8 @@ struct MarketplaceRealView: View {
                     ForEach(store.data?.my_distributors ?? []) { d in
                         Button { store.selectDistributor(d.id); activeSheet = nil } label: {
                             HStack(spacing: 12) {
-                                InitialBadge(text: String(d.displayName.prefix(1)), color: Brand.purple, size: 40)
+                                DistributorAvatar(logoUrl: d.logo_url,
+                                                  initial: String(d.displayName.prefix(1)), size: 40)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(d.displayName).font(.system(size: 14, weight: .bold))
                                         .foregroundColor(Brand.textPrimary)

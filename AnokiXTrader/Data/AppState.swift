@@ -148,6 +148,7 @@ final class Session: ObservableObject {
     }
 
     func signOut() {
+        PushManager.shared.unregister()   // drop this device's token (needs the auth token, so first)
         APIClient.shared.token = nil
         LoginSessionStore.clear()
         storeName = "Sipho's Spaza"

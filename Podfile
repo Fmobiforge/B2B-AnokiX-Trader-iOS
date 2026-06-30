@@ -12,6 +12,8 @@ target 'AnokiXTrader' do
   # Google Maps for the Create Account location step (same SDK/key as the
   # Distributor iOS app). Run `pod install` after adding this.
   pod 'GoogleMaps', '~> 9.0'
+  # Firebase Cloud Messaging (push notifications). Run `pod install` after adding.
+  pod 'Firebase/Messaging', '~> 11.0'
 end
 
 post_install do |installer|
