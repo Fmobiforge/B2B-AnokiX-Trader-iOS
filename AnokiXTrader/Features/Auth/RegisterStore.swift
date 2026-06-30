@@ -47,7 +47,11 @@ final class RegisterStore: ObservableObject {
 
     // Step 6 — distributors / delivery / payment
     @Published var selectedDistributorIds: Set<Int> = []
-    @Published var deliveryDays: Set<String> = ["Mon", "Wed", "Fri"]
+    @Published var deliveryRows: [DeliveryRow] = {
+        var rows = DeliveryGrid.makeRows()
+        for i in [1, 3, 5] { rows[i].checked = true }   // Mon/Wed/Fri default on (0=Sun..6=Sat)
+        return rows
+    }()
     @Published var paymentMethod = "wallet"
 
     // Step 7 — wallet
@@ -152,7 +156,7 @@ final class RegisterStore: ObservableObject {
             }
         case 5:
             if selectedDistributorIds.isEmpty { return "Select at least one distributor." }
-            if deliveryDays.isEmpty { return "Choose at least one delivery day." }
+            if !deliveryRows.contains(where: { $0.checked }) { return "Choose at least one delivery day." }
             if paymentMethod.isEmpty { return "Select a payment method." }
         case 7:
             if !(termAccurate && termTos && termKyc && termComms) {
@@ -202,7 +206,7 @@ final class RegisterStore: ObservableObject {
             "latitude": latitude.map { String($0) } ?? "",
             "longitude": longitude.map { String($0) } ?? "",
             "preferred_distributor_ids": selectedDistributorIds.sorted().map(String.init).joined(separator: ","),
-            "preferred_delivery_days": RegisterStore.allDays.filter { deliveryDays.contains($0) }.joined(separator: ","),
+            "preferred_delivery_days": DeliveryGrid.selectedDaysCSV(deliveryRows),
             "payment_method": paymentMethod
         ]
         if let firstDist = selectedDistributorIds.sorted().first {

@@ -392,10 +392,17 @@ final class APIClient {
         return PreferencesDTO(json: data["preferences"])
     }
 
-    /// Read-only business profile incl. documents (api/trader/business/profile).
+    /// Business profile incl. documents (api/trader/business/profile).
     func getBusinessProfile() async throws -> BusinessProfileDTO {
         let data = try await get("api/trader/business/profile", query: [:])
         return BusinessProfileDTO(json: data["profile"])
+    }
+
+    /// Update the trader's business profile (api/trader/business/profile/update) —
+    /// partial multipart: only the supplied fields/files change (per-step Save in the
+    /// Business editor). Authenticated; mirrors the Android `updateBusinessProfile`.
+    func updateBusinessProfile(fields: [String: String], files: [MultipartFile]) async throws {
+        try await uploadStatus("api/trader/business/profile/update", fields: fields, files: files)
     }
 
     /// Update the user's personal profile (api/common/profile/update).

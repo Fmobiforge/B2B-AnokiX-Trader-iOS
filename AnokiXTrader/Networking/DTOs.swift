@@ -91,8 +91,8 @@ struct DistributorRefDTO: Decodable, Identifiable, Hashable {
     let address: String?
 
     var displayName: String {
-        if let t = trading_name, !t.isEmpty { return t }
         if let c = company_legal_name, !c.isEmpty { return c }
+        if let t = trading_name, !t.isEmpty { return t }
         return distributor_code ?? "Distributor"
     }
 }

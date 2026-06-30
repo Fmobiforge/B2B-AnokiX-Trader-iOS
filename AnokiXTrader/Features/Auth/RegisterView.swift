@@ -580,18 +580,6 @@ private struct DistributorsStep: View {
     @ObservedObject var store: RegisterStore
     @State private var showDistributors = false
 
-    static func fullDayName(_ abbr: String) -> String {
-        switch abbr {
-        case "Mon": return "Monday"
-        case "Tue": return "Tuesday"
-        case "Wed": return "Wednesday"
-        case "Thu": return "Thursday"
-        case "Fri": return "Friday"
-        case "Sat": return "Saturday"
-        default:    return "Sunday"
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
@@ -613,14 +601,9 @@ private struct DistributorsStep: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Preferred Delivery Days").font(.system(size: 13, weight: .medium))
                     .foregroundColor(Brand.textSecondary)
-                FlowLayout(hSpacing: 8, vSpacing: 8) {
-                    ForEach(RegisterStore.allDays, id: \.self) { day in
-                        SelectChip(label: Self.fullDayName(day), selected: store.deliveryDays.contains(day)) {
-                            if store.deliveryDays.contains(day) { store.deliveryDays.remove(day) }
-                            else { store.deliveryDays.insert(day) }
-                        }
-                    }
-                }
+                DeliveryHoursGrid(rows: $store.deliveryRows)
+                Text("24-hour times (e.g. 8 = 08:00); leave a row blank to default to 8–18. The second pair is an optional split window.")
+                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
 
             MenuDropdown(title: "Preferred Payment Method", value: store.paymentLabel,

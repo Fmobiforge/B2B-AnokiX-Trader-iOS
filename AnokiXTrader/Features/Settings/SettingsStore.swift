@@ -55,14 +55,15 @@ enum SettingsOptions {
         SettingsOption(value: "YYYY-MM-DD", label: "2024-05-19"),
     ]
 
-    /// Notification toggles — verbatim from the design.
+    /// Notification toggles — keys/titles/descriptions + order verbatim from the web
+    /// portal's Notification Preferences screen.
     static let toggles = [
         NotifToggle(key: "orderAlerts", title: "Order Alerts",
-                    desc: "Get notified when new orders are placed."),
-        NotifToggle(key: "lowStockAlerts", title: "Low Stock Alerts",
-                    desc: "Receive alerts when products fall below minimum stock."),
+                    desc: "Get notified about your order status changes."),
         NotifToggle(key: "deliveryUpdates", title: "Delivery Updates",
                     desc: "Track delivery status changes and delays."),
+        NotifToggle(key: "promotionAlerts", title: "Promotion Alerts",
+                    desc: "Hear about new deals and promotions from distributors."),
         NotifToggle(key: "financeReminders", title: "Finance Reminders",
                     desc: "Reminders for overdue invoices and payments."),
         NotifToggle(key: "reportReady", title: "Report Ready",
@@ -82,11 +83,14 @@ enum SettingsOptions {
 // MARK: - DTOs
 
 struct ProfileUser {
-    var firstName: String, lastName: String, email: String, roleLabel: String
+    var firstName: String, lastName: String, email: String, roleLabel: String, phone: String
     init(json: JSON) {
         firstName = json["first_name"].stringValue
         lastName = json["last_name"].stringValue
         email = json["email"].stringValue
+        // base-info may carry the user's phone (the Distributor app reads the same field);
+        // absent → "" so the field just stays empty.
+        phone = json["phone_number"].stringValue
         let role = json["role_label"].string
         roleLabel = (role?.isEmpty == false) ? role! : "Trader"
     }
@@ -130,6 +134,14 @@ struct BusinessProfileDTO {
     var idNumber: String, passportNumber: String, address: String, status: String
     var documents: [BusinessDocGroup]
 
+    // Editor prefill fields (mirrors the Android `loadProfile`).
+    var traderType: String, paymentMethod: String
+    var primaryCategoryIds: String, preferredDistributorIds: String, preferredDeliveryDays: String
+    var latitude: Double?, longitude: Double?
+    var companyLogoUrl: String?
+    /// POST field key → existing uploaded file name (for the Verify step "Uploaded"/"Replace" state).
+    var uploadedDocNames: [String: String]
+
     init(json: JSON) {
         traderCode = json["trader_code"].stringValue
         businessName = json["business_name"].stringValue
@@ -141,18 +153,45 @@ struct BusinessProfileDTO {
         passportNumber = json["passport_number"].stringValue
         address = json["address"].stringValue
         status = json["status"].stringValue
+        traderType = json["trader_type"].optStringFlexible
+        paymentMethod = json["payment_method"].stringValue
+        primaryCategoryIds = json["primary_product_category_ids"].optStringFlexible
+        preferredDistributorIds = json["preferred_distributor_ids"].optStringFlexible
+        preferredDeliveryDays = json["preferred_delivery_days"].stringValue
+        latitude = json["latitude"].double
+        longitude = json["longitude"].double
+        let logo = json["company_logo_url"].string ?? json["company_logo"].string
+        companyLogoUrl = (logo?.isEmpty == false) ? logo : nil
+
         let d = json["documents"]
-        let mapping: [(String, String)] = [
-            ("registration_document", "Business Registration Document"),
-            ("id_document", "Owner ID Document"),
-            ("proof_of_address", "Proof of Address"),
-            ("store_front_photo", "Store Front Photo"),
-            ("store_interior_photo", "Store Interior Photo"),
-            ("additional_document", "Additional Documents"),
+        // GET key → (POST field key, display label). The Verify step posts under the POST keys.
+        let mapping: [(getKey: String, field: String, label: String)] = [
+            ("registration_document", "business_registration_document", "Business Registration Document"),
+            ("id_document", "owner_id_document", "Owner ID Document"),
+            ("proof_of_address", "proof_of_address", "Proof of Address"),
+            ("store_front_photo", "store_front_photo", "Store Front Photo"),
+            ("store_interior_photo", "store_interior_photo", "Store Interior Photo"),
+            ("additional_document", "additional_documents", "Additional Documents"),
         ]
-        documents = mapping.map { key, label in
-            BusinessDocGroup(label: label, docs: (d[key].array ?? []).map(BusinessDoc.init(json:)))
+        documents = mapping.map { m in
+            BusinessDocGroup(label: m.label, docs: (d[m.getKey].array ?? []).map(BusinessDoc.init(json:)))
         }
+        var names: [String: String] = [:]
+        for m in mapping {
+            if let first = d[m.getKey].array?.first {
+                names[m.field] = first["original_name"].string ?? "file"
+            }
+        }
+        uploadedDocNames = names
+    }
+}
+
+private extension JSON {
+    /// A scalar that may arrive as a string ("3") or a number (3); "" when absent/null.
+    var optStringFlexible: String {
+        if let s = string { return s }
+        if type == .number { return stringValue }
+        return ""
     }
 }
 
@@ -164,7 +203,8 @@ final class SettingsStore: ObservableObject {
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var email = ""
-    @Published var phone = ""
+    @Published var phone = ""                        // national digits (dial code prepended on save)
+    @Published var phoneCountry = Countries.default
     @Published var roleLabel = "Trader"
     @Published var companyName = ""
 
@@ -214,6 +254,9 @@ final class SettingsStore: ObservableObject {
             lastName = user.lastName
             email = user.email
             roleLabel = user.roleLabel
+            let (country, national) = PhoneCompose.split(user.phone)
+            phoneCountry = country
+            phone = national
         }
         if let tz = try? await APIClient.shared.getTimezones() { timezones = tz }
         if let prefs = try? await APIClient.shared.getPreferences() {
@@ -241,7 +284,7 @@ final class SettingsStore: ObservableObject {
         do {
             try await APIClient.shared.updateProfile(
                 firstName: first, lastName: lastName.trimmingCharacters(in: .whitespaces),
-                email: mail, phone: phone.trimmingCharacters(in: .whitespaces))
+                email: mail, phone: PhoneCompose.full(country: phoneCountry, national: phone))
             toast = "Profile updated successfully."
         } catch {
             toast = (error as? LocalizedError)?.errorDescription ?? "Failed to update profile."
@@ -286,6 +329,195 @@ final class SettingsStore: ObservableObject {
             toast = "Password updated successfully."
         } catch {
             toast = (error as? LocalizedError)?.errorDescription ?? "Failed to update password."
+        }
+    }
+}
+
+// MARK: - Business Profile editor store
+
+/// Drives the 7-step Business Profile editor (Owner · Business · Type · Location ·
+/// Verify · Distributor · Wallet). Prefills from `getBusinessProfile` + `getReference`
+/// and saves each step's own subset to `api/trader/business/profile/update` (partial
+/// multipart). 1:1 with the Android `BusinessProfileActivity`.
+@MainActor
+final class BusinessEditStore: ObservableObject {
+    // Step 0 — Owner
+    @Published var idNumber = ""
+    @Published var passportNumber = ""
+
+    // Step 1 — Business
+    @Published var logo: UIImage?
+    @Published var existingLogoUrl: String?
+    @Published var businessName = ""
+    @Published var tradingName = ""
+    @Published var businessRegNumber = ""
+    @Published var businessEmail = ""
+    @Published var businessPhone = ""                       // national digits
+    @Published var businessPhoneCountry = Countries.default
+
+    // Step 2 — Type
+    @Published var traderTypeId: Int?
+    @Published var selectedCategoryIds: Set<Int> = []
+
+    // Step 3 — Location
+    @Published var address = ""
+    @Published var latitude: Double?
+    @Published var longitude: Double?
+
+    // Step 4 — Verify (POST field key -> newly picked document)
+    @Published var documents: [String: RegDocument] = [:]
+    @Published var uploadedDocNames: [String: String] = [:]  // already on file
+
+    // Step 5 — Distributor
+    @Published var selectedDistributorIds: Set<Int> = []
+    @Published var deliveryRows: [DeliveryRow] = DeliveryGrid.makeRows()
+    @Published var paymentMethod = ""
+
+    // Reference data
+    @Published var traderTypes: [TraderTypeDTO] = []
+    @Published var categories: [ProductCategoryDTO] = []
+    @Published var distributors: [DistributorRefDTO] = []
+
+    // UI state
+    @Published var loaded = false
+    @Published var saving = false
+    @Published var toast: String?
+
+    private var profileLoaded = false
+    private var referenceLoaded = false
+    private var pendingCategoryIds: [Int] = []
+    private var pendingDistributorIds: [Int] = []
+
+    /// Verify-step document rows (POST field key, title) — order matches Android `docDefs`.
+    static let verifyDocs: [(field: String, label: String)] = [
+        ("business_registration_document", "Business Registration Document"),
+        ("owner_id_document", "Owner ID Document"),
+        ("proof_of_address", "Proof of Address"),
+        ("store_front_photo", "Store Front Photo"),
+        ("store_interior_photo", "Store Interior Photo"),
+    ]
+
+    var parentCategories: [ProductCategoryDTO] { categories.filter { $0.parent_id == nil } }
+    var traderTypeName: String { traderTypes.first { $0.id == traderTypeId }?.name ?? "" }
+    var paymentLabel: String { RegisterStore.paymentOptions.first { $0.code == paymentMethod }?.label ?? "" }
+
+    // MARK: Load
+
+    func load() async {
+        await loadReference()
+        await loadProfile()
+        loaded = true
+    }
+
+    private func loadReference() async {
+        do {
+            let ref = try await APIClient.shared.getReference()
+            traderTypes = (ref.trader_types?.isEmpty == false) ? ref.trader_types! : RegisterStore.fallbackTraderTypes
+            categories = ref.product_categories ?? []
+            distributors = ref.distributors ?? []
+        } catch {
+            traderTypes = RegisterStore.fallbackTraderTypes
+        }
+        referenceLoaded = true
+        applyPendingSelections()
+    }
+
+    private func loadProfile() async {
+        guard let p = try? await APIClient.shared.getBusinessProfile() else { return }
+        idNumber = p.idNumber
+        passportNumber = p.passportNumber
+        businessName = p.businessName
+        tradingName = p.tradingName
+        businessRegNumber = p.registrationNumber
+        businessEmail = p.businessEmail
+        let (country, national) = PhoneCompose.split(p.businessPhone)
+        businessPhoneCountry = country
+        businessPhone = national
+        existingLogoUrl = p.companyLogoUrl
+        traderTypeId = Int(p.traderType)
+        address = p.address
+        latitude = p.latitude
+        longitude = p.longitude
+        uploadedDocNames = p.uploadedDocNames
+        paymentMethod = p.paymentMethod
+        var rows = deliveryRows
+        DeliveryGrid.apply(p.preferredDeliveryDays, to: &rows)
+        deliveryRows = rows
+        pendingCategoryIds = Self.parseIds(p.primaryCategoryIds)
+        pendingDistributorIds = Self.parseIds(p.preferredDistributorIds)
+        profileLoaded = true
+        applyPendingSelections()
+    }
+
+    /// Categories/distributors can only resolve once BOTH the profile (selected ids) and
+    /// the reference list have loaded — mirrors Android `applyPrefillSelections`.
+    private func applyPendingSelections() {
+        guard profileLoaded, referenceLoaded else { return }
+        selectedCategoryIds = Set(pendingCategoryIds)
+        selectedDistributorIds = Set(pendingDistributorIds)
+    }
+
+    static func parseIds(_ csv: String) -> [Int] {
+        csv.split(separator: ",").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+    }
+
+    // MARK: Save (per step)
+
+    func saveStep(_ step: Int) async {
+        var fields: [String: String] = [:]
+        var files: [MultipartFile] = []
+        switch step {
+        case 0:
+            fields["id_number"] = idNumber.trimmed
+            fields["passport_number"] = passportNumber.trimmed
+        case 1:
+            guard !businessName.trimmed.isEmpty else { toast = "Business name is required."; return }
+            fields["business_name"] = businessName.trimmed
+            fields["trading_name"] = tradingName.trimmed
+            fields["business_registration_number"] = businessRegNumber.trimmed
+            fields["business_email"] = businessEmail.trimmed
+            fields["business_phone_number"] = PhoneCompose.full(country: businessPhoneCountry, national: businessPhone)
+            if let logo, let data = logo.downscaledJPEG(maxDimension: 600, quality: 0.85) {
+                files.append(MultipartFile(field: "company_logo", fileName: "company_logo.jpg",
+                                           mimeType: "image/jpeg", data: data))
+            }
+        case 2:
+            guard let t = traderTypeId else { toast = "Select a trader type."; return }
+            fields["trader_type"] = String(t)
+            fields["primary_product_category_ids"] =
+                selectedCategoryIds.sorted().map(String.init).joined(separator: ",")
+        case 3:
+            fields["address"] = address.trimmed
+            if let lat = latitude, let lng = longitude {
+                fields["latitude"] = String(lat)
+                fields["longitude"] = String(lng)
+            }
+        case 4:
+            for (field, doc) in documents {
+                files.append(MultipartFile(field: field, fileName: doc.fileName,
+                                           mimeType: doc.mimeType, data: doc.data))
+            }
+            guard !files.isEmpty else { toast = "Pick a document to upload first."; return }
+        case 5:
+            fields["preferred_distributor_ids"] =
+                selectedDistributorIds.sorted().map(String.init).joined(separator: ",")
+            fields["preferred_delivery_days"] = DeliveryGrid.serialize(deliveryRows)
+            fields["payment_method"] = paymentMethod
+        default:
+            return
+        }
+        saving = true
+        defer { saving = false }
+        do {
+            try await APIClient.shared.updateBusinessProfile(fields: fields, files: files)
+            if step == 4 {
+                // Reflect freshly-uploaded docs as on-file.
+                for (field, doc) in documents { uploadedDocNames[field] = doc.fileName }
+                documents.removeAll()
+            }
+            toast = "Business profile updated."
+        } catch {
+            toast = (error as? LocalizedError)?.errorDescription ?? "Failed to update business profile."
         }
     }
 }

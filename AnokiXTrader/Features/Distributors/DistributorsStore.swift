@@ -67,11 +67,11 @@ struct TraderDistributorDTO: Decodable, Identifiable, Hashable {
         return nil
     }
 
-    /// Best human label: display → trading → legal → code.
+    /// Best human label — prefer the registered legal name, then backend display, then trading.
     var displayName: String {
+        if let c = company_legal_name, !c.isEmpty { return c }
         if let d = display_name, !d.isEmpty { return d }
         if let t = trading_name, !t.isEmpty { return t }
-        if let c = company_legal_name, !c.isEmpty { return c }
         return distributor_code ?? "Distributor"
     }
 
