@@ -164,6 +164,7 @@ struct LoginView: View {
     @State private var showPassword = false
     @State private var emailTab = true
     @State private var toastMsg: String?
+    @State private var showReset = false
 
     var body: some View {
         ZStack {
@@ -225,7 +226,7 @@ struct LoginView: View {
                         .disabled(session.isSigningIn)
                         .padding(.top, 4)
 
-                        Button { toastMsg = "Password reset coming soon" } label: {
+                        Button { showReset = true } label: {
                             Text("Forgot password?")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(AuthPalette.tagline)
@@ -250,6 +251,9 @@ struct LoginView: View {
             .toast($toastMsg)
         }
         .preferredColorScheme(.dark)   // white status bar text on the dark login
+        .fullScreenCover(isPresented: $showReset) {
+            ForgotPasswordView(initialEmail: email.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
     }
 
     private var tabs: some View {
@@ -291,5 +295,151 @@ struct LoginView: View {
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.15), lineWidth: 1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+    }
+}
+
+// MARK: - Forgot / reset password
+
+/// Dedicated "Reset your password" screen (presented over the login screen).
+/// Pre-fills the email from login, POSTs it to api/common/forgot-password
+/// (portal_type "trader"), then swaps to a neutral "Check your email" confirmation
+/// with Resend / Back-to-login actions. Matches the dark auth styling.
+struct ForgotPasswordView: View {
+    let initialEmail: String
+    @Environment(\.dismiss) private var dismiss
+    @State private var email: String
+    @State private var sending = false
+    @State private var sent = false
+    @State private var toastMsg: String?
+
+    init(initialEmail: String) {
+        self.initialEmail = initialEmail
+        _email = State(initialValue: initialEmail)
+    }
+
+    var body: some View {
+        ZStack {
+            Brand.loginBg.ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: 0) {
+                    Image("LogoWhite")
+                        .resizable().scaledToFit()
+                        .frame(width: 190, height: 60)
+                        .padding(.top, 56)
+
+                    Group { if sent { sentCard } else { formCard } }
+                        .padding(24)
+                        .background(Color.white.opacity(0.04))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 28)
+                }
+            }
+            .toast($toastMsg)
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    // MARK: form state
+
+    private var formCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Reset your password")
+                .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+            Text("Enter your account email and we'll send you a link to reset your password.")
+                .font(.system(size: 14)).foregroundColor(AuthPalette.tagline)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Email").font(.system(size: 13, weight: .medium)).foregroundColor(AuthPalette.tagline)
+                TextField("you@business.co.za", text: $email)
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .foregroundColor(.white)
+                    .padding(14)
+                    .background(Color.white.opacity(0.06))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            Button { submit(firstSend: true) } label: {
+                Text(sending ? "Sending…" : "Send reset link")
+            }
+            .buttonStyle(WelcomeGradientButtonStyle())
+            .disabled(sending)
+            .padding(.top, 4)
+
+            Button { dismiss() } label: {
+                Text("Back to login")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(Color(hex: "#5B8DEF"))
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(.top, 2)
+        }
+    }
+
+    // MARK: confirmation state
+
+    private var sentCard: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "checkmark")
+                .font(.system(size: 26, weight: .bold))
+                .foregroundColor(.white)
+                .frame(width: 72, height: 72)
+                .background(Brand.success)
+                .clipShape(Circle())
+
+            Text("Check your email")
+                .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+
+            Text("If \(maskedEmail) is registered, we've sent a password reset link to it. Follow the link in the email to set a new password.")
+                .font(.system(size: 14)).foregroundColor(AuthPalette.tagline)
+                .multilineTextAlignment(.center)
+
+            Button { dismiss() } label: { Text("Back to login") }
+                .buttonStyle(WelcomeGradientButtonStyle())
+                .padding(.top, 6)
+
+            Button { submit(firstSend: false) } label: {
+                Text(sending ? "Sending…" : "Resend link")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Brand.success)
+                    .frame(maxWidth: .infinity).frame(height: 56)
+                    .overlay(Capsule().stroke(Color(hex: "#2B3B63"), lineWidth: 1.5))
+            }
+            .disabled(sending)
+        }
+    }
+
+    // MARK: actions
+
+    private func submit(firstSend: Bool) {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            toastMsg = "Please enter your email first"
+            return
+        }
+        sending = true
+        Task {
+            defer { sending = false }
+            do {
+                try await APIClient.shared.forgotPassword(email: trimmed)
+                sent = true
+                if !firstSend { toastMsg = "Reset link sent again." }
+            } catch {
+                toastMsg = (error as? LocalizedError)?.errorDescription ?? "Couldn't send reset link."
+            }
+        }
+    }
+
+    /// "sipho@business.co.za" → "s•••••@business.co.za" (keeps first char + domain).
+    private var maskedEmail: String {
+        let value = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let at = value.firstIndex(of: "@"), at != value.startIndex else { return value }
+        let local = value[value.startIndex..<at]
+        let domain = value[at...]
+        guard local.count > 1 else { return value }
+        return String(local.first!) + String(repeating: "•", count: local.count - 1) + domain
     }
 }

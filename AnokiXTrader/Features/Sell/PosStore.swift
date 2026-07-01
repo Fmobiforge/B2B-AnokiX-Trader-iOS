@@ -192,7 +192,7 @@ struct SalesView: View {
                 if isLoading {
                     ProgressView().padding(.top, 40)
                 } else if sales.isEmpty {
-                    Text("No sales recorded yet.")
+                    Text("No sales in this period yet.")
                         .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
                         .padding(.top, 40)
                 } else {

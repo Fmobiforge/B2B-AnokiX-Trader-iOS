@@ -84,6 +84,13 @@ final class APIClient {
         return try decode(data)
     }
 
+    /// Request a password-reset link (api/common/forgot-password). No token; sends the
+    /// typed email + portal_type "trader". Only status/message matter.
+    func forgotPassword(email: String) async throws {
+        try await postFormStatus("api/common/forgot-password",
+                                 form: ["email": email, "portal_type": "trader"])
+    }
+
     func getReference() async throws -> ReferenceData {
         let data = try await get("api/common/reference", query: [:])
         return try decode(data)
@@ -375,16 +382,17 @@ final class APIClient {
     // MARK: Push / device tokens (FCM)
 
     /// Register this device's FCM token with the backend so the server can target it
-    /// with pushes (api/common/device-token). Best-effort: only status/message matter.
+    /// with pushes (api/common/device-tokens). Best-effort: only status/message matter.
     /// `platform` is "ios"; `deviceId` is the identifierForVendor.
     func registerDeviceToken(_ token: String, deviceId: String) async throws {
-        try await postFormStatus("api/common/device-token",
-                                 form: ["token": token, "platform": "ios", "device_id": deviceId])
+        // Field is `device_token` (not `token` — that key is reserved by the API gateway).
+        try await postFormStatus("api/common/device-tokens",
+                                 form: ["device_token": token, "platform": "ios"])
     }
 
-    /// Remove this device's FCM token on logout (api/common/device-token/remove).
+    /// Remove this device's FCM token on logout (api/common/device-tokens/delete).
     func unregisterDeviceToken(_ token: String) async throws {
-        try await postFormStatus("api/common/device-token/remove", form: ["token": token])
+        try await postFormStatus("api/common/device-tokens/delete", form: ["device_token": token])
     }
 
     // MARK: Settings (account / preferences / security)
