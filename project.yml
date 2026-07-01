@@ -42,19 +42,18 @@ targets:
         # original hand-built .xcodeproj exactly).
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: AnokiXTrader/Info.plist
-        # Force the whole app to light appearance. Several screens use near-navy
-        # text on a dark system background under dark mode, making titles vanish;
-        # the design is light-only, so pin UIUserInterfaceStyle to Light. Also
-        # written into Info.plist so it applies even before an xcodegen regen.
-        INFOPLIST_KEY_UIUserInterfaceStyle: Light
         INFOPLIST_KEY_CFBundleDisplayName: "AnokiX Trader"
         INFOPLIST_KEY_NSCameraUsageDescription: "Capture your store logo and verification documents."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Attach your store logo and verification documents."
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         # Branded launch screen lives in AnokiXTrader/Base.lproj/LaunchScreen.storyboard
-        # (navy bg + white logo constrained to 60% width), referenced by
-        # UILaunchStoryboardName in Info.plist. Don't auto-generate an empty one.
+        # (navy bg + white logo constrained to 60% width). Point the app at it via
+        # UILaunchStoryboardName and suppress the auto-generated empty launch screen.
+        # Setting it here (not via the Xcode "Launch Screen File" UI) means it
+        # survives `xcodegen generate` — regen rewrites the pbxproj and wipes any
+        # launch-screen choice made through Xcode's UI.
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_UILaunchScreen_Generation: NO
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"

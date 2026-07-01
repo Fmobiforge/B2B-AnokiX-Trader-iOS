@@ -26,6 +26,10 @@ struct MainTabView: View {
             }
         }
         .animation(.easeOut(duration: 0.22), value: router.drawerOpen)
+        // The main app is designed light-only (dark mode makes some navy titles
+        // blend into the background). Force light here rather than app-wide, so the
+        // auth screens can still opt into `.dark` for a white status bar.
+        .preferredColorScheme(.light)
         .environmentObject(router)
         .environmentObject(posCart)
         .fullScreenCover(item: $router.presented) { module in
@@ -99,10 +103,20 @@ struct ModuleHost: View {
     let module: Module
     @EnvironmentObject var router: Router
 
-    // Marketplace and Cart bring their own header / NavigationStack.
-    private var hidesSystemNavBar: Bool { module == .marketplace || module == .cart }
+    private var hidesSystemNavBar: Bool { module == .marketplace }
 
     var body: some View {
+        // Cart is fully self-contained (its own NavigationStack + a Close button
+        // that dismisses the cover); present it directly. Wrapping it in ModuleHost's
+        // NavigationStack swallowed that Close button, leaving no way out.
+        if module == .cart {
+            CartView(store: MarketStore.shared)
+        } else {
+            hostedModule
+        }
+    }
+
+    private var hostedModule: some View {
         NavigationStack {
             Group {
                 switch module {
@@ -113,7 +127,7 @@ struct ModuleHost: View {
                 case .invoices:      InvoicesView()
                 case .distributors:  DistributorsView()
                 case .marketplace:   MarketplaceRealView()
-                case .cart:          CartView(store: MarketStore.shared)
+                case .cart:          EmptyView()   // handled directly in `body`
                 case .payments:      PaymentsView()
                 case .airtime:       AirtimeView()
                 case .rewards:       RewardsView()
