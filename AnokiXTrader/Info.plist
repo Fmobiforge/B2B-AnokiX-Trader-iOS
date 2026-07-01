@@ -20,8 +20,6 @@
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchScreen</key>
-	<false/>
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
+	<true/>
 </dict>
 </plist>
