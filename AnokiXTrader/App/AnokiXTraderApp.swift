@@ -37,6 +37,10 @@ struct AnokiXTraderApp: App {
                 .environmentObject(session)
                 .environmentObject(MarketStore.shared)
                 .tint(Brand.purple)
+                // The UI is designed light-only; dark mode makes some navy titles
+                // blend into the dark system background. Pin to light (also enforced
+                // via UIUserInterfaceStyle=Light in Info.plist for UIKit surfaces).
+                .preferredColorScheme(.light)
         }
     }
 }

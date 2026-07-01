@@ -99,7 +99,8 @@ struct ModuleHost: View {
     let module: Module
     @EnvironmentObject var router: Router
 
-    private var hidesSystemNavBar: Bool { module == .marketplace }
+    // Marketplace and Cart bring their own header / NavigationStack.
+    private var hidesSystemNavBar: Bool { module == .marketplace || module == .cart }
 
     var body: some View {
         NavigationStack {
@@ -112,6 +113,7 @@ struct ModuleHost: View {
                 case .invoices:      InvoicesView()
                 case .distributors:  DistributorsView()
                 case .marketplace:   MarketplaceRealView()
+                case .cart:          CartView(store: MarketStore.shared)
                 case .payments:      PaymentsView()
                 case .airtime:       AirtimeView()
                 case .rewards:       RewardsView()

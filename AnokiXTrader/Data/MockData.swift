@@ -49,11 +49,12 @@ enum MockData {
     static let drawerMenu: [MenuItem] = [
         MenuItem("home", "Dashboard", icon: "square.grid.2x2.fill"),
         MenuItem("marketplace", "Marketplace", icon: "storefront.fill"),
+        MenuItem("cart", "Cart", icon: "cart.fill"),
         MenuItem("orders", "Orders", icon: "shippingbox.fill"),
         MenuItem("goods_received", "Goods Received (GRV)", icon: "tray.and.arrow.down.fill"),
         MenuItem("goods_returns", "Goods Returns (GRN)", icon: "arrow.uturn.backward.circle.fill"),
         MenuItem("inventory", "Inventory", icon: "archivebox.fill"),
-        MenuItem("sell", "POS", subtitle: "Powered by Pagamio", icon: "cart.fill"),
+        MenuItem("sell", "POS", icon: "cart.fill"),
         MenuItem("sales", "Sales", icon: "banknote.fill"),
         MenuItem("invoices", "Invoices", icon: "doc.plaintext.fill"),
         MenuItem("distributors", "Distributors", icon: "building.2.fill"),

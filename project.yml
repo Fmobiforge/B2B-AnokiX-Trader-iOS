@@ -31,7 +31,7 @@ targets:
         buildPhase: resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.anokix.trader
+        PRODUCT_BUNDLE_IDENTIFIER: com.anokix.traderapp
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: AnokiXTrader/AnokiXTrader.entitlements
@@ -42,6 +42,11 @@ targets:
         # original hand-built .xcodeproj exactly).
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: AnokiXTrader/Info.plist
+        # Force the whole app to light appearance. Several screens use near-navy
+        # text on a dark system background under dark mode, making titles vanish;
+        # the design is light-only, so pin UIUserInterfaceStyle to Light. Also
+        # written into Info.plist so it applies even before an xcodegen regen.
+        INFOPLIST_KEY_UIUserInterfaceStyle: Light
         INFOPLIST_KEY_CFBundleDisplayName: "AnokiX Trader"
         INFOPLIST_KEY_NSCameraUsageDescription: "Capture your store logo and verification documents."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Attach your store logo and verification documents."

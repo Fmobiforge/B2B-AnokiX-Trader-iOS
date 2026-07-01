@@ -102,7 +102,7 @@ struct SellView: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text("POS").font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
-                Text("Scan and sell products — Powered by Pagamio")
+                Text("Scan and sell products")
                     .font(.system(size: 12)).foregroundColor(Brand.textSecondary).lineLimit(1)
             }
             Spacer()
