@@ -2,20 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleLightContent</string>
-	<key>NSCameraUsageDescription</key>
-	<string>anokiX needs access to your camera so you can capture your store photos and verification documents.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>anokiX needs access to your photo library so you can upload your company logo and verification documents.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>anokiX uses your location to help pin your business on the map during registration.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -29,5 +15,11 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<false/>
 </dict>
 </plist>

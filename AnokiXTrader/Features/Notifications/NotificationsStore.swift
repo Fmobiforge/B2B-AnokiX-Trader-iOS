@@ -159,7 +159,7 @@ private extension NotificationDTO {
     func readCopy() -> NotificationDTO {
         NotificationDTO(id: id, type: type, title: title, body: body, data: data,
                         read_at: read_at, created_at: created_at, is_read: true)
-    }
+    }	
 }
 
 // MARK: - Shared unread badge (header bell)
