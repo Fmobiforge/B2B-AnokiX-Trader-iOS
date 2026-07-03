@@ -247,7 +247,7 @@ struct OrderRow: View {
         .overlay {
             if order.statusKey == "pending" {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(statusColor("pending"), lineWidth: 1.5)
+                    .stroke(statusColor("pending"), lineWidth: 1.0)
             }
         }
     }
