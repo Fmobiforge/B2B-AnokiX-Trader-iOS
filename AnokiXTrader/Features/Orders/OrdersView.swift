@@ -243,6 +243,13 @@ struct OrderRow: View {
             .padding(.top, 12)
         }
         .card()
+        // Highlight the card border for pending orders (mirrors the web portal).
+        .overlay {
+            if order.statusKey == "pending" {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(statusColor("pending"), lineWidth: 1.5)
+            }
+        }
     }
 
     private var deliveryInfo: String {
