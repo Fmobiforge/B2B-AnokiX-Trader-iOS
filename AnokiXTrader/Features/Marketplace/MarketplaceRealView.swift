@@ -504,16 +504,20 @@ struct BannerCard: View {
     private let bannerHeight: CGFloat = 180
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            media
-            LinearGradient(colors: [.clear, .black.opacity(0.55)],
-                           startPoint: .top, endPoint: .bottom)
-            caption
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: bannerHeight)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .padding(.horizontal, 2)
+        // Color.clear pins the size; media/gradient/caption are overlays that can't
+        // grow the frame (an aspect-fill image under a plain .frame overflows and pushes
+        // the caption out of view — the documented banner bug).
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: bannerHeight)
+            .overlay(media)
+            .overlay(
+                LinearGradient(colors: [.black.opacity(0.7), .black.opacity(0.12)],
+                               startPoint: .leading, endPoint: .trailing)
+            )
+            .overlay(alignment: .leading) { caption }
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .padding(.horizontal, 2)
     }
 
     @ViewBuilder
@@ -543,8 +547,11 @@ struct BannerCard: View {
     private var caption: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(banner.name ?? "").font(.system(size: 19, weight: .bold)).foregroundColor(.white)
-            Text(banner.description ?? "").font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
                 .lineLimit(2)
+                .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+            Text(banner.description ?? "").font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
+                .lineLimit(2)
+                .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
             HStack(spacing: 8) {
                 Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
                     .padding(.horizontal, 14).padding(.vertical, 7)
@@ -566,39 +573,44 @@ struct PromotionCard: View {
     var onShop: () -> Void = {}
 
     var body: some View {
-        ZStack(alignment: .leading) {
-            media
-            LinearGradient(colors: [.black.opacity(0.72), .black.opacity(0.12)],
-                           startPoint: .leading, endPoint: .trailing)
-            VStack(alignment: .leading, spacing: 5) {
-                // Dark text shadow ("stroke" effect) keeps the title/description legible
-                // over any background image.
-                Text(promo.name ?? "")
-                    .font(.system(size: 19, weight: .bold)).foregroundColor(.white)
-                    .lineLimit(2)
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: 180)
+            .overlay(media)
+            .overlay(
+                LinearGradient(colors: [.black.opacity(0.72), .black.opacity(0.12)],
+                               startPoint: .leading, endPoint: .trailing)
+            )
+            .overlay(alignment: .leading) { content }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            // Dark text shadow ("stroke" effect) keeps the title/description legible
+            // over any background image.
+            Text(promo.name ?? "")
+                .font(.system(size: 19, weight: .bold)).foregroundColor(.white)
+                .lineLimit(2)
+                .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+            Text(promo.description ?? "")
+                .font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
+                .lineLimit(2)
+                .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+            if let end = promo.end_date, !end.isEmpty {
+                Text(end).font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
                     .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
-                Text(promo.description ?? "")
-                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
-                    .lineLimit(2)
-                    .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
-                if let end = promo.end_date, !end.isEmpty {
-                    Text(end).font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
-                        .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
-                        .padding(.top, 2)
-                }
-                Button(action: onShop) {
-                    Text("Shop Now").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
-                        .padding(.horizontal, 16).padding(.vertical, 8)
-                        .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 6)
+                    .padding(.top, 2)
             }
-            .padding(16)
+            Button(action: onShop) {
+                Text("Shop Now").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                    .padding(.horizontal, 16).padding(.vertical, 8)
+                    .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 6)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 180)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(16)
     }
 
     @ViewBuilder

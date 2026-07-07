@@ -29,6 +29,7 @@ struct CartView: View {
             .task { await store.refreshCart() }
             .toast($toastMsg)
         }
+        .environment(\.colorScheme, .light)
     }
 
     private func proceedToCheckout() {
