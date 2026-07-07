@@ -80,9 +80,12 @@ struct ProductDetailView: View {
             .task { await refresh() }
             .toast($toastMsg)
         }
-        // Presented as a sheet from screens that force .preferredColorScheme(.dark);
-        // keep this content in light mode so the fixed Brand colors stay legible.
-        .environment(\.colorScheme, .light)
+        // Presented as a sheet from screens that force .preferredColorScheme(.dark).
+        // The sheet inherits that dark userInterfaceStyle (dark system backgrounds +
+        // invisible dark Brand text), so force this presentation back to light. Must be
+        // .preferredColorScheme (drives the sheet's UIKit style) — .environment(\.colorScheme)
+        // alone does NOT recolour the NavigationStack/ScrollView system backgrounds.
+        .preferredColorScheme(.light)
     }
 
     @ViewBuilder private var image: some View {

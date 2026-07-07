@@ -29,7 +29,8 @@ struct CartView: View {
             .task { await store.refreshCart() }
             .toast($toastMsg)
         }
-        .environment(\.colorScheme, .light)
+        // Force light: presented from screens that set .preferredColorScheme(.dark).
+        .preferredColorScheme(.light)
     }
 
     private func proceedToCheckout() {

@@ -88,8 +88,9 @@ struct CategoryFilterSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) { footer }
-            .environment(\.colorScheme, .light)
         }
+        // Presented from screens that force .preferredColorScheme(.dark); force light.
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Sections

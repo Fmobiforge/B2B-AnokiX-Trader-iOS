@@ -243,6 +243,9 @@ struct MarketplaceRealView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { activeSheet = nil } } }
         }
+        // The marketplace forces .preferredColorScheme(.dark); this picker sheet inherits
+        // that dark style, so force it back to light.
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Banner slider
@@ -257,7 +260,9 @@ struct MarketplaceRealView: View {
         if let banners = store.data?.banners, !banners.isEmpty {
             let safeIndex = max(0, min(bannerIndex, banners.count - 1))
             VStack(spacing: 12) {
-                BannerCard(banner: banners[safeIndex])
+                BannerCard(banner: banners[safeIndex],
+                           onShop: { toastMsg = "Coming soon" },
+                           onPromotions: { destination = .promotions })
                     .id(banners[safeIndex].id)
 
                 if banners.count > 1 {
@@ -501,6 +506,8 @@ struct MarketplaceRealView: View {
 
 struct BannerCard: View {
     let banner: BannerDTO
+    var onShop: () -> Void = {}
+    var onPromotions: () -> Void = {}
     private let bannerHeight: CGFloat = 180
 
     var body: some View {
@@ -553,12 +560,18 @@ struct BannerCard: View {
                 .lineLimit(2)
                 .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
             HStack(spacing: 8) {
-                Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
-                    .padding(.horizontal, 14).padding(.vertical, 7)
-                    .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
-                Text("View Promotions").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
-                    .padding(.horizontal, 14).padding(.vertical, 7)
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white, lineWidth: 1))
+                Button(action: onShop) {
+                    Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                Button(action: onPromotions) {
+                    Text("View Promotions").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
             .padding(.top, 6)
         }
