@@ -80,6 +80,9 @@ struct ProductDetailView: View {
             .task { await refresh() }
             .toast($toastMsg)
         }
+        // Presented as a sheet from screens that force .preferredColorScheme(.dark);
+        // keep this content in light mode so the fixed Brand colors stay legible.
+        .environment(\.colorScheme, .light)
     }
 
     @ViewBuilder private var image: some View {

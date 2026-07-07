@@ -237,8 +237,14 @@ struct CategoryProductCard: View {
     var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 0) {
-                RemoteImage(url: product.imageURL)
-                    .frame(maxWidth: .infinity).frame(height: 120).clipped()
+                // Size-anchor: an aspect-fill image with a flexible width would otherwise
+                // blow out the grid cell (first row wider than the rest). Color.clear pins
+                // the size; the image is a clipped overlay that can't resize its parent.
+                Color.clear
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 120)
+                    .overlay(RemoteImage(url: product.imageURL))
+                    .clipped()
                 VStack(alignment: .leading, spacing: 6) {
                     Text(product.name ?? "")
                         .font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
