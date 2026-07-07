@@ -541,13 +541,16 @@ struct BannerCard: View {
         Color.clear
             .frame(maxWidth: .infinity)
             .frame(height: bannerHeight)
-            .overlay(media)
+            // Decorative layers non-hittable (aspect-fill hit area overflows the frame).
+            .overlay(media.allowsHitTesting(false))
             .overlay(
                 LinearGradient(colors: [.black.opacity(0.7), .black.opacity(0.12)],
                                startPoint: .leading, endPoint: .trailing)
+                    .allowsHitTesting(false)
             )
             .overlay(alignment: .leading) { caption }
             .clipShape(RoundedRectangle(cornerRadius: 18))
+            .contentShape(Rectangle())
             .padding(.horizontal, 2)
     }
 
@@ -613,13 +616,18 @@ struct PromotionCard: View {
         Color.clear
             .frame(maxWidth: .infinity)
             .frame(height: 180)
-            .overlay(media)
+            // Decorative layers must NOT be hittable: the aspect-fill image's hit area
+            // overflows the 180pt frame and, being higher in the VStack z-order, would
+            // otherwise cover (and swallow taps meant for) the section's "View All" above.
+            .overlay(media.allowsHitTesting(false))
             .overlay(
                 LinearGradient(colors: [.black.opacity(0.72), .black.opacity(0.12)],
                                startPoint: .leading, endPoint: .trailing)
+                    .allowsHitTesting(false)
             )
             .overlay(alignment: .leading) { content }
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .contentShape(Rectangle())
     }
 
     private var content: some View {

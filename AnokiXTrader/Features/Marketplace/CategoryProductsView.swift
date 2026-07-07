@@ -243,7 +243,7 @@ struct CategoryProductCard: View {
                 Color.clear
                     .frame(maxWidth: .infinity)
                     .frame(height: 120)
-                    .overlay(RemoteImage(url: product.imageURL))
+                    .overlay(RemoteImage(url: product.imageURL).allowsHitTesting(false))
                     .clipped()
                 VStack(alignment: .leading, spacing: 6) {
                     Text(product.name ?? "")
