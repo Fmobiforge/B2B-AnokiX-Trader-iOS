@@ -110,6 +110,59 @@ final class APIClient {
         return try decode(data)
     }
 
+    /// Category browse/filter page (api/trader/marketplace/category). All args except
+    /// `categoryId` are optional; empty/false values are omitted so the backend applies
+    /// no constraint — parity with the Android `ApiClient.getCategoryPage`.
+    func getCategoryProducts(categoryId: String,
+                             distributorId: String? = nil,
+                             brands: String? = nil,
+                             subCategories: String? = nil,
+                             packSizes: String? = nil,
+                             minPrice: String? = nil,
+                             maxPrice: String? = nil,
+                             onPromotion: Bool = false,
+                             inStock: Bool = false,
+                             search: String? = nil,
+                             sortBy: String = "popularity",
+                             page: Int = 1,
+                             perPage: Int = 60) async throws -> CategoryPageData {
+        var q: [String: String] = [
+            "category_id": categoryId,
+            "sort_by": sortBy.isEmpty ? "popularity" : sortBy,
+            "page": String(page),
+            "per_page": String(perPage)
+        ]
+        if let v = distributorId, !v.isEmpty { q["distributor_id"] = v }
+        if let v = brands, !v.isEmpty { q["brands"] = v }
+        if let v = subCategories, !v.isEmpty { q["sub_categories"] = v }
+        if let v = packSizes, !v.isEmpty { q["pack_sizes"] = v }
+        if let v = minPrice, !v.isEmpty { q["min_price"] = v }
+        if let v = maxPrice, !v.isEmpty { q["max_price"] = v }
+        if onPromotion { q["on_promotion"] = "1" }
+        if inStock { q["in_stock"] = "1" }
+        if let v = search, !v.trimmingCharacters(in: .whitespaces).isEmpty {
+            q["search"] = v.trimmingCharacters(in: .whitespaces)
+        }
+        let data = try await get("api/trader/marketplace/category", query: q)
+        return try decode(data)
+    }
+
+    /// Titled, paginated product collection (api/trader/marketplace/collection),
+    /// e.g. type=recommended / best_sellers — opened from a Marketplace "View All".
+    func getCollection(type: String, page: Int, perPage: Int) async throws -> CollectionData {
+        let q: [String: String] = ["type": type, "page": String(page), "per_page": String(perPage)]
+        let data = try await get("api/trader/marketplace/collection", query: q)
+        return try decode(data)
+    }
+
+    /// Titled, paginated "Current Promotions" list (api/trader/marketplace/promotions),
+    /// opened from the Marketplace "Current Promotions" View All.
+    func getPromotions(page: Int, perPage: Int) async throws -> PromotionCollectionData {
+        let q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        let data = try await get("api/trader/marketplace/promotions", query: q)
+        return try decode(data)
+    }
+
     func getProductDetail(id: String) async throws -> ProductDTO {
         let data = try await get("api/common/product-detail", query: ["id": id])
         let wrapper: CommonProductData = try decode(data)

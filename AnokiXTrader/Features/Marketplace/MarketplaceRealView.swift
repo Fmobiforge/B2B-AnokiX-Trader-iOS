@@ -11,6 +11,25 @@ struct MarketplaceRealView: View {
     @State private var activeSheet: ActiveSheet?
     @State private var bannerIndex = 0
     @State private var toastMsg: String?
+    @State private var destination: MarketDestination?
+
+    /// Full-screen destinations opened over the marketplace (each in its own
+    /// NavigationStack): the "View All" category chooser, a tapped category, or a
+    /// "View All" product collection (Recommended / Best Sellers).
+    private enum MarketDestination: Identifiable {
+        case allCategories
+        case category(ProductCategoryDTO)
+        case collection(type: String, title: String)
+        case promotions
+        var id: String {
+            switch self {
+            case .allCategories: return "all-categories"
+            case .category(let c): return "category-\(c.id)"
+            case .collection(let type, _): return "collection-\(type)"
+            case .promotions: return "promotions"
+            }
+        }
+    }
 
     /// One sheet at a time — multiple `.sheet` modifiers on a single view are
     /// unreliable, so all three presentations share this enum.
@@ -47,10 +66,10 @@ struct MarketplaceRealView: View {
                             categoriesSection
                             opportunitiesCard
                             productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
-                                           products: store.data?.recommended)
+                                           products: store.data?.recommended, collectionType: "recommended")
                             promotionsSection.id("promotions")
                             productSection(title: "Best Sellers", subtitle: nil,
-                                           products: store.data?.best_sellers)
+                                           products: store.data?.best_sellers, collectionType: "best_sellers")
                             featureStrip
                         }
                     }
@@ -81,6 +100,16 @@ struct MarketplaceRealView: View {
             }
         }
         .toast($toastMsg)
+        .fullScreenCover(item: $destination) { dest in
+            NavigationStack {
+                switch dest {
+                case .allCategories: AllCategoriesView(store: store)
+                case .category(let c): CategoryProductsView(category: c, store: store)
+                case .collection(let type, let title): CollectionView(type: type, title: title, store: store)
+                case .promotions: PromotionsView(store: store)
+                }
+            }
+        }
         // White status-bar icons over the purple header (same trick as Login / Register).
         // Keep scroll content in light mode; closing the screen restores the tab bar default.
         .environment(\.colorScheme, .light)
@@ -357,20 +386,23 @@ struct MarketplaceRealView: View {
     private var categoriesSection: some View {
         if !store.parentCategories.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                SectionHeader(title: "Categories", actionTitle: "View All") {}
+                SectionHeader(title: "Categories", actionTitle: "View All") { destination = .allCategories }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {
                         ForEach(store.parentCategories) { c in
-                            VStack(spacing: 6) {
-                                Image(systemName: "square.grid.2x2").font(.system(size: 18)).foregroundColor(Brand.purple)
-                                    .frame(width: 48, height: 48).background(Brand.purpleLight)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                                Text(c.title).font(.system(size: 10)).foregroundColor(Brand.textPrimary)
-                                    .multilineTextAlignment(.center)
-                                    .lineLimit(2)
-                                    .frame(width: 64, alignment: .top)
+                            Button { destination = .category(c) } label: {
+                                VStack(spacing: 6) {
+                                    Image(systemName: CategoryIcon.symbol(for: c)).font(.system(size: 18)).foregroundColor(Brand.purple)
+                                        .frame(width: 48, height: 48).background(Brand.purpleLight)
+                                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                                    Text(c.title).font(.system(size: 10)).foregroundColor(Brand.textPrimary)
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(2)
+                                        .frame(width: 64, alignment: .top)
+                                }
+                                .frame(width: 64, alignment: .top)
                             }
-                            .frame(width: 64, alignment: .top)
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -400,12 +432,20 @@ struct MarketplaceRealView: View {
     // MARK: - Product rows
 
     @ViewBuilder
-    private func productSection(title: String, subtitle: String?, products: [ProductDTO]?) -> some View {
+    private func productSection(title: String, subtitle: String?, products: [ProductDTO]?,
+                               collectionType: String? = nil) -> some View {
         if let products, !products.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    if let subtitle { Text(subtitle).font(.system(size: 11)).foregroundColor(Brand.textSecondary) }
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        if let subtitle { Text(subtitle).font(.system(size: 11)).foregroundColor(Brand.textSecondary) }
+                    }
+                    Spacer()
+                    if let collectionType {
+                        Button("View All") { destination = .collection(type: collectionType, title: title) }
+                            .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    }
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -424,8 +464,10 @@ struct MarketplaceRealView: View {
     private var promotionsSection: some View {
         if let promos = store.data?.promotions, !promos.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Current Promotions").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
-                ForEach(promos) { promo in PromotionCard(promo: promo) }
+                SectionHeader(title: "Current Promotions", actionTitle: "View All") { destination = .promotions }
+                ForEach(promos) { promo in
+                    PromotionCard(promo: promo) { toastMsg = "Coming soon" }
+                }
             }
         }
     }
@@ -521,21 +563,62 @@ struct BannerCard: View {
 
 struct PromotionCard: View {
     let promo: PromotionDTO
+    var onShop: () -> Void = {}
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let url = promo.mediaURL, !promo.isVideo, !url.isEmpty {
-                RemoteImage(url: url)
-                    .frame(height: 130).frame(maxWidth: .infinity).clipped()
+        ZStack(alignment: .leading) {
+            media
+            LinearGradient(colors: [.black.opacity(0.72), .black.opacity(0.12)],
+                           startPoint: .leading, endPoint: .trailing)
+            VStack(alignment: .leading, spacing: 5) {
+                // Dark text shadow ("stroke" effect) keeps the title/description legible
+                // over any background image.
+                Text(promo.name ?? "")
+                    .font(.system(size: 19, weight: .bold)).foregroundColor(.white)
+                    .lineLimit(2)
+                    .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+                Text(promo.description ?? "")
+                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
+                    .lineLimit(2)
+                    .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+                if let end = promo.end_date, !end.isEmpty {
+                    Text(end).font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
+                        .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
+                        .padding(.top, 2)
+                }
+                Button(action: onShop) {
+                    Text("Shop Now").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                        .padding(.horizontal, 16).padding(.vertical, 8)
+                        .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 6)
             }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(promo.name ?? "").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
-                Text(promo.description ?? "").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-            }
-            .padding(14)
+            .padding(16)
         }
-        .background(Brand.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Brand.border, lineWidth: 1))
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    @ViewBuilder
+    private var media: some View {
+        Group {
+            if promo.isVideo, let url = MediaUrls.url(promo.mediaURL) {
+                ZStack {
+                    VideoThumbnailView(url: url)
+                    LoopingVideoView(url: url)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else if let url = MediaUrls.resolve(promo.mediaURL), !url.isEmpty {
+                RemoteImage(url: url)
+            } else {
+                LinearGradient(colors: [Brand.purple, Brand.purpleDark],
+                               startPoint: .leading, endPoint: .trailing)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
     }
 }
 

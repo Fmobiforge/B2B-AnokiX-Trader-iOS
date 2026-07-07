@@ -175,6 +175,8 @@ struct PromotionDTO: Decodable, Identifiable, Hashable {
     let campaign_type: String?
     let name: String?
     let description: String?
+    let start_date: String?
+    let end_date: String?
     let banner_file: MediaDTO?
     let video_file: MediaDTO?
 
@@ -234,6 +236,7 @@ struct ProductDTO: Decodable, Identifiable, Hashable {
     let stock_quantity: String?
     let primary_product_image_url: String?
     let image_url: String?
+    let additional_images: [ProductImageDTO]?
 
     var priceValue: Double {
         if let s = selling_price, let d = Double(s), d > 0 { return d }
@@ -244,12 +247,27 @@ struct ProductDTO: Decodable, Identifiable, Hashable {
         if let u = image_url, !u.isEmpty { return u }
         return primary_product_image_url
     }
+    /// Ordered, de-duplicated image gallery: primary image first, then additional_images.
+    var galleryURLs: [String] {
+        var urls: [String] = []
+        if let main = imageURL, !main.isEmpty { urls.append(main) }
+        let extra = (additional_images ?? []).sorted { ($0.sort_order ?? 0) < ($1.sort_order ?? 0) }
+        for img in extra {
+            if let u = img.file_url, !u.isEmpty, !urls.contains(u) { urls.append(u) }
+        }
+        return urls
+    }
     var stockCount: Int {
         if let s = stock, s > 0 { return s }
         if let q = stock_quantity, let n = Int(q) { return n }
         return 0
     }
     var inStock: Bool { stockCount > 0 }
+}
+
+struct ProductImageDTO: Decodable, Hashable {
+    let file_url: String?
+    let sort_order: Int?
 }
 
 // MARK: - Cart (GET /api/trader/cart)
@@ -603,4 +621,112 @@ struct CoordinateData: Decodable {
     var lat: Double? { latitude }
     var lng: Double? { longitude }
     var resolvedAddress: String? { formatted_address ?? address }
+}
+
+// MARK: - Category products page (GET /api/trader/marketplace/category)
+
+/// data block of the category browse/filter screen — iOS counterpart of the Android
+/// `CategoryPageData`. Products / recently-purchased reuse `ProductDTO`; banners reuse
+/// `BannerDTO`. All the filter options (with live counts) arrive in `filters` in this
+/// one call, exactly like the web portal.
+struct CategoryPageData: Decodable {
+    let meta: MetaDTO?
+    let category: ProductCategoryDTO?
+    let pagination: PaginationDTO?
+    let filters: CategoryFiltersDTO?
+    let products: [ProductDTO]?
+    let banners: [BannerDTO]?
+    let recently_purchased: [ProductDTO]?
+    let sort_options: [SortOptionDTO]?
+
+    var currencySymbol: String {
+        if let s = meta?.currency?.symbol, !s.isEmpty { return s }
+        return "R"
+    }
+}
+
+/// The filter facets, each carrying a count of matching products.
+struct CategoryFiltersDTO: Decodable {
+    let brands: [BrandFacetDTO]?
+    let categories: [SubCategoryFacetDTO]?
+    let pack_sizes: [PackSizeFacetDTO]?
+    let price_range: PriceRangeDTO?
+    let promotions: [PromotionFacetDTO]?
+    let availability: AvailabilityFacetDTO?
+}
+
+struct BrandFacetDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let name: String?
+    let count: Int?
+}
+
+struct SubCategoryFacetDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let title: String?
+    let slug: String?
+    let count: Int?
+}
+
+struct PackSizeFacetDTO: Decodable, Identifiable, Hashable {
+    var id: String { key }
+    let key: String            // small | medium | large
+    let label: String?
+    let count: Int?
+}
+
+struct PriceRangeDTO: Decodable, Hashable {
+    let min: Double
+    let max: Double
+}
+
+struct PromotionFacetDTO: Decodable, Identifiable, Hashable {
+    var id: String { key }
+    let key: String            // on_promotion | buy_more_save_more | sponsored
+    let label: String?
+    let count: Int?
+}
+
+struct AvailabilityFacetDTO: Decodable, Hashable {
+    let in_stock_count: Int?
+    let total_count: Int?
+}
+
+struct SortOptionDTO: Decodable, Identifiable, Hashable {
+    var id: String { value }
+    let value: String
+    let label: String?
+}
+
+// MARK: - Collection (GET /api/trader/marketplace/collection?type=)
+
+/// A titled, paginated product collection (type=recommended / best_sellers), opened
+/// from a Marketplace section's "View All". Products reuse `ProductDTO`.
+struct CollectionData: Decodable {
+    let meta: MetaDTO?
+    let type: String?
+    let title: String?
+    let pagination: PaginationDTO?
+    let products: [ProductDTO]?
+
+    var currencySymbol: String {
+        if let s = meta?.currency?.symbol, !s.isEmpty { return s }
+        return "R"
+    }
+}
+
+// MARK: - Promotions collection (GET /api/trader/marketplace/promotions)
+
+/// The titled, paginated "Current Promotions" list opened from the Marketplace
+/// section's "View All". Promotions reuse `PromotionDTO`.
+struct PromotionCollectionData: Decodable {
+    let meta: MetaDTO?
+    let title: String?
+    let pagination: PaginationDTO?
+    let promotions: [PromotionDTO]?
+
+    var currencySymbol: String {
+        if let s = meta?.currency?.symbol, !s.isEmpty { return s }
+        return "R"
+    }
 }

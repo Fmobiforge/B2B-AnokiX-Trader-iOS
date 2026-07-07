@@ -14,6 +14,7 @@ struct ProductDetailView: View {
     @State private var product: ProductDTO
     @State private var quantity = 1
     @State private var toastMsg: String?
+    @State private var selectedImage: String?
 
     init(productId: String, fallback: ProductDTO, distributorName: String,
          currency: String, store: MarketStore) {
@@ -82,9 +83,31 @@ struct ProductDetailView: View {
     }
 
     @ViewBuilder private var image: some View {
-        RemoteImage(url: product.imageURL)
-            .frame(height: 240).frame(maxWidth: .infinity).clipped()
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+        let gallery = product.galleryURLs
+        let current = selectedImage.flatMap { gallery.contains($0) ? $0 : nil } ?? gallery.first
+        VStack(spacing: 10) {
+            RemoteImage(url: current)
+                .frame(height: 240).frame(maxWidth: .infinity).clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+            if gallery.count > 1 {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(gallery, id: \.self) { url in
+                            RemoteImage(url: url)
+                                .frame(width: 60, height: 60).clipped()
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(current == url ? Brand.purple : Brand.border,
+                                                lineWidth: current == url ? 2 : 1)
+                                )
+                                .onTapGesture { selectedImage = url }
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
     }
 
     private var stepper: some View {
