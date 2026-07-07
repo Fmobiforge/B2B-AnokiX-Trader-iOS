@@ -110,8 +110,13 @@ final class Session: ObservableObject {
     }
 
     func bootFinished() {
-        // After the splash animation, go to the welcome screen.
-        stage = .welcome
+        // If a session was restored on launch (persisted Bearer token), skip the auth
+        // flow and go straight to the main app; otherwise show the welcome screen.
+        if let token = APIClient.shared.token, !token.isEmpty {
+            stage = .main
+        } else {
+            stage = .welcome
+        }
     }
 
     /// Real login against the AX backend. On success the Bearer token is stored on
