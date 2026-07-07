@@ -67,7 +67,11 @@ struct MarketplaceRealView: View {
                             opportunitiesCard
                             productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
                                            products: store.data?.recommended, collectionType: "recommended")
-                            promotionsSection.id("promotions")
+                            // Scroll anchor for the menu's "Promotions" button — kept OFF the
+                            // section itself, because .id() on the interactive section swallowed
+                            // its "View All" button tap.
+                            Color.clear.frame(height: 0).id("promotions")
+                            promotionsSection
                             productSection(title: "Best Sellers", subtitle: nil,
                                            products: store.data?.best_sellers, collectionType: "best_sellers")
                             featureStrip
@@ -391,7 +395,12 @@ struct MarketplaceRealView: View {
     private var categoriesSection: some View {
         if !store.parentCategories.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                SectionHeader(title: "Categories", actionTitle: "View All") { destination = .allCategories }
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Categories").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Spacer()
+                    Button("View All") { destination = .allCategories }
+                        .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {
                         ForEach(store.parentCategories) { c in
@@ -469,7 +478,14 @@ struct MarketplaceRealView: View {
     private var promotionsSection: some View {
         if let promos = store.data?.promotions, !promos.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                SectionHeader(title: "Current Promotions", actionTitle: "View All") { destination = .promotions }
+                // Inline header/Button (same pattern as the working Recommended/Best
+                // Sellers "View All") rather than SectionHeader.
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Current Promotions").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Spacer()
+                    Button("View All") { destination = .promotions }
+                        .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                }
                 ForEach(promos) { promo in
                     PromotionCard(promo: promo) { toastMsg = "Coming soon" }
                 }
