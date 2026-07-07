@@ -113,6 +113,10 @@ struct MarketplaceRealView: View {
                 case .promotions: PromotionsView(store: store)
                 }
             }
+            .onAppear { print("🟣 [Marketplace] fullScreenCover presenting destination id=\(dest.id)") }
+        }
+        .onChange(of: destination?.id) { newId in
+            print("🟣 [Marketplace] destination changed → \(newId ?? "nil")")
         }
         // White status-bar icons over the purple header (same trick as Login / Register).
         // Keep scroll content in light mode; closing the screen restores the tab bar default.
@@ -483,8 +487,12 @@ struct MarketplaceRealView: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text("Current Promotions").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
                     Spacer()
-                    Button("View All") { destination = .promotions }
-                        .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    Button("View All") {
+                        print("🟣 [Marketplace] Current Promotions 'View All' tapped → destination = .promotions")
+                        destination = .promotions
+                    }
+                    .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    .contentShape(Rectangle())
                 }
                 ForEach(promos) { promo in
                     PromotionCard(promo: promo) { toastMsg = "Coming soon" }

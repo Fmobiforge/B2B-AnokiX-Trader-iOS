@@ -16,6 +16,8 @@ final class PromotionsStore: ObservableObject {
     private var totalPages = 1
     private let perPage = 10
 
+    init() {}
+
     func loadFirst() async {
         guard promotions.isEmpty, !loading else { return }
         loading = true
