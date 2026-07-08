@@ -340,19 +340,19 @@ struct SellVasSection: View {
         return Button {
             Task { await store.selectCategory(node) }
         } label: {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .center, spacing: 8) {
                 Image(systemName: AirtimeView.icon(for: node.id, node.name))
                     .font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.purple)
                     .frame(width: 36, height: 36)
                     .background(Brand.purpleLight).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 Text(node.name)
                     .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                    .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(2).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 Text("\(node.productCount) \(node.productCount == 1 ? "bundle" : "bundles")")
                     .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
-            .frame(width: fixedWidth ? 128 : nil, alignment: .leading)
-            .frame(maxWidth: fixedWidth ? nil : .infinity, alignment: .leading)
+            .frame(width: fixedWidth ? 128 : nil, alignment: .center)
+            .frame(maxWidth: fixedWidth ? nil : .infinity, alignment: .center)
             .padding(12)
             .background(Brand.surface)
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -426,7 +426,7 @@ struct SellVasSection: View {
                         .font(.system(size: 18)).foregroundColor(Brand.success)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 60, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(12)
             .background(Brand.surface)
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
