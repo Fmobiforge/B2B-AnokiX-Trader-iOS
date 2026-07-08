@@ -92,7 +92,7 @@ struct SellView: View {
                 }
             }
             .background(Brand.background)
-            .scrollDismissesKeyboard(.interactive)
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarHidden(true)
         .navigationDestination(isPresented: $showCheckout) { CheckoutView() }
