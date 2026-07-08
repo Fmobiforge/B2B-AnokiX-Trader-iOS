@@ -60,7 +60,7 @@ enum MockData {
         MenuItem("distributors", "Distributors", icon: "building.2.fill"),
         MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
         MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
-        MenuItem("airtime", "Airtime & VAS", icon: "antenna.radiowaves.left.and.right"),
+        MenuItem("airtime", "Airtime & VAS", subtitle: "Powered by Limes", icon: "antenna.radiowaves.left.and.right"),
         MenuItem("analytics", "Analytics", icon: "chart.bar.fill"),
         MenuItem("reports", "Reports", icon: "doc.text.fill"),
         MenuItem("settings", "Settings", icon: "gearshape.fill"),

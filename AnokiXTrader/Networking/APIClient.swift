@@ -511,6 +511,46 @@ final class APIClient {
         _ = try await postJSON("api/common/profile/password", json: payload)
     }
 
+    // MARK: Airtime & VAS (Limes, common — api/common/vas/*)
+
+    /// VAS dashboard: recent transactions + KPI summary (api/common/vas/transactions).
+    func getVasTransactions(page: Int, perPage: Int) async throws -> VasTransactionsData {
+        let q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        let data = try await get("api/common/vas/transactions", query: q)
+        return VasTransactionsData(json: data)
+    }
+
+    /// The Limes VAS category tree (api/common/vas/categories). Flatten via `.leaves`.
+    func getVasCategories() async throws -> VasCategoriesData {
+        let data = try await get("api/common/vas/categories", query: [:])
+        return VasCategoriesData(json: data)
+    }
+
+    /// Purchasable products for one leaf category (api/common/vas/products).
+    func getVasProducts(category: String, page: Int, limit: Int) async throws -> VasProductsData {
+        let q: [String: String] = ["category": category, "page": String(page), "limit": String(limit)]
+        let data = try await get("api/common/vas/products", query: q)
+        return VasProductsData(json: data)
+    }
+
+    /// Buy a VAS product (api/common/vas/purchase, formdata). Paid from the anokiX
+    /// wallet; the server debits and forwards to Limes. Only status/message decide
+    /// success — the failure path carries the network's reason (e.g. inactive subscriber).
+    func purchaseVas(productId: String, msisdn: String, amount: Double, sku: String,
+                     name: String, category: String) async throws {
+        let form: [String: String] = [
+            "product_id": productId,
+            "msisdn": msisdn,
+            "amount": String(amount),
+            "sku": sku,
+            "name": name,
+            "category": category,
+            // Postman collection sends earn_commission=1 so the trader accrues VAS commission.
+            "earn_commission": "1"
+        ]
+        try await postFormStatus("api/common/vas/purchase", form: form)
+    }
+
     // MARK: - Core requests (Alamofire)
 
     /// GET → returns the validated `data` node as SwiftyJSON.

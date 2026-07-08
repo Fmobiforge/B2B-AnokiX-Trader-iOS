@@ -730,3 +730,144 @@ struct PromotionCollectionData: Decodable {
         return "R"
     }
 }
+
+// MARK: - Airtime & VAS (Limes, common — api/common/vas/*)
+//
+// Built with SwiftyJSON `init(json:)` (not strict Codable) because the VAS feed mixes
+// numbers and numeric strings across ids/prices/amounts — SwiftyJSON's `*Value`
+// accessors coerce either way, matching the leniency Android's Gson gives these shapes.
+
+/// `data` of GET api/common/vas/transactions: recent transactions + KPI summary.
+struct VasTransactionsData {
+    let transactions: [VasTransactionDTO]
+    let summary: VasSummaryDTO?
+
+    init(json: JSON) {
+        transactions = (json["transactions"].array ?? []).map(VasTransactionDTO.init(json:))
+        summary = json["summary"].exists() ? VasSummaryDTO(json: json["summary"]) : nil
+    }
+}
+
+struct VasTransactionDTO: Identifiable, Hashable {
+    let id: String
+    let msisdn: String?
+    let name: String?
+    let category: String?
+    let amount: String?
+    let currency: String?
+    let status: String?
+    let error: String?
+    let created_at: String?
+
+    init(json: JSON) {
+        id = json["id"].stringValue
+        msisdn = json["msisdn"].string
+        name = json["name"].string
+        category = json["category"].string
+        amount = json["amount"].exists() ? json["amount"].stringValue : nil
+        currency = json["currency"].string
+        status = json["status"].string
+        error = json["error"].string
+        created_at = json["created_at"].string
+    }
+
+    static func == (lhs: VasTransactionDTO, rhs: VasTransactionDTO) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+/// Header KPI figures on the VAS dashboard.
+struct VasSummaryDTO {
+    let sales_today: Double
+    let count_today: Double
+    let commission_month: Double
+    let wallet_balance: Double
+
+    init(json: JSON) {
+        sales_today = json["sales_today"].doubleValue
+        count_today = json["count_today"].doubleValue
+        commission_month = json["commission_month"].doubleValue
+        wallet_balance = json["wallet_balance"].doubleValue
+    }
+}
+
+/// `data` of GET api/common/vas/categories — a tree; only leaf nodes are purchasable.
+struct VasCategoriesData {
+    let configured: Bool
+    let commission_rate: Double
+    let categories: [VasCategoryNode]
+
+    init(json: JSON) {
+        configured = json["configured"].boolValue
+        commission_rate = json["commission_rate"].doubleValue
+        categories = (json["categories"].array ?? []).map(VasCategoryNode.init(json:))
+    }
+
+    /// Depth-first flatten to selectable leaf categories, ordered by `displayOrder`.
+    var leaves: [VasCategoryNode] {
+        var out: [VasCategoryNode] = []
+        func walk(_ nodes: [VasCategoryNode]) {
+            for node in nodes.sorted(by: { $0.displayOrder < $1.displayOrder }) {
+                if !node.children.isEmpty {
+                    walk(node.children)
+                } else if node.hasProducts || node.productCount > 0 {
+                    out.append(node)
+                }
+            }
+        }
+        walk(categories)
+        return out
+    }
+}
+
+struct VasCategoryNode: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let displayOrder: Int
+    let children: [VasCategoryNode]
+    let productCount: Int
+    let hasProducts: Bool
+
+    init(json: JSON) {
+        id = json["id"].stringValue
+        name = json["name"].stringValue
+        displayOrder = json["displayOrder"].intValue
+        children = (json["children"].array ?? []).map(VasCategoryNode.init(json:))
+        productCount = json["productCount"].intValue
+        hasProducts = json["hasProducts"].boolValue
+    }
+
+    static func == (lhs: VasCategoryNode, rhs: VasCategoryNode) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+/// `data` of GET api/common/vas/products for one leaf category.
+struct VasProductsData {
+    let products: [VasProductDTO]
+
+    init(json: JSON) {
+        products = (json["products"].array ?? []).map(VasProductDTO.init(json:))
+    }
+}
+
+struct VasProductDTO: Identifiable, Hashable {
+    let id: String
+    let sku: String?
+    let name: String?
+    let description: String?
+    let price: Double
+    let brand: String?
+    let isAdHoc: Bool
+
+    init(json: JSON) {
+        id = json["id"].stringValue
+        sku = json["sku"].string
+        name = json["name"].string
+        description = json["description"].string
+        price = json["price"].doubleValue
+        brand = json["brand"].string
+        isAdHoc = json["isAdHoc"].boolValue
+    }
+
+    static func == (lhs: VasProductDTO, rhs: VasProductDTO) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
