@@ -214,7 +214,7 @@ struct AirtimeView: View {
                     .background(Brand.purpleLight).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 Text(node.name)
                     .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                    .lineLimit(2).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(2, reservesSpace: true).multilineTextAlignment(.center)
                 Text(bundleCount(node.productCount))
                     .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
@@ -272,11 +272,11 @@ struct AirtimeView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(adHoc ? "Custom" : (product.name ?? "—"))
                         .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
-                        .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(1).multilineTextAlignment(.leading)
                     Text(adHoc ? (product.name ?? "") : Money.rand(product.price))
                         .font(.system(size: 12, weight: adHoc ? .regular : .semibold))
                         .foregroundColor(adHoc ? Brand.textSecondary : Brand.purple)
-                        .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(2, reservesSpace: true).multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
                 if selected {

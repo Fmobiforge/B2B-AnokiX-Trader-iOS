@@ -347,7 +347,7 @@ struct SellVasSection: View {
                     .background(Brand.purpleLight).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 Text(node.name)
                     .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                    .lineLimit(2).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(2, reservesSpace: true).multilineTextAlignment(.center)
                 Text("\(node.productCount) \(node.productCount == 1 ? "bundle" : "bundles")")
                     .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
@@ -415,10 +415,10 @@ struct SellVasSection: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(adHoc ? "Custom" : Money.rand(product.price))
                         .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
-                        .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(1).multilineTextAlignment(.leading)
                     Text(product.name ?? "—")
                         .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                        .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(2, reservesSpace: true).multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
                 if selected {
