@@ -133,7 +133,7 @@ struct AirtimeView: View {
             .padding(16)
         }
         .background(Brand.background)
-        .scrollDismissesKeyboard(.interactive)
+        .scrollDismissesKeyboard(.interactively)
         .task {
             await store.loadTransactions()
             await store.loadCategories()

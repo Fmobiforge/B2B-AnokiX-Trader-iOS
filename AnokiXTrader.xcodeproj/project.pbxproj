@@ -50,13 +50,13 @@
 		90E292E3B4DFC5149F07A2B0 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B7C23EF6695669B46657AB /* FlowLayout.swift */; };
 		932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CD2B00377D56966727ED1C /* SettingsView.swift */; };
 		94177D83E04817A5B54F474E /* MarketplaceRealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */; };
-		97DD602DB7C69B9BA77FB387 /* Pods_AnokiXTrader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06FF5D8A91A9D8769DC45E6E /* Pods_AnokiXTrader.framework */; };
 		98732CBDF84F3E17ABBBEEA5 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F612DF0751C5C28CA0A656 /* MockData.swift */; };
 		9A82CB1B2299C5AFE760709B /* DistributorsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D0491BFEBED50AF17FE93E /* DistributorsStore.swift */; };
 		9D4A787677D19CEB6895236D /* GoodsReceivedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D502CBEB08D436613B429 /* GoodsReceivedView.swift */; };
 		9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A20C9413C35FB20B0B107 /* FormControls.swift */; };
 		A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */; };
 		A2CDDDB7DAAFE31A6826465F /* GoogleMapsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646DCD9992E8853358C469A6 /* GoogleMapsConfig.swift */; };
+		AABF5247C2597A827D5BCDF8 /* Pods_AnokiXTrader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AE2109B037D8662257DDEEF /* Pods_AnokiXTrader.framework */; };
 		ACB47341F1822723610294AB /* CategoryFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD0B2B3D2EA2C1E4200F6F /* CategoryFilterSheet.swift */; };
 		AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C23167F101A111EA84DC70 /* ImagePicker.swift */; };
 		AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */; };
@@ -88,7 +88,6 @@
 
 /* Begin PBXFileReference section */
 		06FBF424F9F984CD97815E7B /* ScrollVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollVisibility.swift; sourceTree = "<group>"; };
-		06FF5D8A91A9D8769DC45E6E /* Pods_AnokiXTrader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXTrader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E94660470A7F090BF9FC18 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		0CFD0B2B3D2EA2C1E4200F6F /* CategoryFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFilterSheet.swift; sourceTree = "<group>"; };
 		11CD2B00377D56966727ED1C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -101,10 +100,11 @@
 		34C23167F101A111EA84DC70 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		3505798C608C699E424D8706 /* GoodsReturnsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsStore.swift; sourceTree = "<group>"; };
 		38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceView.swift; sourceTree = "<group>"; };
-		3B840F4264839326E16AD4B1 /* Pods-AnokiXTrader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.debug.xcconfig"; sourceTree = "<group>"; };
+		3AE2109B037D8662257DDEEF /* Pods_AnokiXTrader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXTrader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D85815C108EB14B5430C3EA /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		3F4F80FD3B29A95F61A789B4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		3F75C1AF3A56E1801EF1281F /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		40069ECFB3ACBFAEB479BBF3 /* Pods-AnokiXTrader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.release.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.release.xcconfig"; sourceTree = "<group>"; };
 		480ADE15FE92A9892833F379 /* AnokiXTrader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXTrader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B02E8A3DA0FC91E4B365D7F /* InventoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStore.swift; sourceTree = "<group>"; };
 		4DEAA2988953FDC67C3CD299 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -118,6 +118,7 @@
 		626A29BDE53D18E971A04DB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		646DCD9992E8853358C469A6 /* GoogleMapsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsConfig.swift; sourceTree = "<group>"; };
 		666633CA9A56BF13DF4DB944 /* CollectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionStore.swift; sourceTree = "<group>"; };
+		689FF683F27FB26EB26C68BD /* Pods-AnokiXTrader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.debug.xcconfig"; sourceTree = "<group>"; };
 		6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnokiXTraderApp.swift; sourceTree = "<group>"; };
 		7082192B3DDD613321065A12 /* SellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SellView.swift; sourceTree = "<group>"; };
 		72B9CD271808E91C6276A68A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -150,7 +151,6 @@
 		D3DE53611F2413423FBED6C6 /* AirtimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeView.swift; sourceTree = "<group>"; };
 		D6D4F331CC341D3A0F0125C4 /* CategoryProductsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryProductsView.swift; sourceTree = "<group>"; };
 		D6DAFD016859ED78D8D45E23 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
-		D8D160F903948EE0EB785FDF /* Pods-AnokiXTrader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.release.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.release.xcconfig"; sourceTree = "<group>"; };
 		DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		DCABD1C8C98F030AA4E35535 /* InvoicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesView.swift; sourceTree = "<group>"; };
 		DECDA888C08ACE1B86A0781B /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
@@ -171,11 +171,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A3E6D3B78E759257816C849C /* Frameworks */ = {
+		07C68ED7EF88959044D636F3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97DD602DB7C69B9BA77FB387 /* Pods_AnokiXTrader.framework in Frameworks */,
+				AABF5247C2597A827D5BCDF8 /* Pods_AnokiXTrader.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,8 +286,8 @@
 			children = (
 				350A4D40187E3A7C5296A489 /* AnokiXTrader */,
 				A03BFA308D2320DDBD9096FC /* Products */,
-				4D61D634D499796C00C657A0 /* Pods */,
-				FAEFDC4509D1428C316DDC3A /* Frameworks */,
+				484F6B1C1782717FB085D5B4 /* Pods */,
+				7AE0D71235144C9BE3203419 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -299,11 +299,11 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
-		4D61D634D499796C00C657A0 /* Pods */ = {
+		484F6B1C1782717FB085D5B4 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B840F4264839326E16AD4B1 /* Pods-AnokiXTrader.debug.xcconfig */,
-				D8D160F903948EE0EB785FDF /* Pods-AnokiXTrader.release.xcconfig */,
+				689FF683F27FB26EB26C68BD /* Pods-AnokiXTrader.debug.xcconfig */,
+				40069ECFB3ACBFAEB479BBF3 /* Pods-AnokiXTrader.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
@@ -389,6 +389,14 @@
 				11CD2B00377D56966727ED1C /* SettingsView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		7AE0D71235144C9BE3203419 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3AE2109B037D8662257DDEEF /* Pods_AnokiXTrader.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		8106EAE82BEF650216F6E54E /* Theme */ = {
@@ -510,14 +518,6 @@
 			path = Rewards;
 			sourceTree = "<group>";
 		};
-		FAEFDC4509D1428C316DDC3A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				06FF5D8A91A9D8769DC45E6E /* Pods_AnokiXTrader.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -525,12 +525,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC637E665592A8178E1D1211 /* Build configuration list for PBXNativeTarget "AnokiXTrader" */;
 			buildPhases = (
-				D32D9E4D81DB0602867A13AD /* [CP] Check Pods Manifest.lock */,
+				B964181402B29B997698D4DB /* [CP] Check Pods Manifest.lock */,
 				9B7ECE0C125BAB8B092E47CA /* Sources */,
 				052DFADCF26CAAC1E67112D3 /* Resources */,
-				A3E6D3B78E759257816C849C /* Frameworks */,
-				977B9FB1440527C97E1A7B5B /* [CP] Embed Pods Frameworks */,
-				AFCEB4CA005109531DE82A24 /* [CP] Copy Pods Resources */,
+				07C68ED7EF88959044D636F3 /* Frameworks */,
+				6396E4C429C29320D7B156C6 /* [CP] Embed Pods Frameworks */,
+				D8B17C838128B1E66E994B48 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -589,7 +589,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		977B9FB1440527C97E1A7B5B /* [CP] Embed Pods Frameworks */ = {
+		6396E4C429C29320D7B156C6 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -606,24 +606,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AFCEB4CA005109531DE82A24 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D32D9E4D81DB0602867A13AD /* [CP] Check Pods Manifest.lock */ = {
+		B964181402B29B997698D4DB /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -643,6 +626,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D8B17C838128B1E66E994B48 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -744,7 +744,7 @@
 /* Begin XCBuildConfiguration section */
 		0464EAD31C31DA38F728A6A3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B840F4264839326E16AD4B1 /* Pods-AnokiXTrader.debug.xcconfig */;
+			baseConfigurationReference = 689FF683F27FB26EB26C68BD /* Pods-AnokiXTrader.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXTrader/AnokiXTrader.entitlements;
@@ -774,7 +774,7 @@
 		};
 		BD5476E3E29C05D58D7A2B76 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D8D160F903948EE0EB785FDF /* Pods-AnokiXTrader.release.xcconfig */;
+			baseConfigurationReference = 40069ECFB3ACBFAEB479BBF3 /* Pods-AnokiXTrader.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXTrader/AnokiXTrader.entitlements;
