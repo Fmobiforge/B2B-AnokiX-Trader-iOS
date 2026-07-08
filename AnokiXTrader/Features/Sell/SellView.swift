@@ -94,7 +94,7 @@ struct SellView: View {
             .background(Brand.background)
             .scrollDismissesKeyboard(.interactively)
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(isPresented: $showCheckout) { CheckoutView() }
         .task { await store.load() }
         .toast($toastMsg)
