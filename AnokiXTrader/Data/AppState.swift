@@ -66,13 +66,16 @@ final class Cart: ObservableObject {
 /// Auth gate. Mock-first: any non-empty credentials sign in. The only real backend
 /// account (changd@gmail.com) is actually a distributor, so we don't pretend otherwise.
 final class Session: ObservableObject {
-    enum Stage { case splash, welcome, login, register, main }
+    enum Stage { case splash, welcome, login, register, pendingApproval, main }
 
     @Published var stage: Stage = .splash
     @Published var storeName: String = "Sipho's Spaza"
     @Published var accountName: String = "Trader Account"
     @Published var loginError: String?
     @Published var isSigningIn = false
+    /// Payload backing the "Application Under Review" screen (set when login
+    /// returns a still-pending account). No token is issued in this case.
+    @Published var pendingApproval: LoginData?
 
     init() {
         restoreSavedSession()
@@ -133,8 +136,15 @@ final class Session: ObservableObject {
             do {
                 let data = try await APIClient.shared.login(email: typed, password: pass)
                 await MainActor.run {
-                    persistLogin(data)
-                    stage = .main
+                    // Account still awaiting approval: no token is issued, so don't
+                    // open a session — show the "Application Under Review" screen.
+                    if data.isPendingApproval {
+                        pendingApproval = data
+                        stage = .pendingApproval
+                    } else {
+                        persistLogin(data)
+                        stage = .main
+                    }
                 }
             } catch {
                 await MainActor.run {

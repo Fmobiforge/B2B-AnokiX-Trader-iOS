@@ -8,6 +8,34 @@ struct LoginData: Decodable {
     let user: LoginUser?
     let portal_type: String?
     let portal_info: TraderPortalInfo?
+
+    // Pending-approval variant: status=true, pending_approval=true, no token.
+    // The profile is flattened onto the data block instead of portal_info.
+    let pending_approval: Bool?
+    let account_status: String?
+    let registration_status: String?
+    let submitted_at: String?
+    let reference: String?
+    let business_name: String?
+    let wallet: WalletInfo?
+
+    var isPendingApproval: Bool { pending_approval == true }
+}
+
+/// IMB wallet snapshot returned alongside a pending account.
+struct WalletInfo: Decodable {
+    let status: String?
+    let account_number: String?
+    let activated_at: String?
+    let last_error: String?
+    let configured: Bool?
+
+    /// Wallet counts as activated once it goes active / has an activation timestamp.
+    var isActivated: Bool {
+        if status?.lowercased() == "active" { return true }
+        if let at = activated_at, !at.trimmingCharacters(in: .whitespaces).isEmpty { return true }
+        return false
+    }
 }
 
 struct LoginUser: Codable {

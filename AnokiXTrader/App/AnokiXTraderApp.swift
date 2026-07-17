@@ -51,6 +51,7 @@ struct RootView: View {
         case .welcome:  WelcomeView()
         case .login:    LoginView()
         case .register: RegisterView()
+        case .pendingApproval: PendingApprovalView()
         case .main:     MainTabView()
         }
     }

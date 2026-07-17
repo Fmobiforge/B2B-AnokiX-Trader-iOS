@@ -32,6 +32,7 @@
 		43BB7263DC1BFDC76A26F7B5 /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65DC1F1908F16554337AF74 /* DTOs.swift */; };
 		458BC0E954255207E98812AC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B9CD271808E91C6276A68A /* Theme.swift */; };
 		47EB84CABA03F85959AFDC9E /* AuthViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40821D1A0F4B489085DF015 /* AuthViews.swift */; };
+		FE01AA01FE01AA01FE01AA01 /* PendingApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE02BB02FE02BB02FE02BB02 /* PendingApprovalView.swift */; };
 		48B95C52921CAC08C9EF7EEB /* DrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53374834E1AC2497ECAEA4B /* DrawerView.swift */; };
 		4A2290C14A17C19DBD8221D4 /* CategoryProductsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F016AAC1A2787D3E2D0A3259 /* CategoryProductsStore.swift */; };
 		4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33EB8CFD0367FAAB3893276F /* WalletView.swift */; };
@@ -134,6 +135,7 @@
 		9C719EC9CD9BDEABDF7BC9BD /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
 		A058E017BA9BA068BC2E1877 /* Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countries.swift; sourceTree = "<group>"; };
 		A40821D1A0F4B489085DF015 /* AuthViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViews.swift; sourceTree = "<group>"; };
+		FE02BB02FE02BB02FE02BB02 /* PendingApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingApprovalView.swift; sourceTree = "<group>"; };
 		A53374834E1AC2497ECAEA4B /* DrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerView.swift; sourceTree = "<group>"; };
 		A54A20C9413C35FB20B0B107 /* FormControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControls.swift; sourceTree = "<group>"; };
 		AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
@@ -495,6 +497,7 @@
 			isa = PBXGroup;
 			children = (
 				A40821D1A0F4B489085DF015 /* AuthViews.swift */,
+				FE02BB02FE02BB02FE02BB02 /* PendingApprovalView.swift */,
 				E06637A2B06D216E2F1B0658 /* RegisterStore.swift */,
 				7CCBD2699E321399EB3D035E /* RegisterView.swift */,
 			);
@@ -665,6 +668,7 @@
 				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,
 				3725C1D11D64A40150C99D62 /* AppState.swift in Sources */,
 				47EB84CABA03F85959AFDC9E /* AuthViews.swift in Sources */,
+				FE01AA01FE01AA01FE01AA01 /* PendingApprovalView.swift in Sources */,
 				FC943FC175D07228A3F837C8 /* BottomTabBar.swift in Sources */,
 				2E0B39DF03179E89939D61E9 /* CartView.swift in Sources */,
 				ACB47341F1822723610294AB /* CategoryFilterSheet.swift in Sources */,
