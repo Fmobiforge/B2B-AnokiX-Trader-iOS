@@ -143,6 +143,12 @@ final class InventoryStore: ObservableObject {
     @Published var loading = false
     @Published var error: String?
     @Published var filter = "all"
+    @Published var search = ""
+    /// nil = "All Categories" / "All Brands".
+    @Published var category: String?
+    @Published var brand: String?
+    /// True once a load has completed, so the view can tell "empty" from "not loaded yet".
+    @Published var loaded = false
 
     func load() async {
         loading = true
@@ -154,10 +160,33 @@ final class InventoryStore: ObservableObject {
             fastMoving = data.fast_moving ?? []
             rows = data.rows ?? []
             movements = data.movements ?? []
+            pruneStaleSelections()
+            loaded = true
         } catch {
             self.error = (error as? LocalizedError)?.errorDescription ?? "Failed to load inventory."
         }
         loading = false
+    }
+
+    /// Category/brand options come from the rows the server returned (the endpoint takes
+    /// no filter params), so the pickers only ever offer values that can actually match.
+    var categories: [String] {
+        distinct(rows.compactMap { $0.category })
+    }
+
+    var brands: [String] {
+        distinct(rows.compactMap { $0.brand })
+    }
+
+    private func distinct(_ values: [String]) -> [String] {
+        Array(Set(values.filter { !$0.isEmpty })).sorted { $0.lowercased() < $1.lowercased() }
+    }
+
+    /// Drops a category/brand selection the freshly loaded rows can no longer satisfy,
+    /// so a stale pick can't leave the list permanently empty.
+    private func pruneStaleSelections() {
+        if let c = category, !categories.contains(c) { category = nil }
+        if let b = brand, !brands.contains(b) { brand = nil }
     }
 
     /// Adjust stock (signed quantity), then refresh.
@@ -167,12 +196,35 @@ final class InventoryStore: ObservableObject {
     }
 
     var filteredRows: [InvRow] {
+        rows.filter { matchesTab($0) && matchesSearch($0) && matchesCategory($0) && matchesBrand($0) }
+    }
+
+    private func matchesTab(_ row: InvRow) -> Bool {
         switch filter {
-        case "fast": return rows.filter { $0.movement == "fast" }
-        case "slow": return rows.filter { $0.movement == "slow" }
-        case "all":  return rows
-        default:     return rows.filter { $0.stockStatus == filter }
+        case "all":  return true
+        case "fast": return row.movement == "fast"
+        case "slow": return row.movement == "slow"
+        default:     return row.stockStatus == filter
         }
+    }
+
+    /// Product name, SKU or barcode — matching the portal's search placeholder.
+    private func matchesSearch(_ row: InvRow) -> Bool {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !q.isEmpty else { return true }
+        return [row.name, row.sku, row.barcode]
+            .compactMap { $0?.lowercased() }
+            .contains { $0.contains(q) }
+    }
+
+    private func matchesCategory(_ row: InvRow) -> Bool {
+        guard let category else { return true }
+        return row.category == category
+    }
+
+    private func matchesBrand(_ row: InvRow) -> Bool {
+        guard let brand else { return true }
+        return row.brand == brand
     }
 }
 

@@ -204,34 +204,8 @@ enum MockData {
 
     // MARK: Dashboard
 
-    static let kpis: [Kpi] = [
-        Kpi(title: "Today's Sales",  value: "R 6,540.00",  icon: "cart.fill",        tintHex: "#16A34A"),
-        Kpi(title: "Wallet Balance", value: "R 15,450.00", icon: "wallet.pass.fill", tintHex: "#7C3AED"),
-        Kpi(title: "Pending Orders", value: "8",           icon: "shippingbox.fill", tintHex: "#EA580C"),
-        Kpi(title: "Rewards Points", value: "45,500",      icon: "gift.fill",        tintHex: "#2563EB"),
-    ]
-
-    static let topProducts: [ListItem] = [
-        ListItem(title: "Fresh Milk 2L",   subtitle: "48 sold", badge: "R 2,880"),
-        ListItem(title: "Brown Bread",     subtitle: "36 sold", badge: "R 1,440"),
-        ListItem(title: "Eggs (30 pack)",  subtitle: "28 sold", badge: "R 2,240"),
-        ListItem(title: "Cooking Oil 2L",  subtitle: "22 sold", badge: "R 3,300"),
-        ListItem(title: "Soft Drink 2L",   subtitle: "19 sold", badge: "R 1,140"),
-    ]
-
-    static let lowStockAlerts: [ListItem] = [
-        ListItem(title: "Sunlight Liquid 2L", subtitle: "SKU-8842", badge: "6 units left"),
-        ListItem(title: "Coca Cola 2L",       subtitle: "SKU-2104", badge: "12 units left"),
-        ListItem(title: "White Bread Loaf",   subtitle: "SKU-3301", badge: "4 units left"),
-    ]
-
-    static let recentOrders: [RecentOrder] = [
-        RecentOrder(orderId: "#ORD-2841", amount: "R 420.00",   statusLabel: "Pending",          statusColor: "#F59E0B", date: "Today, 09:12"),
-        RecentOrder(orderId: "#ORD-2839", amount: "R 1,240.00", statusLabel: "Accepted",         statusColor: "#7C3AED", date: "Today, 08:45"),
-        RecentOrder(orderId: "#ORD-2836", amount: "R 560.00",   statusLabel: "Packing",          statusColor: "#2563EB", date: "Today, 07:20"),
-        RecentOrder(orderId: "#ORD-2835", amount: "R 890.00",   statusLabel: "Out for Delivery", statusColor: "#EA580C", date: "Yesterday"),
-        RecentOrder(orderId: "#ORD-2830", amount: "R 2,100.00", statusLabel: "Delivered",        statusColor: "#16A34A", date: "Yesterday"),
-    ]
+    // The dashboard KPI / top-product / low-stock / recent-order mocks were dropped
+    // when the screen moved to live `api/trader/dashboard` data (see DashboardStore).
 
     /// Revenue sparkline used by the Sales Overview card.
     static let salesOverview: [Double] = [3.1, 4.2, 3.8, 5.0, 4.6, 6.1, 4.9]

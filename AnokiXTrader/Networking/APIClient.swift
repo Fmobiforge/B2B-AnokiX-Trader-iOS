@@ -96,10 +96,17 @@ final class APIClient {
         return try decode(data)
     }
 
-    /// Trader home dashboard. The backend endpoint isn't built yet (the Android
-    /// `DashboardFragment` is mock-first too); wired here so iOS is ready when it ships.
+    /// Trader home dashboard: today's sales, anokiX wallet, anokiX rewards,
+    /// pending orders, promotions, recent orders and top selling products.
     func getDashboard() async throws -> DashboardData {
         let data = try await get("api/trader/dashboard", query: [:])
+        return try decode(data)
+    }
+
+    /// Live wallet balance. The `data` block is the wallet object itself — the same
+    /// shape as the dashboard's `wallet` node — so it reuses `DashWalletDTO`.
+    func getWallet() async throws -> DashWalletDTO {
+        let data = try await get("api/common/wallet", query: [:])
         return try decode(data)
     }
 
@@ -492,10 +499,11 @@ final class APIClient {
 
     /// Save the regional preferences only (api/common/preferences/update) — Preferences screen.
     func updatePreferenceValues(language: String, currency: String, timezone: String,
-                                dateFormat: String) async throws {
+                                dateFormat: String, vasPaymentMode: String) async throws {
         let payload: [String: Any] = [
             "language": language, "currency": currency,
             "timezone": timezone, "date_format": dateFormat,
+            "vas_payment_mode": vasPaymentMode,
         ]
         _ = try await postJSON("api/common/preferences/update", json: payload)
     }

@@ -12,9 +12,10 @@ struct InventoryView: View {
     @State private var showAdjustPicker = false
 
     private let statCols = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    /// Mirrors the trader-portal tabs exactly (no "In Stock" tab on the web).
     private let filters: [(key: String, label: String)] = [
-        ("all", "All"), ("fast", "Fast Moving"), ("slow", "Slow Moving"),
-        ("in_stock", "In Stock"), ("low_stock", "Low Stock"), ("out_of_stock", "Out of Stock")
+        ("all", "All Inventory"), ("fast", "Fast Moving"), ("slow", "Slow Moving"),
+        ("low_stock", "Low Stock"), ("out_of_stock", "Out of Stock")
     ]
 
     var body: some View {
@@ -22,9 +23,10 @@ struct InventoryView: View {
             VStack(spacing: 14) {
                 statStrip
                 actionButtons
-                if !store.chart.isEmpty { statusCard }
-                if !store.fastMoving.isEmpty { fastMovingCard }
-                if !store.movements.isEmpty { movementsCard }
+                if let error = store.error { errorCard(error) }
+                statusCard
+                fastMovingCard
+                movementsCard
                 productsSection
             }
             .padding(16)
@@ -89,39 +91,73 @@ struct InventoryView: View {
         }
     }
 
+    /// A failed load must not look like an empty inventory.
+    private func errorCard(_ message: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Brand.danger)
+            Text(message).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+            Spacer()
+            Button("Retry") { Task { await store.load() } }
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Brand.purple)
+        }
+        .padding(14)
+        .background(Brand.dangerBg)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
     private var statusCard: some View {
         let total = max(store.chart.reduce(0) { $0 + ($1.value ?? 0) }, 0)
         return VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Inventory Summary")
-            ZStack {
-                if total <= 0 {
-                    Circle().stroke(Brand.divider, lineWidth: 22)
-                } else {
-                    ForEach(Array(ringArcs(total: total).enumerated()), id: \.offset) { _, arc in
-                        Circle().trim(from: arc.start, to: arc.end)
-                            .stroke(arc.color, style: StrokeStyle(lineWidth: 22, lineCap: .butt))
-                            .rotationEffect(.degrees(-90))
+            if store.chart.isEmpty {
+                emptyLine("No stock data yet.")
+            } else {
+                ZStack {
+                    if total <= 0 {
+                        Circle().stroke(Brand.divider, lineWidth: 22)
+                    } else {
+                        ForEach(Array(ringArcs(total: total).enumerated()), id: \.offset) { _, arc in
+                            Circle().trim(from: arc.start, to: arc.end)
+                                .stroke(arc.color, style: StrokeStyle(lineWidth: 22, lineCap: .butt))
+                                .rotationEffect(.degrees(-90))
+                        }
+                    }
+                    VStack(spacing: 1) {
+                        Text("\(store.summary?.total_products ?? 0)").font(.system(size: 22, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        Text("Products").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
                     }
                 }
-                VStack(spacing: 1) {
-                    Text("\(store.summary?.total_products ?? 0)").font(.system(size: 22, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    Text("Products").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-                }
-            }
-            .frame(width: 150, height: 150)
-            .frame(maxWidth: .infinity)
-            VStack(spacing: 6) {
-                ForEach(Array(store.chart.enumerated()), id: \.offset) { _, s in
-                    HStack(spacing: 8) {
-                        Circle().fill(Color(hex: s.color ?? "#E2E8F0")).frame(width: 10, height: 10)
-                        Text(s.type ?? "").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                        Spacer()
-                        Text(String(format: "%.0f%%", s.value ?? 0)).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                .frame(width: 150, height: 150)
+                .frame(maxWidth: .infinity)
+                VStack(spacing: 6) {
+                    ForEach(Array(store.chart.enumerated()), id: \.offset) { _, s in
+                        HStack(spacing: 8) {
+                            Circle().fill(Color(hex: s.color ?? "#E2E8F0")).frame(width: 10, height: 10)
+                            Text(s.type ?? "").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                            Spacer()
+                            Text(String(format: "%.0f%%", s.value ?? 0)).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                        }
                     }
                 }
             }
         }
         .card()
+    }
+
+    private func emptyProducts(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 24)
+    }
+
+    private func emptyLine(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 6)
     }
 
     /// Cumulative ring arcs (fractions of the circle) for the status slices.
@@ -138,6 +174,7 @@ struct InventoryView: View {
     private var fastMovingCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             SectionHeader(title: "Top Fast Moving Products")
+            if store.fastMoving.isEmpty { emptyLine("No sales recorded yet.") }
             ForEach(store.fastMoving) { m in
                 HStack(spacing: 12) {
                     Text("\(m.rank ?? 0)")
@@ -156,6 +193,7 @@ struct InventoryView: View {
     private var movementsCard: some View {
         VStack(alignment: .leading, spacing: 2) {
             SectionHeader(title: "Recent Stock Movements")
+            if store.movements.isEmpty { emptyLine("No movements yet.") }
             ForEach(store.movements.prefix(6)) { m in
                 MovementRow(m: m, showProduct: true)
             }
@@ -166,6 +204,17 @@ struct InventoryView: View {
     private var productsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Products").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+
+            searchField
+            HStack(spacing: 10) {
+                valueMenu(title: store.category ?? "All Categories",
+                          allLabel: "All Categories",
+                          options: store.categories) { store.category = $0 }
+                valueMenu(title: store.brand ?? "All Brands",
+                          allLabel: "All Brands",
+                          options: store.brands) { store.brand = $0 }
+            }
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(filters, id: \.key) { f in
@@ -176,14 +225,73 @@ struct InventoryView: View {
             if store.loading && store.rows.isEmpty {
                 ProgressView().frame(maxWidth: .infinity).padding(.top, 30)
             } else if store.filteredRows.isEmpty {
-                Text("No products match this filter.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
-                    .frame(maxWidth: .infinity).padding(.top, 24)
+                // Distinguish "no stock at all" from "the filters excluded everything".
+                // After a failed load say nothing here — errorCard above carries the reason.
+                if !store.rows.isEmpty {
+                    emptyProducts("No products match your filters.")
+                } else if store.loaded {
+                    emptyProducts("No stock yet. Goods are received when an order is delivered.")
+                }
             } else {
                 ForEach(store.filteredRows) { row in
                     InventoryRowCard(row: row).onTapGesture { sheet = .adjust(row) }
                 }
             }
+        }
+    }
+}
+
+extension InventoryView {
+
+    fileprivate var searchField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 13)).foregroundColor(Brand.textTertiary)
+            TextField("Search by product name, SKU or barcode…", text: $store.search)
+                .font(.system(size: 13))
+                .foregroundColor(Brand.textPrimary)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+            if !store.search.isEmpty {
+                Button { store.search = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14)).foregroundColor(Brand.textTertiary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 44)
+        .background(Brand.surfaceVariant)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Brand.border, lineWidth: 1))
+    }
+
+    /// "All Categories" / "All Brands" dropdown. `nil` from the picker clears the filter.
+    fileprivate func valueMenu(title: String,
+                               allLabel: String,
+                               options: [String],
+                               onPick: @escaping (String?) -> Void) -> some View {
+        Menu {
+            Button(allLabel) { onPick(nil) }
+            ForEach(options, id: \.self) { option in
+                Button(option) { onPick(option) }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                    .lineLimit(1)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .semibold)).foregroundColor(Brand.textSecondary)
+            }
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(Brand.surfaceVariant)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Brand.border, lineWidth: 1))
         }
     }
 }
@@ -487,6 +595,17 @@ struct InventoryAnalyticsView: View {
 
     private let ageLabels = ["0–30 days", "31–60 days", "61–90 days", "90+ days"]
 
+    /// The server's ageing labels arrive mojibaked (en-dash double-encoded as "â€""), so we
+    /// can't just render them. Prefer the server's label when it is clean — that keeps a
+    /// reordered or resized bucket set correctly labelled — and only fall back to the
+    /// positional defaults when it is missing or garbled.
+    private func ageingLabel(_ serverLabel: String?, _ index: Int) -> String {
+        if let serverLabel, !serverLabel.isEmpty, !serverLabel.contains("â") {
+            return serverLabel
+        }
+        return index < ageLabels.count ? ageLabels[index] : (serverLabel ?? "")
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
@@ -535,7 +654,7 @@ struct InventoryAnalyticsView: View {
                 HStack(spacing: 10) {
                     Circle().fill(Color(hex: b.color ?? "#E2E8F0")).frame(width: 10, height: 10)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(idx < ageLabels.count ? ageLabels[idx] : (b.label ?? ""))
+                        Text(ageingLabel(b.label, idx))
                             .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
                         Text("\(b.products ?? 0) products · \(b.units ?? 0) units")
                             .font(.system(size: 11)).foregroundColor(Brand.textSecondary)

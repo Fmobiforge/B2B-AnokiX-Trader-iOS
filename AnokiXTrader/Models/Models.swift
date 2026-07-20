@@ -165,15 +165,6 @@ struct MenuItem: Identifiable, Hashable {
 }
 
 /// Dashboard recent-order row (verbatim from the portal dashboard).
-struct RecentOrder: Identifiable, Hashable {
-    let id = UUID()
-    let orderId: String
-    let amount: String
-    let statusLabel: String
-    let statusColor: String
-    let date: String
-}
-
 /// Dashboard top-category slice.
 struct CategorySlice: Identifiable, Hashable {
     let id = UUID()
@@ -184,10 +175,3 @@ struct CategorySlice: Identifiable, Hashable {
 }
 
 /// A single KPI tile on the dashboard.
-struct Kpi: Identifiable, Hashable {
-    let id = UUID()
-    let title: String
-    let value: String
-    let icon: String
-    let tintHex: String
-}

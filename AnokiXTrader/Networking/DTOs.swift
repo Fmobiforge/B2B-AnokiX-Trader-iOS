@@ -520,112 +520,123 @@ struct OrderDetailData: Decodable {
 
 // MARK: - Dashboard (GET /api/trader/dashboard)
 
-/// Mirror of the Android `DashboardData` (network/dto/DashboardData.java). The
-/// trader dashboard endpoint is not built on the backend yet, so — exactly like
-/// Android's `DashboardFragment` — the screen binds local mock data; these DTOs
-/// keep iOS structurally ready for the day the endpoint ships.
+/// Mirror of the Android `TraderDashboardData` (network/dto/TraderDashboardData.java)
+/// and of the trader web-portal dashboard: the four stat blocks (today's sales,
+/// anokiX wallet, anokiX rewards, pending orders), the running promotions carousel,
+/// recent orders and top selling products.
 struct DashboardData: Decodable {
     let dashboard: Dashboard?
 
     struct Dashboard: Decodable {
         let meta: DashboardMetaDTO?
-        let summary_cards: [DashboardSummaryCardDTO]?
-        let overview: [OverviewItemDTO]?
-        let revenue_overview: RevenueOverviewDTO?
-        let top_selling_categories: TopCategoriesDTO?
-        let recent_orders: RecentOrdersDTO?
+        let today_sales: TodaySalesDTO?
+        let wallet: DashWalletDTO?
+        let rewards: DashRewardsDTO?
+        let pending_orders: PendingOrdersDTO?
+        let promotions: [PromotionDTO]?
+        let recent_orders: [DashOrderDTO]?
+        let top_products: [TopProductDTO]?
     }
 }
 
 struct DashboardMetaDTO: Decodable {
-    let from_date: String?
-    let to_date: String?
-    let date_range_label: String?
-    let compare_from_date: String?
-    let compare_to_date: String?
-    let compare_period_label: String?
     let currency: CurrencyDTO?
-    let is_dummy_data: Bool?
 }
 
-struct DashboardSummaryCardDTO: Decodable, Identifiable, Hashable {
-    var id: String { key ?? label ?? UUID().uuidString }
-    let key: String?
-    let label: String?
-    let value: Double?
-    let formatted_value: String?
-    let is_money: Bool?
-    let trend: DashboardTrendDTO?
-    let compare_label: String?
-    let sparkline: [Double]?
-    let color: String?
-}
+// MARK: Block 1 — Today's Sales
 
-struct OverviewItemDTO: Decodable, Identifiable, Hashable {
-    var id: String { key ?? label ?? UUID().uuidString }
-    let key: String?
-    let label: String?
-    let value: Int?
-    let action_label: String?
-    let action_route: String?
-}
-
-struct RevenueOverviewDTO: Decodable {
-    let title: String?
-    let total: Double?
-    let formatted_total: String?
-    let trend: DashboardTrendDTO?
-    let chart: ChartDTO?
-}
-
-struct DashboardTrendDTO: Decodable, Hashable {
-    let direction: String?
-    let percentage: Double?
-    let label: String?
-
-    var isUp: Bool { direction?.lowercased() != "down" }
-}
-
-struct ChartDTO: Decodable {
-    let labels: [String]?
-    let values: [Double]?
-    let max_value: Double?
-    let y_axis_max: String?
-}
-
-struct TopCategoriesDTO: Decodable {
-    let title: String?
-    let items: [CategoryItemDTO]?
-    let total: Double?
-    let formatted_total: String?
-}
-
-struct CategoryItemDTO: Decodable, Identifiable, Hashable {
-    var id: String { name ?? UUID().uuidString }
-    let name: String?
+struct TodaySalesDTO: Decodable {
     let amount: Double?
-    let formatted_amount: String?
-    let percentage: Double?
-    let color: String?
+    let transactions: Int?
+    let items: Int?
+    /// `nil` when there is no comparable previous period.
+    let delta_percent: Double?
+    /// "up" / "down" / `nil`.
+    let trend: String?
+
+    var isUp: Bool { trend?.lowercased() != "down" }
 }
 
-struct RecentOrdersDTO: Decodable {
-    let title: String?
-    let items: [RecentOrderDTO]?
-    let total: Int?
-}
+// MARK: Block 2 — anokiX wallet (powered by IMB)
 
-struct RecentOrderDTO: Decodable, Identifiable, Hashable {
-    var id: String { order_id ?? UUID().uuidString }
-    let order_id: String?
-    let trader: String?
-    let amount: Double?
-    let formatted_amount: String?
+struct DashWalletDTO: Decodable {
     let status: String?
-    let status_label: String?
-    let status_color: String?
+    let account_number: String?
+    let activated_at: String?
+    let last_error: String?
+    let configured: Bool?
+    let payments_enabled: Bool?
+    let balance: DashWalletBalanceDTO?
+
+    var isActive: Bool { status?.lowercased() == "active" }
+}
+
+struct DashWalletBalanceDTO: Decodable {
+    let current: Double?
+    let available: Double?
+    let pending: Double?
+    let transactions: [DashWalletTxnDTO]?
+    /// ISO-8601 timestamp the balance was read at.
+    let as_of: String?
+    let stale: Bool?
+}
+
+struct DashWalletTxnDTO: Decodable, Identifiable, Hashable {
+    var id: Int { transaction_id ?? 0 }
     let date: String?
-    let formatted_date: String?
+    /// The server sends this as a string, e.g. "-60.00".
+    let amount: String?
+    let transaction_id: Int?
+    let proof_of_payment: Bool?
+    let pending: Bool?
+}
+
+// MARK: Block 3 — anokiX rewards (powered by Limes)
+
+struct DashRewardsDTO: Decodable {
+    let points: Int?
+    let value: Double?
+    let earned_this_month: Int?
+}
+
+// MARK: Block 4 — Pending Orders
+
+struct PendingOrdersDTO: Decodable {
+    let count: Int?
+    let total_value: Double?
+}
+
+// MARK: Recent orders + top selling products
+
+struct DashOrderDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let order_number: String?
+    let status: String?
+    let status_key: String?
+    let subtotal: Double?
+    let total_amount: Double?
+    let payment_method: String?
+    let payment_status: String?
+    let delivery_date: String?
+    let distributor: DashOrderDistributorDTO?
+    /// "15/07/2026 13:58:04"
+    let created_at: String?
+    let updated_at: String?
+}
+
+struct DashOrderDistributorDTO: Decodable, Hashable {
+    let id: Int?
+    let display_name: String?
+}
+
+struct TopProductDTO: Decodable, Identifiable, Hashable {
+    var id: Int { product_id ?? 0 }
+    let product_id: Int?
+    let name: String?
+    let sku: String?
+    let quantity: Double?
+    let revenue: Double?
+    let image_url: String?
 }
 
 // MARK: - Address autocomplete / coordinate (Create Account location)

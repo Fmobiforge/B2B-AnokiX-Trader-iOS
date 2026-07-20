@@ -200,6 +200,16 @@ struct PreferencesSettingsView: View {
                 }
             }
             optionMenu("Date Format", options: SettingsOptions.dateFormats, selection: $store.dateFormat)
+            // The web shows the explanation in a "?" tooltip; on mobile it reads better
+            // as persistent caption text under the field.
+            VStack(alignment: .leading, spacing: 6) {
+                optionMenu("Airtime & VAS payment",
+                           options: SettingsOptions.vasPaymentModes,
+                           selection: $store.vasPaymentMode)
+                Text("How Airtime & VAS purchases are paid for.")
+                    .font(.system(size: 12))
+                    .foregroundColor(Brand.textTertiary)
+            }
             SaveFooter(loading: store.savingPrefs,
                        cancel: { dismiss() },
                        save: { await store.savePreferences() })
@@ -665,40 +675,191 @@ private struct BizDistributorStep: View {
     }
 }
 
-// MARK: Business editor — Step 6: Wallet (display only)
+// MARK: Business editor — Step 6: Wallet (live, GET api/common/wallet)
+
+/// Read-only wallet view (the step hides the Save button): IMB account, the three
+/// balances and the recent-transaction ledger, with a manual Refresh.
+@MainActor private final class BizWalletStore: ObservableObject {
+    @Published var wallet: DashWalletDTO?
+    @Published var loading = false
+    @Published var loaded = false
+    @Published var error: String?
+
+    func load() async {
+        guard !loading else { return }
+        loading = true
+        error = nil
+        do {
+            wallet = try await APIClient.shared.getWallet()
+            loaded = true
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? "Could not load your wallet."
+        }
+        loading = false
+    }
+}
 
 private struct BizWalletStep: View {
-    private let benefits = ["Faster payments", "Access to credit", "Insurance solutions",
-                            "Rewards & cashback", "Business growth tools"]
+    @StateObject private var store = BizWalletStore()
+
+    private var balance: DashWalletBalanceDTO? { store.wallet?.balance }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 18).fill(Brand.purple)
-                Image(systemName: "wallet.pass.fill").font(.system(size: 40)).foregroundColor(.white)
-            }
-            .frame(width: 96, height: 96)
-            .frame(maxWidth: .infinity, alignment: .center)
+        VStack(alignment: .leading, spacing: 14) {
+            infoBanner
+            statusRow
+            if let error = store.error { errorBox(error) }
+            accountCard
+            balanceRow
+            transactionsCard
+        }
+        .task { if !store.loaded { await store.load() } }
+    }
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Benefits").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.topTitle)
-                ForEach(benefits, id: \.self) { benefit in
-                    HStack(spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 18)).foregroundColor(Brand.success)
-                        Text(benefit).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
-                        Spacer()
+    private var infoBanner: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "wallet.pass.fill")
+                .font(.system(size: 20)).foregroundColor(Brand.purple)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("anokiX Wallet")
+                    .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Your IMB business account — balances, payments and rewards in one place.")
+                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(Brand.purpleLight)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var statusRow: some View {
+        HStack {
+            let status = store.wallet?.status ?? ""
+            let active = store.wallet?.isActive ?? false
+            StatusBadge(text: status.isEmpty ? "Not set up" : status.capitalized,
+                        fg: active ? Brand.success : Brand.warning,
+                        bg: active ? Brand.successBg : Brand.warningBg)
+            Spacer()
+            if store.loading {
+                ProgressView().scaleEffect(0.8)
+            } else {
+                Button { Task { await store.load() } } label: {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(Brand.textSecondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func errorBox(_ message: String) -> some View {
+        Text(message)
+            .font(.system(size: 12)).foregroundColor(Brand.danger)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Brand.dangerBg)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private var accountCard: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("IMB Account Number")
+                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            Text(store.wallet?.account_number ?? "—")
+                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                .foregroundColor(Brand.textPrimary)
+            if let since = store.wallet?.activated_at, !since.isEmpty {
+                Text("Activated \(since)")
+                    .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Brand.surfaceVariant)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Brand.border, lineWidth: 1))
+    }
+
+    private var balanceRow: some View {
+        HStack(spacing: 8) {
+            balanceTile(Money.rand(balance?.available ?? 0), "Available", Brand.success)
+            balanceTile(Money.rand(balance?.current ?? 0), "Current", Brand.textPrimary)
+            balanceTile(Money.rand(balance?.pending ?? 0), "Pending", Brand.warning)
+        }
+    }
+
+    private func balanceTile(_ value: String, _ label: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(.system(size: 14, weight: .bold)).foregroundColor(color)
+                .minimumScaleFactor(0.7).lineLimit(1)
+            Text(label).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Brand.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Brand.border, lineWidth: 1))
+    }
+
+    private var transactionsCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Recent Transactions")
+                .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .padding(.bottom, 8)
+
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Date").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Spacer()
+                    Text("Amount").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                }
+                .padding(.vertical, 8)
+                Divider()
+
+                let txns = balance?.transactions ?? []
+                if txns.isEmpty {
+                    Text(store.loaded ? "No transactions yet." : "Loading…")
+                        .font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+                        .frame(maxWidth: .infinity).padding(.vertical, 20)
+                } else {
+                    ForEach(Array(txns.enumerated()), id: \.element.id) { idx, t in
+                        let value = Double(t.amount ?? "") ?? 0
+                        HStack {
+                            Text(Self.txnDate(t.date))
+                                .font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                                .lineLimit(1)
+                            Spacer(minLength: 10)
+                            // The API sends the amount as a string ("-60.00"); keep the sign.
+                            Text((value < 0 ? "-" : "") + Money.rand(abs(value)))
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(value < 0 ? Brand.textPrimary : Brand.success)
+                        }
+                        .padding(.vertical, 11)
+                        if idx < txns.count - 1 { Divider() }
                     }
                 }
             }
-
-            Text("Wallet activation is coming soon.")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                .frame(maxWidth: .infinity)
-                .padding(14)
-                .background(Brand.purpleLight)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.horizontal, 14)
+            .background(Brand.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Brand.border, lineWidth: 1))
         }
+    }
+
+    /// "2026-07-15T15:58:07+02:00" → "15 Jul 2026, 15:58". Falls back to the raw value.
+    private static func txnDate(_ iso: String?) -> String {
+        guard let iso, !iso.isEmpty else { return "" }
+        let parser = ISO8601DateFormatter()
+        parser.formatOptions = [.withInternetDateTime]
+        guard let date = parser.date(from: iso) else { return iso }
+        let out = DateFormatter()
+        out.dateFormat = "dd MMM yyyy, HH:mm"
+        out.locale = Locale(identifier: "en_US_POSIX")
+        return out.string(from: date)
     }
 }
 

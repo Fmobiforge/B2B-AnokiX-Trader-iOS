@@ -38,11 +38,11 @@ struct TimezoneOption: Identifiable, Hashable {
 }
 
 enum SettingsOptions {
-    // Currency — value sent to the API (ZAR=1, USD=2, EUR=3 per requirements); label is the code.
+    // Currency — the API takes the ISO code ("ZAR"), which is also what we display.
     static let currencies = [
-        SettingsOption(value: "1", label: "ZAR"),
-        SettingsOption(value: "2", label: "USD"),
-        SettingsOption(value: "3", label: "EUR"),
+        SettingsOption(value: "ZAR", label: "ZAR"),
+        SettingsOption(value: "USD", label: "USD"),
+        SettingsOption(value: "EUR", label: "EUR"),
     ]
     static let languages = [
         SettingsOption(value: "en", label: "English"),
@@ -53,6 +53,12 @@ enum SettingsOptions {
         SettingsOption(value: "DD MMM YYYY", label: "19 May 2024"),
         SettingsOption(value: "MM/DD/YYYY", label: "05/19/2024"),
         SettingsOption(value: "YYYY-MM-DD", label: "2024-05-19"),
+    ]
+
+    /// Airtime & VAS payment — how VAS purchases are settled.
+    static let vasPaymentModes = [
+        SettingsOption(value: "wallet", label: "anokiX wallet (debit on purchase)"),
+        SettingsOption(value: "direct", label: "Direct settlement with Limes"),
     ]
 
     /// Notification toggles — keys/titles/descriptions + order verbatim from the web
@@ -71,12 +77,14 @@ enum SettingsOptions {
     ]
     static var toggleKeys: [String] { toggles.map(\.key) }
 
-    /// Map a stored currency ("ZAR"/"USD"/"EUR" code or "1"/"2"/"3" id) to its option value.
+    /// Map a stored currency to its option value. Accepts the ISO code and also the
+    /// legacy numeric ids the backend used to store, so an account saved before the
+    /// switch still resolves to the right option.
     static func currencyValue(forStored stored: String) -> String {
-        let codes = ["ZAR": "1", "USD": "2", "EUR": "3"]
-        if let v = codes[stored.uppercased()] { return v }
-        if currencies.contains(where: { $0.value == stored }) { return stored }
-        return "1"
+        let code = stored.uppercased()
+        if currencies.contains(where: { $0.value == code }) { return code }
+        let legacyIds = ["1": "ZAR", "2": "USD", "3": "EUR"]
+        return legacyIds[stored] ?? "ZAR"
     }
 }
 
@@ -98,12 +106,15 @@ struct ProfileUser {
 
 struct PreferencesDTO {
     var language: String, currency: String, timezone: String, dateFormat: String
+    /// How Airtime & VAS purchases are paid for: "wallet" or "direct".
+    var vasPaymentMode: String
     var notifications: [String: Bool]   // resolved per known key (missing/array => ON)
     init(json: JSON) {
         language = json["language"].string ?? "en"
         currency = json["currency"].string ?? "ZAR"
         timezone = json["timezone"].string ?? "Africa/Johannesburg"
         dateFormat = json["date_format"].string ?? "DD MMM YYYY"
+        vasPaymentMode = json["vas_payment_mode"].string ?? "wallet"
         let n = json["notifications"]
         var flags: [String: Bool] = [:]
         for key in SettingsOptions.toggleKeys { flags[key] = n[key].bool ?? true }
@@ -209,10 +220,11 @@ final class SettingsStore: ObservableObject {
     @Published var companyName = ""
 
     // Preferences (values are what the API expects)
-    @Published var currency = "1"
+    @Published var currency = "ZAR"
     @Published var timezone = "Africa/Johannesburg"
     @Published var dateFormat = "DD MMM YYYY"
     @Published var language = "en"
+    @Published var vasPaymentMode = "wallet"
     @Published var timezones: [TimezoneOption] = []
 
     // Notifications
@@ -264,6 +276,7 @@ final class SettingsStore: ObservableObject {
             timezone = prefs.timezone
             dateFormat = prefs.dateFormat
             language = prefs.language
+            vasPaymentMode = prefs.vasPaymentMode
             toggles = prefs.notifications
         }
         if let biz = try? await APIClient.shared.getBusinessProfile() {
@@ -296,7 +309,8 @@ final class SettingsStore: ObservableObject {
         defer { savingPrefs = false }
         do {
             try await APIClient.shared.updatePreferenceValues(
-                language: language, currency: currency, timezone: timezone, dateFormat: dateFormat)
+                language: language, currency: currency, timezone: timezone,
+                dateFormat: dateFormat, vasPaymentMode: vasPaymentMode)
             toast = "Preferences updated successfully."
         } catch {
             toast = (error as? LocalizedError)?.errorDescription ?? "Failed to update preferences."

@@ -416,21 +416,31 @@ enum DeliveryGrid {
         dayOrder.enumerated().map { DeliveryRow(index: $0.offset, abbr: $0.element) }
     }
 
-    /// "Mon,Wed,Fri/0:8.00-18.00/.../6:..." — selected-day CSV + per-day windows for EVERY
-    /// index (blank window → "8.00-18.00", per-field blank → "0.00", optional 2nd window
-    /// appended ",open2-close2").
+    /// Payload day number → row index. The payload is ISO (1=Mon…7=Sun) while rows run
+    /// 0=Sun…6=Sat, so 1–6 line up and only Sunday moves. A legacy `0` also means Sunday.
+    static func rowIndex(forDay day: Int) -> Int? {
+        if day == 0 || day == 7 { return 0 }            // Sunday (legacy 0 / ISO 7)
+        return (1...6).contains(day) ? day : nil
+    }
+
+    /// "1:8.00-18.00/3:8.00-18.00/5:8.00-18.00" — ONLY the ticked days, keyed by ISO day
+    /// (1=Mon…7=Sun) and emitted in Mon→Sun order. This is the shape the server stores and
+    /// that `DeliverySlot` reads when building order slots; it drops the old leading
+    /// abbreviation CSV and no longer writes hours for unticked days (which used to make
+    /// every weekday a delivery day, and lost Sunday entirely because `DeliverySlot`
+    /// rejects day 0).
     static func serialize(_ rows: [DeliveryRow]) -> String {
-        let sel = rows.filter { $0.checked }.map { $0.abbr }
-        let hours = rows.map { row -> String in
+        (1...7).compactMap { day -> String? in
+            guard let i = rowIndex(forDay: day), rows.indices.contains(i), rows[i].checked else { return nil }
+            let row = rows[i]
             let o1 = row.open1.trimmingCharacters(in: .whitespaces)
             let c1 = row.close1.trimmingCharacters(in: .whitespaces)
             var slot = (o1.isEmpty && c1.isEmpty) ? "8.00-18.00" : fmtHour(o1) + "-" + fmtHour(c1)
             let o2 = row.open2.trimmingCharacters(in: .whitespaces)
             let c2 = row.close2.trimmingCharacters(in: .whitespaces)
             if !o2.isEmpty || !c2.isEmpty { slot += "," + fmtHour(o2) + "-" + fmtHour(c2) }
-            return "\(row.index):\(slot)"
+            return "\(day):\(slot)"
         }.joined(separator: "/")
-        return sel.joined(separator: ",") + "/" + hours
     }
 
     /// Selected-day abbreviations only, e.g. "Mon,Wed,Fri" (no hours). Used by Create
@@ -440,32 +450,51 @@ enum DeliveryGrid {
         rows.filter { $0.checked }.map { $0.abbr }.joined(separator: ",")
     }
 
-    /// Prefill rows from the stored string: leading CSV ticks the days, then each
-    /// "i:open1-close1[,open2-close2]" segment fills that day index's windows.
+    /// Prefill rows from the stored string. Handles both shapes:
+    ///
+    /// - canonical (what the server stores, and what `DeliverySlot` reads):
+    ///   `"1:8.00-18.00/3:8.00-18.00/5:8.00-18.00"` — ONLY the delivery days are listed, so a
+    ///   day that carries hours IS a selected day and must be ticked.
+    /// - legacy (what this grid used to write): a leading `"Mon,Wed,Fri"` CSV followed by hours
+    ///   for ALL seven days. There the CSV is the only reliable source of selection, since
+    ///   unchecked days still carry default hours.
     static func apply(_ raw: String, to rows: inout [DeliveryRow]) {
         guard !raw.isEmpty else { return }
         let parts = raw.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
-        let selected = Set(parts[0].split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
-        for i in rows.indices { rows[i].checked = selected.contains(rows[i].abbr) }
-        guard parts.count > 1 else { return }
-        for seg in parts[1...] {
-            guard let colon = seg.firstIndex(of: ":") else { continue }
-            guard let idx = Int(seg[..<colon].trimmingCharacters(in: .whitespaces)),
-                  rows.indices.contains(idx) else { continue }
+
+        // A first segment without a ':' is the legacy day-abbreviation CSV.
+        let hasLegacyCSV = !(parts.first?.trimmingCharacters(in: .whitespaces).isEmpty ?? true)
+            && !(parts[0].contains(":"))
+
+        if hasLegacyCSV {
+            let selected = Set(parts[0].split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
+            for i in rows.indices { rows[i].checked = selected.contains(rows[i].abbr) }
+        }
+
+        for seg in parts {
+            guard let colon = seg.firstIndex(of: ":") else { continue }   // legacy CSV, or junk
+            guard let day = Int(seg[..<colon].trimmingCharacters(in: .whitespaces)),
+                  let idx = rowIndex(forDay: day), rows.indices.contains(idx) else { continue }
             let slots = seg[seg.index(after: colon)...]
                 .split(separator: ",", omittingEmptySubsequences: false).map(String.init)
-            if slots.count > 0 { fillSlot(&rows[idx], slots[0], second: false) }
-            if slots.count > 1 { fillSlot(&rows[idx], slots[1], second: true) }
+            var filled = false
+            if slots.count > 0 { filled = fillSlot(&rows[idx], slots[0], second: false) }
+            if slots.count > 1 { filled = fillSlot(&rows[idx], slots[1], second: true) || filled }
+            // Canonical strings list delivery days only, so real hours imply a ticked day.
+            if filled && !hasLegacyCSV { rows[idx].checked = true }
         }
     }
 
-    private static func fillSlot(_ row: inout DeliveryRow, _ slot: String, second: Bool) {
+    /// - Returns: true when the slot carried a real time range (so the day counts as selected).
+    @discardableResult
+    private static func fillSlot(_ row: inout DeliveryRow, _ slot: String, second: Bool) -> Bool {
         let s = slot.trimmingCharacters(in: .whitespaces)
-        guard !s.isEmpty, s != "-" else { return }
+        guard !s.isEmpty, s != "-" else { return false }
         let oc = s.split(separator: "-").map { $0.trimmingCharacters(in: .whitespaces) }
-        guard oc.count == 2 else { return }
+        guard oc.count == 2 else { return false }
         if second { row.open2 = oc[0]; row.close2 = oc[1] }
         else { row.open1 = oc[0]; row.close1 = oc[1] }
+        return true
     }
 
     /// "" → "0.00"; "8" → "8.00"; "8.30" kept.
