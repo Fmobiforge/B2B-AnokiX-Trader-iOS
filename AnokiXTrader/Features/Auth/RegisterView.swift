@@ -629,6 +629,17 @@ private struct WalletStep: View {
     private let benefits = ["Faster payments", "Access to credit", "Insurance solutions",
                             "Rewards & cashback", "Business growth tools"]
 
+    private var idNumberLabel: String {
+        switch store.walletIdType {
+        case "passport": return "Passport Number"
+        case "asylum":   return "Asylum Document Number"
+        default:          return "SA ID Number"
+        }
+    }
+    private var idNumberPlaceholder: String {
+        store.walletIdType == "ID" ? "13-digit ID number" : "Document number"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             // Wallet tile
@@ -664,7 +675,175 @@ private struct WalletStep: View {
             .background(Brand.surfaceVariant)
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            // Identity + residential address — only when creating the wallet now.
+            if store.createWallet {
+                walletInfoPanel
+            }
         }
+    }
+
+    private var walletInfoPanel: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ownerNotice
+            identitySection
+            addressSection
+            accessSection
+        }
+    }
+
+    private var ownerNotice: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: 15)).foregroundColor(Brand.purple)
+            Text("Your bank account is opened in the owner's name, so IMB needs to verify their identity and residential address. This is separate from your business address.")
+                .font(.system(size: 12)).foregroundColor(Brand.purpleDark)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Brand.purpleLight)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var identitySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Owner Identity")
+                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+
+            MenuDropdown(title: "ID Type", value: store.walletIdTypeLabel, placeholder: "Select ID type") {
+                ForEach(RegisterStore.idTypeOptions, id: \.code) { opt in
+                    Button(opt.label) { store.walletIdType = opt.code }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                LabeledField(title: idNumberLabel, text: $store.walletIdNumber,
+                             placeholder: idNumberPlaceholder,
+                             keyboard: store.walletIdType == "ID" ? .numberPad : .default,
+                             autocap: .never,
+                             disableAutocorrect: true)
+                    .onChange(of: store.walletIdNumber) { newValue in
+                        if store.walletIdType == "ID" {
+                            let digits = String(newValue.filter { $0.isNumber }.prefix(13))
+                            if digits != newValue { store.walletIdNumber = digits }
+                        }
+                    }
+                saIdFeedback
+            }
+
+            if store.walletIdType == "passport" {
+                VStack(alignment: .leading, spacing: 6) {
+                    LabeledField(title: "Passport Country", text: $store.walletPassportCountry,
+                                 placeholder: "e.g. ZA", autocap: .characters, disableAutocorrect: true)
+                        .onChange(of: store.walletPassportCountry) { v in
+                            let capped = String(v.uppercased().prefix(2))
+                            if capped != v { store.walletPassportCountry = capped }
+                        }
+                    Text("Two-letter country code.")
+                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                }
+                DatePickerField(title: "Passport Expiry Date", date: $store.walletPassportExpDate)
+            }
+
+            if store.walletIdType == "ID" {
+                ReadOnlyField(title: "Date of Birth",
+                              value: store.effectiveDob.map { Self.displayDate.string(from: $0) } ?? "",
+                              placeholder: "Read from ID")
+                ReadOnlyField(title: "Gender", value: store.effectiveGender, placeholder: "Read from ID")
+            } else {
+                DatePickerField(title: "Date of Birth", date: $store.walletDob)
+                MenuDropdown(title: "Gender", value: store.walletGenderManual, placeholder: "Select gender") {
+                    ForEach(RegisterStore.genderOptions, id: \.self) { g in
+                        Button(g) { store.walletGenderManual = g }
+                    }
+                }
+            }
+        }
+    }
+
+    private var addressSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Residential Address")
+                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .padding(.top, 4)
+            LabeledField(title: "Street Address", text: $store.walletStreet, placeholder: "17 New Haven Ave")
+            LabeledField(title: "Suburb", text: $store.walletSuburb, placeholder: "Bethesda")
+            LabeledField(title: "City", text: $store.walletCity, placeholder: "Cape Town")
+            MenuDropdown(title: "Province", value: store.walletProvinceLabel, placeholder: "Select province") {
+                ForEach(RegisterStore.provinceOptions, id: \.code) { opt in
+                    Button(opt.label) { store.walletProvinceCode = opt.code }
+                }
+            }
+            LabeledField(title: "Postal Code", text: $store.walletPostCode, placeholder: "8001", keyboard: .numberPad)
+        }
+    }
+
+    private var accessSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Wallet Access")
+                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .padding(.top, 4)
+            accessTile(title: "USSD access",
+                       subtitle: "Check balances and transact from any phone, no data needed.",
+                       on: store.walletUssd) { store.walletUssd.toggle() }
+            accessTile(title: "Online & app access",
+                       subtitle: "Use the anokiX app and web portal.",
+                       on: store.walletInternet) { store.walletInternet.toggle() }
+            accessTile(title: "Cross-border payments",
+                       subtitle: "Send and receive outside South Africa.",
+                       on: store.walletCrossBorder) { store.walletCrossBorder.toggle() }
+        }
+    }
+
+    /// Red error / green "read from ID" feedback under the SA-ID field.
+    @ViewBuilder
+    private var saIdFeedback: some View {
+        if store.walletIdType == "ID" {
+            switch store.saIdStatus() {
+            case .invalidLength:
+                feedback("A South African ID number must be 13 digits.", color: Brand.danger, icon: nil)
+            case .invalidDate:
+                feedback("The first six digits of the ID number are not a valid date.", color: Brand.danger, icon: nil)
+            case .invalidChecksum:
+                feedback("This ID number is not valid.", color: Brand.danger, icon: nil)
+            case .valid:
+                feedback("Date of birth and gender read from your ID number.",
+                         color: Brand.success, icon: "checkmark.circle.fill")
+            case .empty:
+                EmptyView()
+            }
+        }
+    }
+
+    private func feedback(_ text: String, color: Color, icon: String?) -> some View {
+        HStack(spacing: 4) {
+            if let icon { Image(systemName: icon).font(.system(size: 11)).foregroundColor(color) }
+            Text(text).font(.system(size: 11)).foregroundColor(color)
+        }
+    }
+
+    private func accessTile(title: String, subtitle: String, on: Bool,
+                            action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: on ? "checkmark.square.fill" : "square")
+                    .font(.system(size: 22))
+                    .foregroundColor(on ? Brand.purple : Brand.textTertiary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(on ? Brand.purpleLight : Brand.surface)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(on ? Brand.purple.opacity(0.4) : Brand.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
     }
 
     private func walletOption(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
@@ -680,6 +859,85 @@ private struct WalletStep: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    static let displayDate: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "MM/dd/yyyy"
+        return f
+    }()
+}
+
+// MARK: - Read-only display field (derived DOB / gender for SA ID)
+
+private struct ReadOnlyField: View {
+    let title: String
+    let value: String
+    var placeholder: String = ""
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.textSecondary)
+            Text(value.isEmpty ? placeholder : value)
+                .font(.system(size: 15))
+                .foregroundColor(value.isEmpty ? Brand.textTertiary : Brand.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+                .background(Brand.surfaceVariant)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+}
+
+// MARK: - Date field (tappable, opens a graphical DatePicker sheet)
+
+private struct DatePickerField: View {
+    let title: String
+    @Binding var date: Date?
+    var placeholder: String = "Select date"
+    @State private var showing = false
+    @State private var temp = Date()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.textSecondary)
+            Button {
+                temp = date ?? Date()
+                showing = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text(date.map { WalletStep.displayDate.string(from: $0) } ?? placeholder)
+                        .font(.system(size: 15))
+                        .foregroundColor(date == nil ? Brand.textTertiary : Brand.textPrimary)
+                    Spacer(minLength: 8)
+                    Image(systemName: "calendar").foregroundColor(Brand.textSecondary)
+                }
+                .padding(14)
+                .background(Brand.surface)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
+        .sheet(isPresented: $showing) {
+            NavigationStack {
+                DatePicker("", selection: $temp, displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                    .padding()
+                    .navigationTitle(title)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) { Button("Cancel") { showing = false } }
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { date = temp; showing = false }
+                        }
+                    }
+            }
+            .presentationDetents([.medium, .large])
+            .preferredColorScheme(.light)
+        }
     }
 }
 
