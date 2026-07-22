@@ -606,12 +606,9 @@ private struct DistributorsStep: View {
                     .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
 
-            MenuDropdown(title: "Preferred Payment Method", value: store.paymentLabel,
-                         placeholder: "Select payment method") {
-                ForEach(RegisterStore.paymentOptions, id: \.code) { opt in
-                    Button(opt.label) { store.paymentMethod = opt.code }
-                }
-            }
+            SelectField(title: "Preferred Payment Method", placeholder: "Select payment method",
+                        options: RegisterStore.paymentOptions.map { ($0.code, $0.label) },
+                        selection: $store.paymentMethod)
         }
         .sheet(isPresented: $showDistributors) {
             MultiSelectSheet(title: "Preferred Distributors",
@@ -711,11 +708,9 @@ private struct WalletStep: View {
             Text("Owner Identity")
                 .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
 
-            MenuDropdown(title: "ID Type", value: store.walletIdTypeLabel, placeholder: "Select ID type") {
-                ForEach(RegisterStore.idTypeOptions, id: \.code) { opt in
-                    Button(opt.label) { store.walletIdType = opt.code }
-                }
-            }
+            SelectField(title: "ID Type", placeholder: "Select ID type",
+                        options: RegisterStore.idTypeOptions.map { ($0.code, $0.label) },
+                        selection: $store.walletIdType)
 
             VStack(alignment: .leading, spacing: 6) {
                 LabeledField(title: idNumberLabel, text: $store.walletIdNumber,
@@ -753,11 +748,9 @@ private struct WalletStep: View {
                 ReadOnlyField(title: "Gender", value: store.effectiveGender, placeholder: "Read from ID")
             } else {
                 DatePickerField(title: "Date of Birth", date: $store.walletDob)
-                MenuDropdown(title: "Gender", value: store.walletGenderManual, placeholder: "Select gender") {
-                    ForEach(RegisterStore.genderOptions, id: \.self) { g in
-                        Button(g) { store.walletGenderManual = g }
-                    }
-                }
+                SelectField(title: "Gender", placeholder: "Select gender",
+                            options: RegisterStore.genderOptions.map { ($0, $0) },
+                            selection: $store.walletGenderManual)
             }
         }
     }
@@ -770,11 +763,9 @@ private struct WalletStep: View {
             LabeledField(title: "Street Address", text: $store.walletStreet, placeholder: "17 New Haven Ave")
             LabeledField(title: "Suburb", text: $store.walletSuburb, placeholder: "Bethesda")
             LabeledField(title: "City", text: $store.walletCity, placeholder: "Cape Town")
-            MenuDropdown(title: "Province", value: store.walletProvinceLabel, placeholder: "Select province") {
-                ForEach(RegisterStore.provinceOptions, id: \.code) { opt in
-                    Button(opt.label) { store.walletProvinceCode = opt.code }
-                }
-            }
+            SelectField(title: "Province", placeholder: "Select province",
+                        options: RegisterStore.provinceOptions.map { ($0.code, $0.label) },
+                        selection: $store.walletProvinceCode)
             LabeledField(title: "Postal Code", text: $store.walletPostCode, placeholder: "8001", keyboard: .numberPad)
         }
     }

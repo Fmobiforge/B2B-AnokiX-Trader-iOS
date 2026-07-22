@@ -185,20 +185,14 @@ struct PreferencesSettingsView: View {
     @ObservedObject var store: SettingsStore
     @Environment(\.dismiss) private var dismiss
 
-    private var timezoneLabel: String {
-        store.timezones.first { $0.value == store.timezone }?.label ?? store.timezone
-    }
-
     var body: some View {
         SettingsScreen(title: "Preferences",
                        subtitle: "Configure language, currency and regional settings.") {
             optionMenu("Language", options: SettingsOptions.languages, selection: $store.language)
             optionMenu("Currency", options: SettingsOptions.currencies, selection: $store.currency)
-            MenuDropdown(title: "Timezone", value: timezoneLabel) {
-                ForEach(store.timezones) { tz in
-                    Button(tz.label) { store.timezone = tz.value }
-                }
-            }
+            SelectField(title: "Timezone",
+                        options: store.timezones.map { ($0.value, $0.label) },
+                        selection: $store.timezone)
             optionMenu("Date Format", options: SettingsOptions.dateFormats, selection: $store.dateFormat)
             // The web shows the explanation in a "?" tooltip; on mobile it reads better
             // as persistent caption text under the field.
@@ -219,12 +213,9 @@ struct PreferencesSettingsView: View {
 
     private func optionMenu(_ title: String, options: [SettingsOption],
                             selection: Binding<String>) -> some View {
-        let current = options.first { $0.value == selection.wrappedValue }?.label ?? selection.wrappedValue
-        return MenuDropdown(title: title, value: current) {
-            ForEach(options) { opt in
-                Button(opt.label) { selection.wrappedValue = opt.value }
-            }
-        }
+        SelectField(title: title,
+                    options: options.map { ($0.value, $0.label) },
+                    selection: selection)
     }
 }
 
@@ -411,12 +402,11 @@ private struct BizTypeStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            MenuDropdown(title: "Trader Type", value: store.traderTypeName,
-                         placeholder: "Select trader type") {
-                ForEach(store.traderTypes) { t in
-                    Button(t.name) { store.traderTypeId = t.id }
-                }
-            }
+            SelectField(title: "Trader Type", placeholder: "Select trader type",
+                        options: store.traderTypes.map { (String($0.id), $0.name) },
+                        selection: Binding(
+                            get: { store.traderTypeId.map(String.init) ?? "" },
+                            set: { store.traderTypeId = Int($0) }))
 
             VStack(alignment: .leading, spacing: 8) {
                 DropdownField(title: "Primary Product Categories",
@@ -660,12 +650,9 @@ private struct BizDistributorStep: View {
                     .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
 
-            MenuDropdown(title: "Preferred Payment Method", value: store.paymentLabel,
-                         placeholder: "Select payment method") {
-                ForEach(RegisterStore.paymentOptions, id: \.code) { opt in
-                    Button(opt.label) { store.paymentMethod = opt.code }
-                }
-            }
+            SelectField(title: "Preferred Payment Method", placeholder: "Select payment method",
+                        options: RegisterStore.paymentOptions.map { ($0.code, $0.label) },
+                        selection: $store.paymentMethod)
         }
         .sheet(isPresented: $showDistributors) {
             MultiSelectSheet(title: "Preferred Distributors",

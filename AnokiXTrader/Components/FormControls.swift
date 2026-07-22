@@ -99,42 +99,107 @@ struct DropdownField: View {
     }
 }
 
-// MARK: - Dropdown backed by a Menu (reliable single-select, no action-sheet glitches)
+// MARK: - Single-select field backed by a bottom sheet (theme-safe dropdown)
 
-/// Same look as `DropdownField` but opens a native pull-down `Menu` instead of a
-/// `.confirmationDialog`. Menus render as opaque pop-ups, so they avoid the
-/// transparent-backdrop issue action sheets hit when stacked with other modals.
-struct MenuDropdown<MenuContent: View>: View {
+/// A tappable field that looks like `DropdownField` and opens a self-styled bottom
+/// sheet of options. Replaces the earlier `Menu`-based dropdown: a native `Menu`
+/// pop-up inherits the surrounding foreground color, so on the light-pinned auth /
+/// registration screens its items rendered white-on-white and were invisible. The
+/// sheet below draws its own rows with explicit Brand colors, so it always reads
+/// clearly regardless of the ambient theme.
+///
+/// `options` are `(id, label)` pairs — `id` is the stored code, `label` is shown to
+/// the user — and `selection` is bound to the chosen `id`. Tuples are unlabeled to
+/// match the codebase convention (`MultiSelectSheet`) and avoid array tuple-label
+/// conversion issues when call sites pass `.map { ($0.code, $0.label) }`.
+struct SelectField: View {
     let title: String
-    let value: String
     var placeholder: String = "Select"
-    @ViewBuilder var menuContent: MenuContent
+    let options: [(String, String)]
+    @Binding var selection: String
+    @State private var show = false
+
+    private var currentLabel: String {
+        options.first { $0.0 == selection }?.1 ?? ""
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(Brand.textSecondary)
-            Menu {
-                menuContent
-            } label: {
-                HStack(spacing: 8) {
-                    Text(value.isEmpty ? placeholder : value)
-                        .font(.system(size: 15))
-                        .foregroundColor(value.isEmpty ? Brand.textTertiary : Brand.textPrimary)
-                        .lineLimit(1)
-                    Spacer(minLength: 8)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Brand.textSecondary)
-                }
-                .padding(14)
-                .background(Brand.surface)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+        DropdownField(title: title, value: currentLabel, placeholder: placeholder) { show = true }
+            .sheet(isPresented: $show) {
+                SelectOptionsSheet(title: title, options: options, selection: $selection)
             }
-            .buttonStyle(.plain)
+    }
+}
+
+/// The bottom sheet for `SelectField`: a titled list of tappable rows, the selected
+/// one marked with a purple check. Height fits the content (capped), always light.
+private struct SelectOptionsSheet: View {
+    let title: String
+    let options: [(String, String)]
+    @Binding var selection: String
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(Brand.textPrimary)
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(Brand.textTertiary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 12)
+
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(Array(options.enumerated()), id: \.offset) { idx, opt in
+                        Button {
+                            selection = opt.0
+                            dismiss()
+                        } label: {
+                            HStack(spacing: 12) {
+                                Text(opt.1)
+                                    .font(.system(size: 16,
+                                                  weight: selection == opt.0 ? .semibold : .regular))
+                                    .foregroundColor(selection == opt.0 ? Brand.purple : Brand.textPrimary)
+                                Spacer(minLength: 8)
+                                if selection == opt.0 {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(Brand.purple)
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 16)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        if idx < options.count - 1 {
+                            Divider().padding(.leading, 20)
+                        }
+                    }
+                }
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Brand.surface.ignoresSafeArea())
+        .presentationDetents([.height(sheetHeight)])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.light)   // always render light, even in system Dark Mode
+    }
+
+    /// Fit the sheet to its rows (header + rows), capped so long lists still scroll.
+    private var sheetHeight: CGFloat {
+        let header: CGFloat = 64
+        let row: CGFloat = 54
+        return min(header + CGFloat(options.count) * row + 20, 440)
     }
 }
 
