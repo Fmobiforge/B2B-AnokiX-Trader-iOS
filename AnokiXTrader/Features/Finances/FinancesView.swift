@@ -18,12 +18,18 @@ struct FinancesView: View {
     private let methodOptions = [("all", "All Methods"), ("eft", "EFT"), ("card", "Card"),
                                  ("cash", "Cash"), ("credit", "Credit")]
 
+    // Single outer ScrollView (matching InvoicesView / InventoryView, which are hosted
+    // the same way): the KPI strip, filters and list scroll together. A fixed-header
+    // VStack with a *nested* vertical ScrollView for the list collapsed here — the
+    // nested scroll fought the tall horizontal KPI strip for vertical space.
     var body: some View {
-        VStack(spacing: 0) {
-            statStrip
-            filterBar
-            Divider()
-            content
+        ScrollView {
+            VStack(spacing: 0) {
+                statStrip
+                filterBar
+                Divider()
+                content
+            }
         }
         .background(Brand.background)
         .task { if store.all.isEmpty { await store.load() } }
@@ -62,10 +68,6 @@ struct FinancesView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
-        // A horizontal ScrollView inside a VStack greedily eats all leftover
-        // vertical space; pin it to its content height so the strip doesn't
-        // balloon and hide its cards behind the filter bar below.
-        .fixedSize(horizontal: false, vertical: true)
         .background(Brand.background)
     }
 
@@ -119,7 +121,6 @@ struct FinancesView: View {
                     filterMenu(options: methodOptions, selection: $store.methodFilter, placeholder: "Method")
                 }
             }
-            .fixedSize(horizontal: false, vertical: true)
 
             dateRangePill
         }
@@ -191,26 +192,23 @@ struct FinancesView: View {
     @ViewBuilder
     private var content: some View {
         if store.loading && store.all.isEmpty {
-            Spacer(); ProgressView(); Spacer()
+            ProgressView().frame(maxWidth: .infinity).padding(.top, 60)
         } else if store.filtered.isEmpty {
             emptyState
         } else {
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    HStack {
-                        Text("Showing \(store.filtered.count) \(store.filtered.count == 1 ? "transaction" : "transactions")")
-                            .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-                        Spacer()
-                    }
-                    ForEach(store.filtered) { txn in
-                        FinanceCard(txn: txn,
-                                    onView: { detailTxn = txn },
-                                    onDownload: { toastMsg = "PDF download coming soon." })
-                    }
+            LazyVStack(spacing: 10) {
+                HStack {
+                    Text("Showing \(store.filtered.count) \(store.filtered.count == 1 ? "transaction" : "transactions")")
+                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Spacer()
                 }
-                .padding(16)
+                ForEach(store.filtered) { txn in
+                    FinanceCard(txn: txn,
+                                onView: { detailTxn = txn },
+                                onDownload: { toastMsg = "PDF download coming soon." })
+                }
             }
-            .background(Brand.background)
+            .padding(16)
         }
     }
 
@@ -224,9 +222,9 @@ struct FinancesView: View {
                 .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 32)
-        .background(Brand.background)
+        .padding(.top, 60)
     }
 }
 
