@@ -303,6 +303,14 @@ final class APIClient {
         return try decode(data)
     }
 
+    // MARK: Finances
+
+    /// The trader's anokiX wallet ledger + KPI summary (api/trader/finances).
+    func getFinances() async throws -> FinancesData {
+        let data = try await get("api/trader/finances", query: [:])
+        return try decode(data)
+    }
+
     // MARK: Distributors
 
     /// List the distributors the trader is partnered with (api/trader/distributors).

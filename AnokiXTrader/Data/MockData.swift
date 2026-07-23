@@ -57,6 +57,7 @@ enum MockData {
         MenuItem("sell", "POS", icon: "cart.fill"),
         MenuItem("sales", "Sales", icon: "banknote.fill"),
         MenuItem("invoices", "Invoices", icon: "doc.plaintext.fill"),
+        MenuItem("finances", "Finances", icon: "creditcard.fill"),
         MenuItem("distributors", "Distributors", icon: "building.2.fill"),
         MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
         MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),

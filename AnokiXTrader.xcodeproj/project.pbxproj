@@ -79,6 +79,8 @@
 		DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD2 /* RewardsView.swift */; };
 		E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578A29E /* ReportsView.swift */; };
 		E70206EE4C1DD86CA1B92DB8 /* InvoicesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33A859C7376D341F499F337 /* InvoicesStore.swift */; };
+		FE06EE00000000000000A1A1 /* FinancesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE06EE00000000000000B1B1 /* FinancesStore.swift */; };
+		FE06EE00000000000000A2A2 /* FinancesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE06EE00000000000000B2B2 /* FinancesView.swift */; };
 		F06E668924D75A5A7528933A /* CollectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666633CA9A56BF13DF4DB944 /* CollectionStore.swift */; };
 		F21CAD80974B4216A7987EF1 /* MakeOrderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602EF6516EA31616D0DC0F1D /* MakeOrderView.swift */; };
 		F823FC6B4B535C5531F115B2 /* ImageCompression.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE42037E5EC246A2151C3F48 /* ImageCompression.swift */; };
@@ -150,6 +152,8 @@
 		C6B7C23EF6695669B46657AB /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		CE42037E5EC246A2151C3F48 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
 		D33A859C7376D341F499F337 /* InvoicesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesStore.swift; sourceTree = "<group>"; };
+		FE06EE00000000000000B1B1 /* FinancesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesStore.swift; sourceTree = "<group>"; };
+		FE06EE00000000000000B2B2 /* FinancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesView.swift; sourceTree = "<group>"; };
 		D3DE53611F2413423FBED6C6 /* AirtimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeView.swift; sourceTree = "<group>"; };
 		D6D4F331CC341D3A0F0125C4 /* CategoryProductsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryProductsView.swift; sourceTree = "<group>"; };
 		D6DAFD016859ED78D8D45E23 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
@@ -236,6 +240,15 @@
 				DCABD1C8C98F030AA4E35535 /* InvoicesView.swift */,
 			);
 			path = Invoices;
+			sourceTree = "<group>";
+		};
+		FE06EE00000000000000C1C1 /* Finances */ = {
+			isa = PBXGroup;
+			children = (
+				FE06EE00000000000000B1B1 /* FinancesStore.swift */,
+				FE06EE00000000000000B2B2 /* FinancesView.swift */,
+			);
+			path = Finances;
 			sourceTree = "<group>";
 		};
 		34A76ECF5B4F0863E9AA3CEB /* Models */ = {
@@ -359,6 +372,7 @@
 				116731EA981D7D3F0AB5380B /* GoodsReturns */,
 				6AFB62BB26E7825D3C7C5D67 /* Inventory */,
 				177754B89DD536AFE39D8E1D /* Invoices */,
+				FE06EE00000000000000C1C1 /* Finances */,
 				5AF9FA0D12B9D0669D4AA940 /* Main */,
 				B05F20D1F87FD4B18FBB69ED /* Marketplace */,
 				667B1DD49AD1B4A54DD61CB4 /* Modules */,
@@ -692,6 +706,8 @@
 				B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */,
 				E70206EE4C1DD86CA1B92DB8 /* InvoicesStore.swift in Sources */,
 				C63A23ACD6ED6B0712EA0313 /* InvoicesView.swift in Sources */,
+				FE06EE00000000000000A1A1 /* FinancesStore.swift in Sources */,
+				FE06EE00000000000000A2A2 /* FinancesView.swift in Sources */,
 				BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */,
 				0B1AB0EC013D8D8CDFE0D0FF /* LoginSessionStore.swift in Sources */,
 				2CEE4C3B3E78D51A5D227BAB /* LogoCrop.swift in Sources */,

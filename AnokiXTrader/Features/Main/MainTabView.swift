@@ -125,6 +125,7 @@ struct ModuleHost: View {
                 case .inventory:     InventoryView()
                 case .sales:         SalesView()
                 case .invoices:      InvoicesView()
+                case .finances:      FinancesView()
                 case .distributors:  DistributorsView()
                 case .marketplace:   MarketplaceRealView()
                 case .cart:          EmptyView()   // handled directly in `body`
