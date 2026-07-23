@@ -62,6 +62,10 @@ struct FinancesView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
+        // A horizontal ScrollView inside a VStack greedily eats all leftover
+        // vertical space; pin it to its content height so the strip doesn't
+        // balloon and hide its cards behind the filter bar below.
+        .fixedSize(horizontal: false, vertical: true)
         .background(Brand.background)
     }
 
@@ -115,6 +119,7 @@ struct FinancesView: View {
                     filterMenu(options: methodOptions, selection: $store.methodFilter, placeholder: "Method")
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
 
             dateRangePill
         }
