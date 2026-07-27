@@ -780,6 +780,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AnokiXTrader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show your position on the map and help you find and confirm delivery addresses when placing orders.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
@@ -794,7 +795,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -813,6 +814,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AnokiXTrader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show your position on the map and help you find and confirm delivery addresses when placing orders.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
@@ -827,7 +829,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
