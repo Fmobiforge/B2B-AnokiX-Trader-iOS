@@ -10,6 +10,15 @@ struct FinancesView: View {
     @State private var showDatePicker = false
     @State private var detailTxn: FinanceTxnDTO?
     @State private var toastMsg: String?
+    @State private var activeFilterSheet: FilterSheet?
+
+    /// Which filter dropdown's option sheet is open. A native `Menu` renders its items
+    /// with no opaque backing on these light-pinned screens (bare text over the page),
+    /// so filters open the app's `SelectOptionsSheet` instead — see [[trader-ios-selectfield]].
+    private enum FilterSheet: Int, Identifiable {
+        case status, type, method
+        var id: Int { rawValue }
+    }
 
     private let statusOptions = [("all", "All Statuses"), ("paid", "Paid"), ("pending", "Pending"),
                                  ("overdue", "Overdue"), ("partial", "Partial")]
@@ -41,6 +50,16 @@ struct FinancesView: View {
             DateRangeSheet(from: store.dateFrom ?? Date(), to: store.dateTo ?? Date()) { from, to in
                 store.dateFrom = from
                 store.dateTo = to
+            }
+        }
+        .sheet(item: $activeFilterSheet) { sheet in
+            switch sheet {
+            case .status:
+                SelectOptionsSheet(title: "Status", options: statusOptions, selection: $store.statusFilter)
+            case .type:
+                SelectOptionsSheet(title: "Type", options: typeOptions, selection: $store.typeFilter)
+            case .method:
+                SelectOptionsSheet(title: "Payment Method", options: methodOptions, selection: $store.methodFilter)
             }
         }
         .toast($toastMsg)
@@ -116,9 +135,9 @@ struct FinancesView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    filterMenu(options: statusOptions, selection: $store.statusFilter, placeholder: "Status")
-                    filterMenu(options: typeOptions, selection: $store.typeFilter, placeholder: "Type")
-                    filterMenu(options: methodOptions, selection: $store.methodFilter, placeholder: "Method")
+                    filterPill(.status, options: statusOptions, selection: store.statusFilter, placeholder: "Status")
+                    filterPill(.type, options: typeOptions, selection: store.typeFilter, placeholder: "Type")
+                    filterPill(.method, options: methodOptions, selection: store.methodFilter, placeholder: "Method")
                 }
             }
 
@@ -128,34 +147,28 @@ struct FinancesView: View {
         .background(Brand.surface)
     }
 
-    private func filterMenu(options: [(String, String)], selection: Binding<String>, placeholder: String) -> some View {
-        let currentLabel = options.first { $0.0 == selection.wrappedValue }?.1 ?? placeholder
-        let isActive = selection.wrappedValue != "all"
-        return Menu {
-            ForEach(options, id: \.0) { opt in
-                Button {
-                    selection.wrappedValue = opt.0
-                } label: {
-                    if selection.wrappedValue == opt.0 {
-                        Label(opt.1, systemImage: "checkmark")
-                    } else {
-                        Text(opt.1)
-                    }
-                }
-            }
-        } label: {
+    /// A compact filter pill that opens `SelectOptionsSheet` (theme-safe, opaque) rather
+    /// than a native `Menu`. Active (non-"all") picks turn purple, matching the portal.
+    private func filterPill(_ sheet: FilterSheet, options: [(String, String)],
+                            selection: String, placeholder: String) -> some View {
+        let currentLabel = options.first { $0.0 == selection }?.1 ?? placeholder
+        let isActive = selection != "all"
+        return Button { activeFilterSheet = sheet } label: {
             HStack(spacing: 6) {
                 Text(isActive ? currentLabel : placeholder)
                     .font(.system(size: 12, weight: isActive ? .semibold : .regular))
                     .foregroundColor(isActive ? Brand.purple : Brand.textPrimary)
                     .lineLimit(1)
-                Image(systemName: "chevron.down").font(.system(size: 10)).foregroundColor(Brand.textSecondary)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10))
+                    .foregroundColor(isActive ? Brand.purple : Brand.textSecondary)
             }
             .padding(.horizontal, 12).frame(height: 40)
             .background(isActive ? Brand.purpleLight : Brand.surface)
             .overlay(RoundedRectangle(cornerRadius: 10).stroke(isActive ? Brand.purple : Brand.border, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+        .buttonStyle(.plain)
     }
 
     private var dateRangePill: some View {
@@ -234,6 +247,7 @@ private struct FinanceCard: View {
     let txn: FinanceTxnDTO
     let onView: () -> Void
     let onDownload: () -> Void
+    @State private var showActions = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -281,21 +295,26 @@ private struct FinanceCard: View {
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.purple, lineWidth: 1))
                 }
                 .buttonStyle(.plain)
-                Menu {
-                    Button { onView() } label: { Label("View details", systemImage: "eye") }
-                    Button { onDownload() } label: { Label("Download PDF", systemImage: "doc.text") }
-                } label: {
+                // An action sheet (opaque, system-styled) rather than a native `Menu`,
+                // which renders as bare text on these light-pinned screens.
+                Button { showActions = true } label: {
                     Image(systemName: "ellipsis")
                         .font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.textSecondary)
                         .frame(width: 40, height: 40)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
                 }
+                .buttonStyle(.plain)
             }
             .padding(.top, 12)
         }
         .card()
         .contentShape(Rectangle())
         .onTapGesture { onView() }
+        .confirmationDialog(txn.counterparty ?? "Transaction", isPresented: $showActions, titleVisibility: .visible) {
+            Button("View details") { onView() }
+            Button("Download PDF") { onDownload() }
+            Button("Cancel", role: .cancel) { }
+        }
     }
 
     private func initial(_ name: String?) -> String {
@@ -355,6 +374,7 @@ private struct FinanceDetailSheet: View {
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Close") { dismiss() } } }
         }
         .presentationDetents([.medium, .large])
+        .preferredColorScheme(.light)   // match the app's other sheets (always light)
     }
 
     private func row(_ label: String, _ value: String) -> some View {

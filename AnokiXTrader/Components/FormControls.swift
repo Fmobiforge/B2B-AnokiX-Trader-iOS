@@ -133,7 +133,9 @@ struct SelectField: View {
 
 /// The bottom sheet for `SelectField`: a titled list of tappable rows, the selected
 /// one marked with a purple check. Height fits the content (capped), always light.
-private struct SelectOptionsSheet: View {
+/// Also reused directly by compact pill dropdowns (e.g. the Finances filter bar),
+/// which want the pill trigger look rather than a full `DropdownField`.
+struct SelectOptionsSheet: View {
     let title: String
     let options: [(String, String)]
     @Binding var selection: String

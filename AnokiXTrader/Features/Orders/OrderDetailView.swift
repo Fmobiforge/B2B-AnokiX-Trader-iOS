@@ -300,22 +300,70 @@ struct DateRangeSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                DatePicker("From", selection: $from, displayedComponents: .date)
-                DatePicker("To", selection: $to, in: from..., displayedComponents: .date)
+        // Self-styled sheet (custom header, no NavigationStack) drawn on an explicit
+        // opaque Brand background + forced light scheme — matching SelectOptionsSheet /
+        // the app's other pickers. Without this the sheet inherited a clear backing and
+        // its contents (incl. the DatePicker's calendar popover) showed through onto the
+        // screen behind it.
+        VStack(spacing: 0) {
+            HStack {
+                Text("Date range")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(Brand.textPrimary)
                 Spacer()
-                Button("Apply") {
-                    onApply(from, to)
-                    dismiss()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(Brand.textTertiary)
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(.plain)
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 16)
+
+            VStack(spacing: 0) {
+                dateRow("From", selection: $from, range: nil)
+                Divider()
+                dateRow("To", selection: $to, range: from...)
+            }
+            .padding(.horizontal, 4)
+            .background(Brand.surface)
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Brand.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .padding(.horizontal, 20)
+            .tint(Brand.purple)
+
+            Spacer(minLength: 0)
+
+            Button("Apply") {
+                onApply(from, to)
+                dismiss()
+            }
+            .buttonStyle(PrimaryButtonStyle())
             .padding(20)
-            .navigationTitle("Date range")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Close") { dismiss() } } }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Brand.background.ignoresSafeArea())
         .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.light)
+    }
+
+    @ViewBuilder
+    private func dateRow(_ label: String, selection: Binding<Date>, range: PartialRangeFrom<Date>?) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Brand.textPrimary)
+            Spacer()
+            if let range {
+                DatePicker("", selection: selection, in: range, displayedComponents: .date).labelsHidden()
+            } else {
+                DatePicker("", selection: selection, displayedComponents: .date).labelsHidden()
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 }
