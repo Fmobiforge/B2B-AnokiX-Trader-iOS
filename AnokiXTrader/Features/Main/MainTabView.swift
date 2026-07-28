@@ -155,13 +155,17 @@ struct ModuleHost: View {
     }
 }
 
-// MARK: - Reusable in-tab header (hamburger + title + bell)
+// MARK: - Reusable in-tab header (hamburger + title + [cart] + bell)
 
 struct ScreenHeader: View {
     let title: String
     var subtitle: String? = nil
+    /// Opt-in cart button to the left of the bell (Dashboard only, for now) —
+    /// mirrors the Android `fragment_dashboard.xml` header.
+    var showsCart: Bool = false
     @EnvironmentObject var router: Router
     @ObservedObject private var badge = NotificationBadge.shared
+    @ObservedObject private var market = MarketStore.shared
 
     var body: some View {
         HStack(spacing: 12) {
@@ -177,6 +181,24 @@ struct ScreenHeader: View {
                 }
             }
             Spacer()
+            if showsCart {
+                Button { router.presented = .cart } label: {
+                    Image(systemName: "cart")
+                        .font(.system(size: 19, weight: .medium))
+                        .foregroundColor(Brand.textPrimary)
+                        .overlay(alignment: .topTrailing) {
+                            if market.cartBadgeCount > 0 {
+                                Text(market.cartBadgeCount > 99 ? "99+" : "\(market.cartBadgeCount)")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 4).padding(.vertical, 1)
+                                    .background(Brand.danger)
+                                    .clipShape(Capsule())
+                                    .offset(x: 8, y: -8)
+                            }
+                        }
+                }
+            }
             Button { router.presented = .notifications } label: {
                 Image(systemName: "bell")
                     .font(.system(size: 19, weight: .medium))
@@ -197,6 +219,18 @@ struct ScreenHeader: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(Brand.surface)
-        .task { await badge.refresh() }
+        .task {
+            await badge.refresh()
+            if showsCart { await market.refreshCart() }
+        }
+        // Coming back from a full-screen module (Cart, Marketplace, Notifications)
+        // the counts have usually moved — repaint both badges on dismiss.
+        .onChange(of: router.presented) { module in
+            guard module == nil else { return }
+            Task {
+                await badge.refresh()
+                if showsCart { await market.refreshCart() }
+            }
+        }
     }
 }

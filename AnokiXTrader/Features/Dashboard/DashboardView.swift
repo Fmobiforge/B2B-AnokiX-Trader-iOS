@@ -87,7 +87,7 @@ struct DashboardView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(title: "Welcome back", subtitle: session.storeName)
+            ScreenHeader(title: "Welcome back", subtitle: session.storeName, showsCart: true)
             ScrollView {
                 VStack(spacing: 16) {
                     statRow

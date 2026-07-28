@@ -54,13 +54,18 @@ enum MockData {
         MenuItem("goods_received", "Goods Received (GRV)", icon: "tray.and.arrow.down.fill"),
         MenuItem("goods_returns", "Goods Returns (GRN)", icon: "arrow.uturn.backward.circle.fill"),
         MenuItem("inventory", "Inventory", icon: "archivebox.fill"),
-        MenuItem("sell", "POS", icon: "cart.fill"),
+        // POS is a bag, not a cart — the cart glyph belongs to the Cart entry above
+        // (and to the header cart button). Matches Android's ic_shopping_bag.
+        MenuItem("sell", "POS", icon: "bag.fill"),
         MenuItem("sales", "Sales", icon: "banknote.fill"),
         MenuItem("invoices", "Invoices", icon: "doc.plaintext.fill"),
         MenuItem("finances", "Finances", icon: "creditcard.fill"),
         MenuItem("distributors", "Distributors", icon: "building.2.fill"),
-        MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
-        MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
+        // Hidden for now — anokiX wallet and anokiX rewards are not part of the
+        // current release. Keep these entries so the menu can be restored later.
+        // (The wallet screen itself is still in the build — Tab.wallet / WalletView.)
+        // MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
+        // MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
         MenuItem("airtime", "Airtime & VAS", subtitle: "    ", icon: "antenna.radiowaves.left.and.right"),
         MenuItem("analytics", "Analytics", icon: "chart.bar.fill"),
         MenuItem("reports", "Reports", icon: "doc.text.fill"),
@@ -220,7 +225,7 @@ enum MockData {
 
     /// Quick Actions grid on the dashboard.
     static let quickActions: [(title: String, icon: String, route: String)] = [
-        ("Sell (POS)",     "cart.fill",                            "sell"),
+        ("Sell (POS)",     "bag.fill",                             "sell"),
         ("Order Stock",    "shippingbox.fill",                     "marketplace"),
         ("Add Money",      "plus.circle.fill",                     "wallet"),
         ("Airtime & VAS",  "antenna.radiowaves.left.and.right",    "airtime"),

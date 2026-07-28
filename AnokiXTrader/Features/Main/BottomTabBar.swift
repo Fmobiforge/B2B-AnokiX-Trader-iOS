@@ -14,9 +14,13 @@ struct BottomTabBar: View {
 
     private let items: [Item] = [
         Item(tab: .home, title: "Dashboard", icon: "house.fill"),
-        Item(tab: .sell, title: "POS", icon: "cart.fill"),
+        Item(tab: .sell, title: "POS", icon: "bag.fill"),
         Item(tab: .orders, title: "Orders", icon: "shippingbox.fill"),
-        Item(tab: .wallet, title: "Wallet", icon: "wallet.pass.fill"),
+        // Hidden for now — the anokiX wallet is not a bottom-nav destination in the
+        // current release (matches Android `MainActivity.hideWalletTab()`). `Tab.wallet`
+        // still exists and still renders WalletView: the drawer entry and the Dashboard
+        // wallet card route to it. Uncomment this line to bring the tab back.
+        // Item(tab: .wallet, title: "Wallet", icon: "wallet.pass.fill"),
         Item(tab: .more, title: "More", icon: "ellipsis"),
     ]
 
