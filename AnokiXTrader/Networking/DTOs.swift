@@ -291,6 +291,17 @@ struct ProductDTO: Decodable, Identifiable, Hashable {
         return 0
     }
     var inStock: Bool { stockCount > 0 }
+
+    /// An empty product carrying only its id — for deep links (e.g. a product push) that
+    /// arrive without the marketplace row. `ProductDetailView` fills it in from
+    /// api/common/product-detail on appear.
+    static func placeholder(id: String) -> ProductDTO {
+        ProductDTO(id: id, name: nil, sku: nil, barcode: nil, description: nil,
+                   brand_name: nil, category_title: nil, parent_category_title: nil,
+                   selling_price: nil, promotion_price: nil, stock: nil,
+                   stock_quantity: nil, primary_product_image_url: nil,
+                   image_url: nil, additional_images: nil)
+    }
 }
 
 struct ProductImageDTO: Decodable, Hashable {

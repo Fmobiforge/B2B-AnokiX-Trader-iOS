@@ -43,6 +43,11 @@ struct OrderDetailRoute: Identifiable, Hashable {
     let id: Int
 }
 
+/// A deep link to one product's detail screen (e.g. from a price-drop push).
+struct ProductDetailRoute: Identifiable, Hashable {
+    let id: String
+}
+
 /// Central navigation state shared by the whole main app.
 final class Router: ObservableObject {
     @Published var tab: Tab = .home
@@ -50,6 +55,8 @@ final class Router: ObservableObject {
     @Published var presented: Module? = nil
     /// Set to open a specific order's detail full-screen (push deep link).
     @Published var orderDetail: OrderDetailRoute? = nil
+    /// Set to open a specific product's detail full-screen (push deep link).
+    @Published var productDetail: ProductDetailRoute? = nil
 
     /// Route by the string keys used across MockData menus / quick actions.
     func route(_ key: String) {
@@ -61,6 +68,49 @@ final class Router: ObservableObject {
         case "wallet": tab = .wallet
         default:
             if let m = Module(rawValue: key) { presented = m }
+        }
+    }
+
+    /// Applies a notification's destination — the iOS counterpart of the Android
+    /// `PushManager.navigate`. Shared by push taps (`MainTabView`) and in-app feed taps
+    /// (`NotificationsView`) so the two can never drift.
+    ///
+    /// - Parameter fallbackToFeed: `true` for a push tap (an unroutable payload opens the
+    ///   Notifications list); `false` for a tap inside that list, which stays put.
+    func apply(_ route: PushRoute, fallbackToFeed: Bool = true) {
+        drawerOpen = false
+        switch route {
+        // The trader tracks a delivery inside the order's timeline — there is no
+        // separate deliveries screen on this side of the ecosystem, so both land here.
+        case .order(let id), .delivery(let id):
+            if let id {
+                presented = nil
+                orderDetail = OrderDetailRoute(id: id)
+            } else {
+                presented = nil
+                tab = .orders
+            }
+        case .product(let id):
+            if let id, !id.isEmpty {
+                presented = nil
+                productDetail = ProductDetailRoute(id: id)
+            } else {
+                presented = .marketplace
+            }
+        case .grv:           presented = .goodsReceived
+        case .returns:       presented = .goodsReturns
+        case .invoice:       presented = .invoices
+        case .finance:       presented = .finances
+        case .wallet:        presented = nil; tab = .wallet
+        case .inventory:     presented = .inventory
+        case .vas:           presented = .airtime
+        case .promotion:     presented = .promotions
+        case .marketplace:   presented = .marketplace
+        case .cart:          presented = .cart
+        case .report:        presented = .reports
+        case .rewards:       presented = .rewards
+        case .settings:      presented = .settings
+        case .notifications: if fallbackToFeed { presented = .notifications }
         }
     }
 }

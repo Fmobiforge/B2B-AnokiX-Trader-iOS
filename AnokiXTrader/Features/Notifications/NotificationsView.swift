@@ -2,12 +2,14 @@ import SwiftUI
 
 /// Notifications — live feed from GET api/common/notifications (filter all/unread,
 /// paged). KPI tiles (total/read/unread/important), All/Unread tabs, "Mark all as
-/// read", and tap-to-open: a tap marks the row read (POST .../read) and routes to
-/// the related screen (order → Orders, return → Goods Returns, stock → Inventory).
+/// read", and tap-to-open: a tap marks the row read (POST .../read) and routes to the
+/// related screen through the shared `PushRoute` resolver, so a row tap and a push tap
+/// for the same payload land in the same place.
 struct NotificationsView: View {
     @StateObject private var store = NotificationsStore()
     @EnvironmentObject var router: Router
     @State private var orderRouteId: Int?
+    @State private var productRoute: ProductDetailRoute?
 
     private let cols = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
@@ -29,6 +31,15 @@ struct NotificationsView: View {
             set: { if !$0 { orderRouteId = nil } }
         )) {
             if let id = orderRouteId { OrderDetailLoader(orderId: id) }
+        }
+        // ProductDetailView brings its own NavigationStack, so present it as a sheet
+        // rather than pushing it into this one.
+        .sheet(item: $productRoute) { route in
+            ProductDetailView(productId: route.id,
+                              fallback: .placeholder(id: route.id),
+                              distributorName: "",
+                              currency: "R",
+                              store: MarketStore.shared)
         }
     }
 
@@ -127,22 +138,21 @@ struct NotificationsView: View {
 
     // MARK: actions
 
+    /// Marks the row read, then routes. Detail screens are opened from *this* view's own
+    /// stack rather than through `Router` — this screen is itself a full-screen cover, and
+    /// a view can only host one at a time. Everything else swaps the presented module, so
+    /// `Router.apply` (the same resolver a push tap uses) handles it.
     private func handleTap(_ n: NotificationDTO) {
         Task { await store.markRead(n) }
         switch n.route {
-        case .order(let oid):
-            if let oid {
-                orderRouteId = oid          // push the order detail (parity with Android)
-            } else {
-                router.presented = nil
-                router.tab = .orders
-            }
-        case .returns:
-            router.presented = .goodsReturns
-        case .inventory:
-            router.presented = .inventory
-        case .none:
-            break
+        case .order(let oid) where oid != nil, .delivery(let oid) where oid != nil:
+            orderRouteId = oid              // push the order detail (parity with Android)
+        case .product(let pid):
+            if let pid { productRoute = ProductDetailRoute(id: pid) } else { router.presented = .marketplace }
+        default:
+            // fallbackToFeed: false — we are already on the feed, so an unroutable row
+            // simply does nothing instead of re-presenting this screen.
+            router.apply(n.route, fallbackToFeed: false)
         }
     }
 

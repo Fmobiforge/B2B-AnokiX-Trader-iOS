@@ -1,4 +1,6 @@
 import SwiftUI
+import UIKit
+import UserNotifications
 
 // MARK: - DTOs (GET api/common/notifications, /unread-count)
 
@@ -19,14 +21,6 @@ struct UnreadCountData: Decodable {
     let unread_count: Int
 }
 
-/// Where a notification routes when tapped, derived from `type`/`data.route`.
-enum NotifRoute {
-    case order(Int?)
-    case returns
-    case inventory
-    case none
-}
-
 /// One notification. `type` (e.g. "order.status", "return.decision", "stock.low")
 /// drives the icon and which screen a tap opens.
 struct NotificationDTO: Decodable, Identifiable, Hashable {
@@ -39,55 +33,107 @@ struct NotificationDTO: Decodable, Identifiable, Hashable {
     let created_at: String?
     let is_read: Bool
 
-    var route: NotifRoute {
-        let r = data?.route
-        if type.hasPrefix("order") || r == "order" { return .order(data?.order_id) }
-        if type.hasPrefix("return") || r == "return" { return .returns }
-        if type.hasPrefix("stock") || r == "inventory" { return .inventory }
-        return .none
+    /// Resolved through the shared `PushRoute.resolve`, so a row tap and a push tap for
+    /// the same payload always land on the same screen.
+    var route: PushRoute {
+        PushRoute.resolve(type: type, route: data?.route, ids: data?.ids ?? PushIds())
     }
 
     /// Important = any return decision, or an order whose status is Failed/Cancelled.
     /// Mirrors the Trader web portal exactly:
     ///   important = type=="return.decision"
     ///            || (type=="order.status" && status in {"Failed","Cancelled"})
+    ///
+    /// The comparison is case-insensitive and also reads `status_key`: the push contract
+    /// uses machine values ("cancelled", "out_for_delivery") while the portal uses display
+    /// case, and a row built from either source has to raise the same flag.
     var isImportant: Bool {
         if type == "return.decision" { return true }
-        if type == "order.status", let s = data?.status {
-            return s == "Failed" || s == "Cancelled"
+        if type == "order.status" {
+            return Self.isFailedOrCancelled(data?.status)
+                || Self.isFailedOrCancelled(data?.status_key)
         }
         return false
     }
 
+    private static func isFailedOrCancelled(_ status: String?) -> Bool {
+        guard let s = status?.trimmingCharacters(in: .whitespaces).lowercased() else { return false }
+        return s == "failed" || s == "cancelled" || s == "canceled"
+    }
+
     var icon: String {
         switch route {
-        case .order:     return "shippingbox.fill"
-        case .returns:   return "arrowshape.turn.up.left.fill"
-        case .inventory: return "archivebox.fill"
-        case .none:      return "bell.fill"
+        case .order:         return "bag.fill"
+        case .delivery:      return "shippingbox.fill"
+        case .grv:           return "shippingbox.and.arrow.backward.fill"
+        case .returns:       return "arrowshape.turn.up.left.fill"
+        case .inventory:     return "archivebox.fill"
+        case .invoice:       return "doc.text.fill"
+        case .finance, .wallet: return "creditcard.fill"
+        case .vas:           return "antenna.radiowaves.left.and.right"
+        case .promotion, .product, .marketplace, .cart: return "tag.fill"
+        case .report:        return "chart.bar.fill"
+        case .rewards:       return "gift.fill"
+        case .settings:      return "lock.fill"
+        case .notifications: return "bell.fill"
         }
     }
 
     var tint: Color {
         switch route {
-        case .order:     return Brand.purple
-        case .returns:   return Brand.warning
-        case .inventory: return Brand.info
-        case .none:      return Brand.purple
+        case .order, .promotion, .product, .marketplace, .cart, .notifications, .settings:
+            return Brand.purple
+        case .returns, .rewards:
+            return Brand.warning
+        case .delivery, .grv, .inventory, .vas, .report:
+            return Brand.info
+        case .invoice, .finance, .wallet:
+            return Brand.success
         }
     }
 }
 
-/// The `data` object — only the fields used for navigation are modelled.
+/// The `data` object — only the fields used for navigation and the "important" flag are
+/// modelled. See `FCM-settings/3-Event-Catalogue.md` §3.1 for the full dictionary;
+/// unmodelled keys are ignored.
 struct NotifPayload: Decodable, Hashable {
+    /// "order" | "delivery" | "grv" | "return" | "invoice" | "finance" | "wallet"
+    /// | "inventory" | "vas" | "promotion" | "product" | "marketplace" | "cart"
+    /// | "report" | "rewards" | "settings" | "notifications".
     let route: String?
     let order_id: Int?
     let order_number: String?
     let grn_id: Int?
     let grn_number: String?
+    let grv_id: Int?
+    let grv_number: String?
+    let invoice_id: Int?
+    let invoice_number: String?
     let product_id: Int?
+    let promotion_id: Int?
+    let transaction_id: Int?
+    /// Order status — "Cancelled" or the machine form "cancelled"; drives `isImportant`.
     let status: String?
+    /// Machine form of `status` when the server sends both, e.g. "out_for_delivery".
+    let status_key: String?
     let decision: String?
+
+    /// The feed's numeric ids in the shape the shared resolver expects.
+    var ids: PushIds {
+        PushIds(orderId: positive(order_id),
+                grnId: positive(grn_id),
+                grvId: positive(grv_id),
+                invoiceId: positive(invoice_id),
+                productId: positive(product_id).map { String($0) },
+                promotionId: positive(promotion_id).map { String($0) },
+                transactionId: positive(transaction_id).map { String($0) },
+                notificationId: nil)
+    }
+
+    private func positive(_ value: Int?) -> Int? {
+        guard let value, value > 0 else { return nil }
+        return value
+    }
 }
 
 // MARK: - Screen store
@@ -176,6 +222,20 @@ final class NotificationBadge: ObservableObject {
     func refresh() async {
         if let d = try? await APIClient.shared.getUnreadCount() {
             count = d.unread_count
+            applyToAppIcon(d.unread_count)
+        }
+    }
+
+    /// Keeps the springboard badge in step with the bell.
+    ///
+    /// The server sends `aps.badge` as the unread total at send time, so iOS is only
+    /// correct until the user reads something in-app — without this the icon keeps
+    /// showing the old count until the next push arrives.
+    private func applyToAppIcon(_ count: Int) {
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(count) { _ in }
+        } else {
+            UIApplication.shared.applicationIconBadgeNumber = count
         }
     }
 }

@@ -51,6 +51,15 @@ struct MainTabView: View {
             .environmentObject(router)
             .environmentObject(session)
         }
+        // Product deep link (price drop / back in stock) → the Add to Cart screen, which
+        // fills itself in from api/common/product-detail.
+        .fullScreenCover(item: $router.productDetail) { route in
+            ProductDetailView(productId: route.id,
+                              fallback: .placeholder(id: route.id),
+                              distributorName: "",
+                              currency: "R",
+                              store: MarketStore.shared)
+        }
         // FCM: ask for the permission + register the token once the signed-in UI shows,
         // then apply any route a notification tap is waiting to perform.
         .onAppear {
@@ -62,21 +71,10 @@ struct MainTabView: View {
     }
 
     /// Navigate where a tapped push points (parity with Android `PushManager.handleRouting`).
+    /// A payload we can't place opens the Notifications list rather than doing nothing.
     private func applyPendingRoute() {
         guard let route = push.pendingRoute else { return }
-        switch route {
-        case .order(let id):
-            if let id {
-                router.presented = nil
-                router.orderDetail = OrderDetailRoute(id: id)   // open the specific order
-            } else {
-                router.presented = nil
-                router.tab = .orders
-            }
-        case .returns:       router.presented = .goodsReturns
-        case .inventory:     router.presented = .inventory
-        case .notifications: router.presented = .notifications
-        }
+        router.apply(route, fallbackToFeed: true)
         push.pendingRoute = nil
     }
 

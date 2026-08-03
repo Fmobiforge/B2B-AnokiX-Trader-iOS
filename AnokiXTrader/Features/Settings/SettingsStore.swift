@@ -61,13 +61,17 @@ enum SettingsOptions {
         SettingsOption(value: "direct", label: "Direct settlement with Limes"),
     ]
 
-    /// Notification toggles — keys/titles/descriptions + order verbatim from the web
-    /// portal's Notification Preferences screen.
+    /// Notification toggles — keys/titles/descriptions + order from the web portal's
+    /// Notification Preferences screen, plus "lowStockAlerts" so both portals persist the
+    /// same six keys (see FCM-settings/3-Event-Catalogue.md §7). A missing key
+    /// resolves to ON, so adding one is backwards compatible with saved preferences.
     static let toggles = [
         NotifToggle(key: "orderAlerts", title: "Order Alerts",
                     desc: "Get notified about your order status changes."),
         NotifToggle(key: "deliveryUpdates", title: "Delivery Updates",
                     desc: "Track delivery status changes and delays."),
+        NotifToggle(key: "lowStockAlerts", title: "Low Stock Alerts",
+                    desc: "Alerts when a product drops below its reorder level."),
         NotifToggle(key: "promotionAlerts", title: "Promotion Alerts",
                     desc: "Hear about new deals and promotions from distributors."),
         NotifToggle(key: "financeReminders", title: "Finance Reminders",
