@@ -41,6 +41,9 @@
 		53812E40F29C21E91AFA708F /* DistributorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C90FCEF9CF3611879C11FCD /* DistributorsView.swift */; };
 		60ECBBB292F95D184EF3B8D9 /* GoodsReceivedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9269454048A047F3893596 /* GoodsReceivedStore.swift */; };
 		677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB04209 /* SupportView.swift */; };
+		677B5C29C764B279D6F9DA01 /* SupportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */; };
+		677B5C29C764B279D6F9DA02 /* TicketDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */; };
+		E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */; };
 		6CA2E6E526E270A298991A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */; };
 		6D219969E4FD69F7DE0951A9 /* PendingApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502BC529C4C1BBC3C28B7DC /* PendingApprovalView.swift */; };
 		721EE0D0B8ABD611948249E1 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */; };
@@ -97,6 +100,9 @@
 		11CD2B00377D56966727ED1C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		1A47C4FD93E9A214C578A29E /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsStore.swift; sourceTree = "<group>"; };
+		608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportStore.swift; sourceTree = "<group>"; };
+		608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailView.swift; sourceTree = "<group>"; };
 		1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
 		2953B76239F2C95A2E756AA8 /* PosStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosStore.swift; sourceTree = "<group>"; };
 		2FFDED181FB33A7C847AEBE4 /* FinancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesView.swift; sourceTree = "<group>"; };
@@ -280,7 +286,9 @@
 		358157AE6940D676FA4C820C /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */,
 				608FEEC642C83E3A7CB04209 /* SupportView.swift */,
+				608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -502,6 +510,7 @@
 		C757C805EBF59FB2AFAA0F7F /* Reports */ = {
 			isa = PBXGroup;
 			children = (
+				1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */,
 				1A47C4FD93E9A214C578A29E /* ReportsView.swift */,
 			);
 			path = Reports;
@@ -740,6 +749,7 @@
 				4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */,
 				779D758D64356A4B138522C7 /* RegisterView.swift in Sources */,
 				CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */,
+				E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */,
 				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
 				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
 				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,
@@ -748,7 +758,9 @@
 				2E51E622B0213BC63968E4D7 /* SellView.swift in Sources */,
 				B3EEA239B2C155F0AA87D629 /* SettingsStore.swift in Sources */,
 				932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */,
+				677B5C29C764B279D6F9DA01 /* SupportStore.swift in Sources */,
 				677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */,
+				677B5C29C764B279D6F9DA02 /* TicketDetailView.swift in Sources */,
 				458BC0E954255207E98812AC /* Theme.swift in Sources */,
 				4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */,
 			);

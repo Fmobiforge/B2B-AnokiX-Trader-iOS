@@ -21,5 +21,16 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<!--
+		Schemes the Support Centre probes with canOpenURL before launching them.
+		Without this list the checks silently return false and WhatsApp / the dialler /
+		the mail client are never opened.
+	-->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>

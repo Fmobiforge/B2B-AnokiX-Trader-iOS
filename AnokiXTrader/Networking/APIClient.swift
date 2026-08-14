@@ -34,6 +34,11 @@ final class APIClient {
     /// Matches the Android `ApiClient.BASE_URL`.
     let baseURL = "http://155.117.20.51/ax/"
 
+    /// Report files come from a separate download service on its own port, which
+    /// authenticates with the token in the JSON body rather than a Bearer header.
+    /// Same host, so the existing ATS exception in Info.plist already covers it.
+    let reportDownloadURL = "http://155.117.20.51:5721/api/report-download"
+
     private static let tokenKey = "auth_token"
 
     /// Set after a successful login; restored on next launch.
@@ -567,6 +572,142 @@ final class APIClient {
         try await postFormStatus("api/common/vas/purchase", form: form)
     }
 
+    // MARK: - Reports
+
+    /// Dashboard: the catalogue of report types, the reports already generated and the
+    /// KPI summary — GET api/trader/reports.
+    func getReports() async throws -> ReportsData {
+        let data = try await get("api/trader/reports", query: [:])
+        return try decode(data)
+    }
+
+    /// Build a report for a period. `reportKey` comes from `ReportAvailableDTO.key`;
+    /// both dates are "yyyy-MM-dd". The envelope's message ("Till Sales ready — 2 rows.")
+    /// is worth showing, so it comes back alongside the data.
+    func generateReport(reportKey: String, from: String, to: String)
+        async throws -> (data: ReportMutationData, message: String?) {
+        let (node, message) = try await postFormWithMessage(
+            "api/trader/reports/generate",
+            form: ["report_key": reportKey, "from": from, "to": to])
+        let result: ReportMutationData = try decode(node)
+        return (result, message)
+    }
+
+    /// Delete a generated report; the response carries the refreshed summary.
+    func deleteReport(id: Int) async throws -> (data: ReportMutationData, message: String?) {
+        let (node, message) = try await postFormWithMessage(
+            "api/trader/reports/delete", form: ["id": String(id)])
+        let result: ReportMutationData = try decode(node)
+        return (result, message)
+    }
+
+    /// Fetch the report file itself. On failure the download service answers with the
+    /// usual JSON envelope instead of a file, so a JSON content type is treated as an
+    /// error and its `message` surfaced.
+    func downloadReport(id: Int) async throws -> ReportDownload {
+        var request = URLRequest(url: URL(string: reportDownloadURL)!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("*/*", forHTTPHeaderField: "Accept")
+        request.httpBody = try? JSONSerialization.data(
+            withJSONObject: ["id": id, "token": token ?? ""])
+
+        let bytes: Data
+        let response: URLResponse
+        do {
+            (bytes, response) = try await Self.downloadSession.data(for: request)
+        } catch {
+            throw APIError.network
+        }
+
+        let http = response as? HTTPURLResponse
+        let contentType = (http?.value(forHTTPHeaderField: "Content-Type") ?? "").lowercased()
+        let status = http?.statusCode ?? 0
+
+        guard (200..<300).contains(status), !bytes.isEmpty, !contentType.contains("json") else {
+            // An envelope came back rather than a file — surface the server's wording.
+            if let json = try? JSON(data: bytes), let message = json["message"].string,
+               !message.isEmpty {
+                throw APIError.server(message)
+            }
+            throw APIError.server("Could not download the report.")
+        }
+
+        return ReportDownload(
+            bytes: bytes,
+            contentType: contentType.isEmpty ? nil : contentType,
+            fileName: Self.fileName(from: http?.value(forHTTPHeaderField: "Content-Disposition")))
+    }
+
+    /// Plain `URLSession` for the download: Alamofire's string serialisation would
+    /// mangle a binary body, and file transfers want a longer resource timeout.
+    private static let downloadSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 60
+        config.timeoutIntervalForResource = 300
+        return URLSession(configuration: config)
+    }()
+
+    /// Pull `filename="…"` out of a Content-Disposition header.
+    private static func fileName(from disposition: String?) -> String? {
+        guard let disposition else { return nil }
+        let pattern = "filename\\*?=\"?(?:UTF-8'')?([^\";]+)\"?"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: disposition, range: NSRange(disposition.startIndex..., in: disposition)),
+              let range = Range(match.range(at: 1), in: disposition) else { return nil }
+        // Strip any path the header might carry.
+        let raw = String(disposition[range]).trimmingCharacters(in: .whitespaces)
+        return raw.split(separator: "/").last.map(String.init)
+    }
+
+    // MARK: - Support Centre
+
+    /// Landing screen: enabled channels, help-article taxonomy and the trader's tickets.
+    func getSupportOverview() async throws -> SupportOverviewData {
+        let data = try await get("api/common/support/overview", query: [:])
+        return try decode(data)
+    }
+
+    /// Free-text help-article search.
+    func searchSupportArticles(query: String) async throws -> SupportArticlesData {
+        let data = try await get("api/common/support/articles/search", query: ["q": query])
+        return try decode(data)
+    }
+
+    /// Open a ticket. `channel` is "web" (a written request, with a priority) or
+    /// "callback" (a ring-me-back request, with a phone number); pass nil for the field
+    /// that does not apply to the chosen channel.
+    func createSupportTicket(subject: String, message: String, channel: String,
+                             priority: String? = nil, callbackPhone: String? = nil,
+                             category: String? = nil) async throws -> SupportTicketData {
+        var form = ["subject": subject, "message": message, "channel": channel]
+        if let priority, !priority.isEmpty { form["priority"] = priority }
+        if let callbackPhone, !callbackPhone.isEmpty { form["callback_phone"] = callbackPhone }
+        if let category, !category.isEmpty { form["category"] = category }
+        let data = try await postForm("api/common/support/tickets", form: form)
+        return try decode(data)
+    }
+
+    /// One ticket with its full message thread.
+    func getSupportTicket(id: Int) async throws -> SupportTicketData {
+        let data = try await get("api/common/support/tickets/\(id)", query: [:])
+        return try decode(data)
+    }
+
+    /// Add a merchant reply; the response is the refreshed ticket.
+    func replySupportTicket(ticketId: Int, message: String) async throws -> SupportTicketData {
+        let data = try await postForm("api/common/support/tickets/reply",
+                                      form: ["ticket_id": String(ticketId), "message": message])
+        return try decode(data)
+    }
+
+    /// Close a ticket; the response is the refreshed ticket.
+    func closeSupportTicket(ticketId: Int) async throws -> SupportTicketData {
+        let data = try await postForm("api/common/support/tickets/close",
+                                      form: ["ticket_id": String(ticketId)])
+        return try decode(data)
+    }
+
     // MARK: - Core requests (Alamofire)
 
     /// GET → returns the validated `data` node as SwiftyJSON.
@@ -583,6 +724,24 @@ final class APIClient {
         let request = AF.request(baseURL + path, method: .post, parameters: params,
                                  encoding: URLEncoding.httpBody, headers: authHeaders)
         return try await dataNode(request)
+    }
+
+    /// POST form-urlencoded → the validated `data` node **and** the envelope's
+    /// `message`, for endpoints whose wording is worth showing to the trader.
+    private func postFormWithMessage(_ path: String, form: [String: String])
+        async throws -> (JSON, String?) {
+        let params: Parameters = form
+        let request = AF.request(baseURL + path, method: .post, parameters: params,
+                                 encoding: URLEncoding.httpBody, headers: authHeaders)
+        let response = await request.serializingData().response
+        switch response.result {
+        case .success(let bytes):
+            guard let json = try? JSON(data: bytes) else { throw APIError.decoding }
+            if json["status"].boolValue { return (json["data"], json["message"].string) }
+            throw APIError.server(json["message"].string ?? "Request failed")
+        case .failure:
+            throw APIError.network
+        }
     }
 
     /// POST a JSON body → returns the validated `data` node as SwiftyJSON.
