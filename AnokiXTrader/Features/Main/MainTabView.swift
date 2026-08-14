@@ -134,6 +134,7 @@ struct ModuleHost: View {
                 case .customers:     CustomersView()
                 case .analytics:     AnalyticsView()
                 case .reports:       ReportsView()
+                case .staff:         StaffView()
                 case .notifications: NotificationsView()
                 case .settings:      SettingsView()
                 case .support:       SupportView()

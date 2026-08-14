@@ -6,7 +6,7 @@ enum Tab: Hashable { case home, sell, orders, wallet, more }
 /// Presented as a full-screen cover over the tab bar (matches the Android Activities).
 enum Module: String, Identifiable, Hashable {
     case inventory, marketplace, cart, payments, airtime, rewards, sales, invoices, finances, distributors
-    case promotions, customers, analytics, reports, notifications, settings, support
+    case promotions, customers, analytics, reports, staff, notifications, settings, support
     /// Raw values match the drawer keys so Router.route can resolve them.
     case goodsReceived = "goods_received"
     case goodsReturns = "goods_returns"
@@ -30,6 +30,7 @@ enum Module: String, Identifiable, Hashable {
         case .customers: return "Customers"
         case .analytics: return "Analytics"
         case .reports: return "Reports"
+        case .staff: return "Staff"
         case .notifications: return "Notifications"
         case .settings: return "Settings"
         case .support: return "Support Centre"

@@ -44,6 +44,8 @@
 		677B5C29C764B279D6F9DA01 /* SupportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */; };
 		677B5C29C764B279D6F9DA02 /* TicketDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */; };
 		E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */; };
+		E5931ABD3B33362FDF1EDA04 /* StaffStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA04 /* StaffStore.swift */; };
+		E5931ABD3B33362FDF1EDA05 /* StaffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA05 /* StaffView.swift */; };
 		6CA2E6E526E270A298991A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */; };
 		6D219969E4FD69F7DE0951A9 /* PendingApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502BC529C4C1BBC3C28B7DC /* PendingApprovalView.swift */; };
 		721EE0D0B8ABD611948249E1 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */; };
@@ -101,6 +103,8 @@
 		13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		1A47C4FD93E9A214C578A29E /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsStore.swift; sourceTree = "<group>"; };
+		1A47C4FD93E9A214C578DA04 /* StaffStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffStore.swift; sourceTree = "<group>"; };
+		1A47C4FD93E9A214C578DA05 /* StaffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffView.swift; sourceTree = "<group>"; };
 		608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportStore.swift; sourceTree = "<group>"; };
 		608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailView.swift; sourceTree = "<group>"; };
 		1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
@@ -407,6 +411,7 @@
 				E92BF74EBA358C1F946B514D /* Rewards */,
 				C571E0BFEB3B5853FAB32160 /* Sell */,
 				79FBC6A258795BB76854C21E /* Settings */,
+				C757C805EBF59FB2AFAA0FDA /* Staff */,
 				358157AE6940D676FA4C820C /* Support */,
 				9EDCB7D214B49EE4323357E9 /* Wallet */,
 			);
@@ -514,6 +519,15 @@
 				1A47C4FD93E9A214C578A29E /* ReportsView.swift */,
 			);
 			path = Reports;
+			sourceTree = "<group>";
+		};
+		C757C805EBF59FB2AFAA0FDA /* Staff */ = {
+			isa = PBXGroup;
+			children = (
+				1A47C4FD93E9A214C578DA04 /* StaffStore.swift */,
+				1A47C4FD93E9A214C578DA05 /* StaffView.swift */,
+			);
+			path = Staff;
 			sourceTree = "<group>";
 		};
 		DAEA340379A1B59D9733D0F0 /* Auth */ = {
@@ -750,6 +764,8 @@
 				779D758D64356A4B138522C7 /* RegisterView.swift in Sources */,
 				CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */,
 				E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */,
+				E5931ABD3B33362FDF1EDA04 /* StaffStore.swift in Sources */,
+				E5931ABD3B33362FDF1EDA05 /* StaffView.swift in Sources */,
 				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
 				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
 				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,

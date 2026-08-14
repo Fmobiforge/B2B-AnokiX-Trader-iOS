@@ -68,9 +68,10 @@ struct TicketDetailView: View {
                     if let badge = ticket.priorityBadge {
                         StatusBadge(text: badge.label, fg: badge.fg, bg: badge.bg)
                     }
-                    Text("Opened \(SupportFmt.shortDateTime(ticket.created_at))")
+                    Text(openedLine(ticket))
                         .font(.system(size: 12))
                         .foregroundColor(Brand.textSecondary)
+                        .lineLimit(1)
                     Spacer(minLength: 0)
                 }
             }
@@ -107,6 +108,14 @@ struct TicketDetailView: View {
     }
 
     private var messages: [SupportMessageDTO] { ticket?.messages ?? [] }
+
+    /// "Opened 13 Aug, 20:39", plus who it went to when the ticket was raised with a
+    /// distributor rather than anokiX Support.
+    private func openedLine(_ ticket: SupportTicketDTO) -> String {
+        let opened = "Opened \(SupportFmt.shortDateTime(ticket.created_at))"
+        guard let name = ticket.distributor_name, !name.isEmpty else { return opened }
+        return "\(opened) · Sent to \(name)"
+    }
 
     // MARK: Composer
 

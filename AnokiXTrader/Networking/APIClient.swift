@@ -660,6 +660,51 @@ final class APIClient {
         return raw.split(separator: "/").last.map(String.init)
     }
 
+    // MARK: - Staff
+
+    /// Everyone the trader has given till access to, plus what a staff login may reach.
+    func getStaff() async throws -> StaffData {
+        let data = try await get("api/trader/staff", query: [:])
+        return try decode(data)
+    }
+
+    /// Add a staff member. They sign in with `email` + `password`; phone and job title
+    /// are optional. The response is the created member.
+    func addStaff(firstName: String, lastName: String, email: String, password: String,
+                  phone: String, jobTitle: String)
+        async throws -> (data: StaffMemberData, message: String?) {
+        let (node, message) = try await postFormWithMessage("api/trader/staff", form: [
+            "first_name": firstName,
+            "last_name": lastName,
+            "email": email,
+            "password": password,
+            "phone_number": phone,
+            "job_title": jobTitle,
+        ])
+        let result: StaffMemberData = try decode(node)
+        return (result, message)
+    }
+
+    /// Set a new sign-in password for a staff member (they are not emailed it).
+    func setStaffPassword(staffId: Int, password: String)
+        async throws -> (data: StaffMemberData, message: String?) {
+        let (node, message) = try await postFormWithMessage(
+            "api/trader/staff/password",
+            form: ["staff_id": String(staffId), "password": password])
+        let result: StaffMemberData = try decode(node)
+        return (result, message)
+    }
+
+    /// Turn a staff member's sign-in on or off. `status` is "active" or "disabled".
+    func updateStaffStatus(staffId: Int, status: String)
+        async throws -> (data: StaffMemberData, message: String?) {
+        let (node, message) = try await postFormWithMessage(
+            "api/trader/staff/update",
+            form: ["staff_id": String(staffId), "status": status])
+        let result: StaffMemberData = try decode(node)
+        return (result, message)
+    }
+
     // MARK: - Support Centre
 
     /// Landing screen: enabled channels, help-article taxonomy and the trader's tickets.
@@ -677,13 +722,18 @@ final class APIClient {
     /// Open a ticket. `channel` is "web" (a written request, with a priority) or
     /// "callback" (a ring-me-back request, with a phone number); pass nil for the field
     /// that does not apply to the chosen channel.
+    ///
+    /// `distributorId` routes the ticket: nil sends it to anokiX Support, a value raises
+    /// it with that distributor instead.
     func createSupportTicket(subject: String, message: String, channel: String,
                              priority: String? = nil, callbackPhone: String? = nil,
-                             category: String? = nil) async throws -> SupportTicketData {
+                             category: String? = nil,
+                             distributorId: String? = nil) async throws -> SupportTicketData {
         var form = ["subject": subject, "message": message, "channel": channel]
         if let priority, !priority.isEmpty { form["priority"] = priority }
         if let callbackPhone, !callbackPhone.isEmpty { form["callback_phone"] = callbackPhone }
         if let category, !category.isEmpty { form["category"] = category }
+        if let distributorId, !distributorId.isEmpty { form["distributor_id"] = distributorId }
         let data = try await postForm("api/common/support/tickets", form: form)
         return try decode(data)
     }

@@ -69,6 +69,7 @@ enum MockData {
         MenuItem("airtime", "Airtime & VAS", subtitle: "    ", icon: "antenna.radiowaves.left.and.right"),
         MenuItem("analytics", "Analytics", icon: "chart.bar.fill"),
         MenuItem("reports", "Reports", icon: "doc.text.fill"),
+        MenuItem("staff", "Staff", subtitle: "Who can use this till", icon: "person.2.fill"),
         MenuItem("settings", "Settings", icon: "gearshape.fill"),
         MenuItem("notifications", "Notifications", icon: "bell.fill"),
         MenuItem("support", "Support Centre", icon: "headphones"),

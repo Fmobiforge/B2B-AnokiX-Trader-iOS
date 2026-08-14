@@ -27,7 +27,10 @@ struct SupportView: View {
             .padding(16)
         }
         .background(Brand.background)
-        .task { if store.channels == nil { await store.load() } }
+        .task {
+            if store.channels == nil { await store.load() }
+            await store.loadDistributors()
+        }
         .refreshable { await store.load() }
         // Surface a failed load/search as a toast, then clear it so it shows only once.
         .onChange(of: store.error) { message in
@@ -36,7 +39,9 @@ struct SupportView: View {
             store.error = nil
         }
         .sheet(item: $request) { kind in
-            SupportRequestSheet(kind: kind, categories: store.categories) { message in
+            SupportRequestSheet(kind: kind,
+                                categories: store.categories,
+                                distributors: store.distributors) { message in
                 toastMsg = message
                 Task { await store.load() }
             }
@@ -389,7 +394,13 @@ enum SupportRequestKind: String, Identifiable {
 private struct SupportRequestSheet: View {
     let kind: SupportRequestKind
     let categories: [SupportCategoryDTO]
+    /// Offered alongside anokiX Support in "Who should answer this?".
+    let distributors: [TraderDistributorDTO]
     let onSubmitted: (String) -> Void
+
+    /// Sentinel for the anokiX Support option — an empty id means no distributor_id
+    /// is sent, which is how the API routes a ticket to anokiX.
+    private static let anokixOption = ""
 
     @Environment(\.dismiss) private var dismiss
     @State private var phone = ""
@@ -397,8 +408,10 @@ private struct SupportRequestSheet: View {
     @State private var message = ""
     @State private var priority = TicketPriority.normal
     @State private var category = ""
+    @State private var distributorId = SupportRequestSheet.anokixOption
     @State private var showPriorityPicker = false
     @State private var showCategoryPicker = false
+    @State private var showAudiencePicker = false
     @State private var submitting = false
     @State private var errorMsg: String?
 
@@ -445,6 +458,11 @@ private struct SupportRequestSheet: View {
                                options: categories.map { ($0.key, $0.name) },
                                selection: $category)
         }
+        .sheet(isPresented: $showAudiencePicker) {
+            SelectOptionsSheet(title: "Who should answer this?",
+                               options: audienceOptions,
+                               selection: $distributorId)
+        }
     }
 
     @ViewBuilder
@@ -459,8 +477,18 @@ private struct SupportRequestSheet: View {
 
     @ViewBuilder
     private var ticketFields: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            DropdownField(title: "Who should answer this?",
+                          value: selectedAudienceName,
+                          placeholder: "anokiX Support") { showAudiencePicker = true }
+            Text("Ask your distributor about their stock, prices and deliveries. "
+                 + "Ask anokiX about the app, your wallet or payments.")
+                .font(.system(size: 11))
+                .foregroundColor(Brand.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         SingleLineField(title: "What is this about?", required: true, text: $subject,
-                        placeholder: "Order ODR000123 has not arrived")
+                        placeholder: "Wallet top-up hasn't arrived")
         if !categories.isEmpty {
             DropdownField(title: "Topic (optional)",
                           value: selectedCategoryName,
@@ -469,7 +497,21 @@ private struct SupportRequestSheet: View {
         DropdownField(title: "How urgent is it?",
                       value: priority.label) { showPriorityPicker = true }
         MultilineField(title: "What happened?", required: true, text: $message,
-                       placeholder: "Include order numbers, amounts and dates.", height: 130)
+                       placeholder: "Include amounts, dates and reference numbers.", height: 130)
+    }
+
+    /// Empty selection reads as anokiX Support, matching the placeholder.
+    private var selectedAudienceName: String {
+        distributors.first(where: { $0.id == distributorId })?.displayName ?? ""
+    }
+
+    /// anokiX Support first, then the trader's distributors.
+    private var audienceOptions: [(String, String)] {
+        var options: [(String, String)] = [(Self.anokixOption, "anokiX Support")]
+        for distributor in distributors {
+            options.append((distributor.id, distributor.displayName))
+        }
+        return options
     }
 
     private var selectedCategoryName: String {
@@ -518,7 +560,11 @@ private struct SupportRequestSheet: View {
                     channel: kind == .callback ? "callback" : "web",
                     priority: kind == .callback ? nil : priority.rawValue,
                     callbackPhone: kind == .callback ? trimmedPhone : nil,
-                    category: kind == .callback ? nil : (category.isEmpty ? nil : category))
+                    category: kind == .callback ? nil : (category.isEmpty ? nil : category),
+                    // A call-back always goes to anokiX Support — that form has no
+                    // audience picker, so no distributor is attached.
+                    distributorId: (kind == .callback || distributorId.isEmpty)
+                        ? nil : distributorId)
                 dismiss()
                 onSubmitted("Your request has been logged.")
             } catch {
@@ -552,12 +598,16 @@ struct SingleLineField: View {
     @Binding var text: String
     var placeholder: String = ""
     var keyboard: UIKeyboardType = .default
+    /// Turn off for values the keyboard must not "help" with, e.g. an email address.
+    var autocapitalize = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             FieldLabel(text: title, required: required)
             TextField(placeholder, text: $text)
                 .keyboardType(keyboard)
+                .textInputAutocapitalization(autocapitalize ? .sentences : .never)
+                .autocorrectionDisabled(!autocapitalize)
                 .font(.system(size: 15))
                 .foregroundColor(Brand.textPrimary)
                 .padding(14)

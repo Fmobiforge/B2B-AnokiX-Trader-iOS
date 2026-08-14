@@ -90,6 +90,10 @@ struct SupportTicketDTO: Decodable, Identifiable, Hashable {
     let id: Int
     let ticket_number: String?
     let subject: String?
+    /// Who the ticket was addressed to. Nil means anokiX Support; a value means the
+    /// trader raised it with that distributor instead.
+    let distributor_id: Int?
+    let distributor_name: String?
     let category: String?
     /// "web" | "callback".
     let channel: String?
@@ -185,6 +189,9 @@ final class SupportStore: ObservableObject {
     /// Non-nil while showing search results rather than the popular topics.
     @Published private(set) var activeQuery: String?
 
+    /// The trader's distributors, for the "Who should answer this?" picker.
+    @Published private(set) var distributors: [TraderDistributorDTO] = []
+
     private var popular: [SupportArticleDTO] = []
 
     var hasAnyChannel: Bool {
@@ -207,6 +214,16 @@ final class SupportStore: ObservableObject {
                 ?? "Could not load the Support Centre."
         }
         loading = false
+    }
+
+    /// Loaded alongside the overview so the Create Ticket sheet opens with the picker
+    /// ready. A failure is silent — the picker then offers anokiX Support only, which
+    /// is the default anyway.
+    func loadDistributors() async {
+        guard distributors.isEmpty else { return }
+        if let data = try? await APIClient.shared.getDistributors() {
+            distributors = data.distributors
+        }
     }
 
     func runSearch() async {
