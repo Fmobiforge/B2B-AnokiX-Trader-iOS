@@ -542,14 +542,19 @@ final class APIClient {
     }
 
     /// The Limes VAS category tree (api/common/vas/categories). Flatten via `.leaves`.
-    func getVasCategories() async throws -> VasCategoriesData {
-        let data = try await get("api/common/vas/categories", query: [:])
+    /// Scoped to the customer being acted for — see `selectVasCustomer`.
+    func getVasCategories(customerId: String = "") async throws -> VasCategoriesData {
+        let data = try await get("api/common/vas/categories", query: Self.customerScope(customerId))
         return VasCategoriesData(json: data)
     }
 
     /// Purchasable products for one leaf category (api/common/vas/products).
-    func getVasProducts(category: String, page: Int, limit: Int) async throws -> VasProductsData {
-        let q: [String: String] = ["category": category, "page": String(page), "limit": String(limit)]
+    func getVasProducts(category: String, page: Int, limit: Int,
+                        customerId: String = "") async throws -> VasProductsData {
+        var q = Self.customerScope(customerId)
+        q["category"] = category
+        q["page"] = String(page)
+        q["limit"] = String(limit)
         let data = try await get("api/common/vas/products", query: q)
         return VasProductsData(json: data)
     }
@@ -558,18 +563,108 @@ final class APIClient {
     /// wallet; the server debits and forwards to Limes. Only status/message decide
     /// success — the failure path carries the network's reason (e.g. inactive subscriber).
     func purchaseVas(productId: String, msisdn: String, amount: Double, sku: String,
-                     name: String, category: String) async throws {
-        let form: [String: String] = [
-            "product_id": productId,
-            "msisdn": msisdn,
-            "amount": String(amount),
-            "sku": sku,
-            "name": name,
-            "category": category,
-            // Postman collection sends earn_commission=1 so the trader accrues VAS commission.
-            "earn_commission": "1"
-        ]
+                     name: String, category: String, customerId: String = "") async throws {
+        var form = Self.customerScope(customerId)
+        form["product_id"] = productId
+        form["msisdn"] = msisdn
+        form["amount"] = String(amount)
+        form["sku"] = sku
+        form["name"] = name
+        form["category"] = category
+        // Postman collection sends earn_commission=1 so the trader accrues VAS commission.
+        form["earn_commission"] = "1"
         try await postFormStatus("api/common/vas/purchase", form: form)
+    }
+
+    /// Register an end-customer in the Limes CRM (api/common/vas/onboard-customer). Step 1 of
+    /// signing someone up to a SIM subscription; upserts by ID number, so a retry reports
+    /// `already_exists` rather than creating a duplicate.
+    func onboardVasCustomer(form: [String: String]) async throws -> VasOnboardCustomerData {
+        let data = try await postForm("api/common/vas/onboard-customer", form: form)
+        return VasOnboardCustomerData(json: data)
+    }
+
+    /// Build — but do not send — the JSON body an onboard would POST to Limes
+    /// (api/common/vas/onboard-customer/preview). Runs no validation, so a half-filled form
+    /// still previews.
+    func previewVasOnboard(form: [String: String]) async throws -> VasOnboardPreviewData {
+        let data = try await postForm("api/common/vas/onboard-customer/preview", form: form)
+        return VasOnboardPreviewData(json: data)
+    }
+
+    /// End-customers this trader has onboarded (api/common/vas/customers). Pass `activeOnly`
+    /// to ask for the ACT customers only — that is the list the "Acting as" picker offers,
+    /// because Limes will not authenticate as a customer who is not active yet.
+    func getVasCustomers(search: String, limit: Int,
+                         activeOnly: Bool) async throws -> VasCustomersData {
+        var q: [String: String] = ["search": search, "limit": String(limit)]
+        if activeOnly { q["active"] = "1" }
+        let data = try await get("api/common/vas/customers", query: q)
+        return VasCustomersData(json: data)
+    }
+
+    /// Authenticate as an onboarded customer (api/common/vas/select-customer). Limes issues its
+    /// token per customer, so the Subscription, Catalog & orders and Dynamic services tabs only
+    /// work once this has been approved; every later call on those tabs carries the same
+    /// `customer_id`.
+    func selectVasCustomer(customerId: String) async throws -> VasSelectCustomerData {
+        let data = try await postForm("api/common/vas/select-customer",
+                                      form: Self.customerScope(customerId))
+        return VasSelectCustomerData(json: data)
+    }
+
+    /// SIM subscription products offered by the "Assign a SIM" form (never hardcode these).
+    func getVasSubscriptionProducts(customerId: String) async throws -> VasSubscriptionProductsData {
+        let data = try await get("api/common/vas/subscription-products",
+                                 query: Self.customerScope(customerId))
+        return VasSubscriptionProductsData(json: data)
+    }
+
+    /// SIMs already activated for the selected customer, with the MSISDN Limes assigned to each.
+    func getVasSubscriptions(customerId: String) async throws -> VasSubscriptionsData {
+        let data = try await get("api/common/vas/subscriptions",
+                                 query: Self.customerScope(customerId))
+        return VasSubscriptionsData(json: data)
+    }
+
+    /// Activate a SIM / create a subscription (api/common/vas/subscribe). An eSIM carries no
+    /// ICCID, so `e_sim=1` is sent instead of the serial; a physical "SIM in hand" sends its
+    /// ICCID and activates immediately.
+    func subscribeVas(productId: String, iccid: String, eSim: Bool,
+                      customerId: String) async throws {
+        var form = Self.customerScope(customerId)
+        form["product_id"] = productId
+        if eSim {
+            form["e_sim"] = "1"
+        } else {
+            form["iccid"] = iccid
+        }
+        try await postFormStatus("api/common/vas/subscribe", form: form)
+    }
+
+    /// Provision custom/variable-value bundles straight onto a number
+    /// (api/common/vas/dynamic-services) — the path Limes recommends over order/create for
+    /// amounts the fixed catalog cannot express. Expects a JSON body, so the service lines go
+    /// through `postJSON`; the charge is the sum of `priceInCents`.
+    func provisionVasDynamicServices(msisdn: String, services: [[String: Any]],
+                                     customerId: String) async throws {
+        var body: [String: Any] = [
+            "msisdn": msisdn,
+            // Postman collection sends earn_commission=1 so the trader accrues their commission.
+            "earn_commission": 1,
+            "services": services,
+        ]
+        let trimmed = customerId.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty { body["customer_id"] = trimmed }
+        _ = try await postJSON("api/common/vas/dynamic-services", json: body)
+    }
+
+    /// A fresh parameter map already carrying `customer_id`. Limes runs these calls on the
+    /// customer's own token, so the id travels with every request the three customer-scoped
+    /// tabs make; a blank id is simply omitted rather than sent as an empty string.
+    private static func customerScope(_ customerId: String) -> [String: String] {
+        let trimmed = customerId.trimmingCharacters(in: .whitespaces)
+        return trimmed.isEmpty ? [:] : ["customer_id": trimmed]
     }
 
     // MARK: - Reports

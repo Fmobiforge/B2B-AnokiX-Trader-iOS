@@ -341,7 +341,7 @@ struct SellVasSection: View {
             Task { await store.selectCategory(node) }
         } label: {
             VStack(alignment: .center, spacing: 8) {
-                Image(systemName: AirtimeView.icon(for: node.id, node.name))
+                Image(systemName: VasIcons.icon(for: node.id, node.name))
                     .font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.purple)
                     .frame(width: 36, height: 36)
                     .background(Brand.purpleLight).clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -559,7 +559,7 @@ struct SellVasSection: View {
         if msisdn.isEmpty {
             present("Check your details", "Please enter the recipient's mobile number."); return false
         }
-        if !AirtimeView.isValidMsisdn(msisdn) {
+        if !VasFormat.isValidMsisdn(msisdn) {
             present("Check your details", "Enter a valid mobile number, e.g. 082 123 4567."); return false
         }
         if currentAmount <= 0 {

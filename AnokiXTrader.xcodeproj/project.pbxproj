@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		0095424E02EAEFB39A1D6877 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F75C1AF3A56E1801EF1281F /* Router.swift */; };
 		089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBED6C6 /* AirtimeView.swift */; };
+		089E251C090E74AC57FA0005 /* VasCatalogSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */; };
+		089E251C090E74AC57FA0003 /* VasCustomersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */; };
+		089E251C090E74AC57FA0006 /* VasDynamicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */; };
+		089E251C090E74AC57FA0002 /* VasOnboardSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */; };
+		089E251C090E74AC57FA0001 /* VasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA001 /* VasStore.swift */; };
+		089E251C090E74AC57FA0004 /* VasSubscriptionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */; };
 		0B1AB0EC013D8D8CDFE0D0FF /* LoginSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0BD4EA705CED9C275DB284 /* LoginSessionStore.swift */; };
 		1842E1407450875EAAE44D2C /* NotificationsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769FAF853B246C981F194D0C /* NotificationsStore.swift */; };
 		2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */; };
@@ -164,6 +170,12 @@
 		CE42037E5EC246A2151C3F48 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
 		D33A859C7376D341F499F337 /* InvoicesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesStore.swift; sourceTree = "<group>"; };
 		D3DE53611F2413423FBED6C6 /* AirtimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeView.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCatalogSection.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCustomersSection.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasDynamicSection.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasOnboardSection.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA001 /* VasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasStore.swift; sourceTree = "<group>"; };
+		D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasSubscriptionSection.swift; sourceTree = "<group>"; };
 		D6D4F331CC341D3A0F0125C4 /* CategoryProductsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryProductsView.swift; sourceTree = "<group>"; };
 		D6DAFD016859ED78D8D45E23 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
@@ -230,6 +242,12 @@
 			isa = PBXGroup;
 			children = (
 				D3DE53611F2413423FBED6C6 /* AirtimeView.swift */,
+				D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */,
+				D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */,
+				D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */,
+				D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */,
+				D3DE53611F2413423FBEA001 /* VasStore.swift */,
+				D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */,
 			);
 			path = Airtime;
 			sourceTree = "<group>";
@@ -700,6 +718,12 @@
 			files = (
 				B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */,
 				089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */,
+				089E251C090E74AC57FA0005 /* VasCatalogSection.swift in Sources */,
+				089E251C090E74AC57FA0003 /* VasCustomersSection.swift in Sources */,
+				089E251C090E74AC57FA0006 /* VasDynamicSection.swift in Sources */,
+				089E251C090E74AC57FA0002 /* VasOnboardSection.swift in Sources */,
+				089E251C090E74AC57FA0001 /* VasStore.swift in Sources */,
+				089E251C090E74AC57FA0004 /* VasSubscriptionSection.swift in Sources */,
 				DD649D6F74AFA986EAEEF9DD /* AllCategoriesView.swift in Sources */,
 				2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */,
 				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,
