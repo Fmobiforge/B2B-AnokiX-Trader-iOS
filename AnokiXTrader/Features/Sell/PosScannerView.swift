@@ -104,21 +104,30 @@ final class PosScannerController: NSObject, ObservableObject, AVCaptureMetadataO
     @Published private(set) var status: Status = .idle
     @Published private(set) var hasTorch = false
     @Published private(set) var torchOn = false
+    /// True while a rung-up code is still in front of the lens — drives the "move the
+    /// item away" prompt so the cashier can see why the next read is not landing.
+    @Published private(set) var isHolding = false
 
     let session = AVCaptureSession()
-    /// Called on the main thread with each accepted (debounced) code.
+    /// Called on the main thread with each accepted code.
     var onCode: ((String) -> Void)?
 
-    /// Ignore a repeat of the same code inside this window (one label, many frames).
-    private static let sameCodeCooldown: TimeInterval = 1.5
+    /// A rung-up code counts again only once it has been out of frame for this long.
+    private static let separation: TimeInterval = 0.9
+    /// Nothing at all is accepted for this long after an accept — one item per gesture.
+    private static let deadTime: TimeInterval = 0.6
 
     private let sessionQueue = DispatchQueue(label: "com.anokix.pos.scanner")
     private var configured = false
     /// The device actually opened — the torch belongs to this camera, not "the default one".
     private var device: AVCaptureDevice?
     private var mode: PosScanMode = .barcode
-    private var lastCode: String?
-    private var lastCodeAt: Date = .distantPast
+    /// Codes already rung up and still in front of the lens: code → when last seen.
+    private var heldCodes: [String: Date] = [:]
+    private var lastAcceptedAt: Date = .distantPast
+    /// The metadata delegate only fires on change, so a held code that simply stops being
+    /// reported would never be released. This sweeps them on a timer instead.
+    private var releaseTimer: Timer?
 
     /// Ask for camera access if needed, then wire and start the session.
     func start(mode: PosScanMode) {
@@ -139,6 +148,8 @@ final class PosScannerController: NSObject, ObservableObject, AVCaptureMetadataO
 
     func stop() {
         setTorch(on: false)
+        releaseTimer?.invalidate()
+        releaseTimer = nil
         sessionQueue.async { [session] in
             if session.isRunning { session.stopRunning() }
         }
@@ -159,6 +170,7 @@ final class PosScannerController: NSObject, ObservableObject, AVCaptureMetadataO
             DispatchQueue.main.async {
                 self.hasTorch = torch
                 self.status = .running
+                self.startReleaseTimer()
             }
         }
     }
@@ -212,31 +224,62 @@ final class PosScannerController: NSObject, ObservableObject, AVCaptureMetadataO
         }
     }
 
-    // MARK: AVCaptureMetadataOutputObjectsDelegate
+    // MARK: Scan separation
 
+    /// A label sits in front of the lens continuously, so a code is rung up once and then
+    /// *held*: it cannot be rung up again until it has been out of frame for `separation`.
+    /// That is the physical gesture a cashier already makes — scan, move the item aside,
+    /// scan the next — and presenting the same item again still deliberately adds a second
+    /// unit. A short dead time after every accept stops a second label in the same shot
+    /// being swept up with the first.
+    ///
+    /// Codes are held whatever the outcome, so an unknown or out-of-stock label reports
+    /// once instead of hammering the banner for as long as it is in view.
     func metadataOutput(_ output: AVCaptureMetadataOutput,
                         didOutput metadataObjects: [AVMetadataObject],
                         from connection: AVCaptureConnection) {
+        let now = Date()
+        var visible: [String] = []
         for object in metadataObjects {
             guard let readable = object as? AVMetadataMachineReadableCodeObject,
                   let value = readable.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !value.isEmpty else { continue }
-            // The same label sits in front of the lens for many frames — only act once per
-            // pass. Re-presenting it after the cooldown deliberately adds another unit.
-            if value == lastCode, Date().timeIntervalSince(lastCodeAt) < Self.sameCodeCooldown {
-                return
-            }
-            lastCode = value
-            lastCodeAt = Date()
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            onCode?(value)
-            return
+                  !value.isEmpty, !visible.contains(value) else { continue }
+            visible.append(value)
+        }
+
+        // Refresh the hold on anything still in view, then release what has cleared.
+        for code in visible where heldCodes[code] != nil { heldCodes[code] = now }
+        releaseClearedHolds(now: now)
+
+        guard now.timeIntervalSince(lastAcceptedAt) >= Self.deadTime,
+              let next = visible.first(where: { heldCodes[$0] == nil }) else { return }
+
+        heldCodes[next] = now
+        lastAcceptedAt = now
+        isHolding = true
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        onCode?(next)
+    }
+
+    private func startReleaseTimer() {
+        releaseTimer?.invalidate()
+        releaseTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
+            self?.releaseClearedHolds(now: Date())
         }
     }
 
-    /// A typed code is an explicit request, so it bypasses the scan cooldown.
-    func clearDebounce() {
-        lastCode = nil
+    /// Drops holds whose code has been absent long enough to count as a fresh presentation.
+    private func releaseClearedHolds(now: Date) {
+        guard !heldCodes.isEmpty else { return }
+        heldCodes = heldCodes.filter { now.timeIntervalSince($0.value) < Self.separation }
+        let holding = !heldCodes.isEmpty
+        if holding != isHolding { isHolding = holding }
+    }
+
+    /// A typed code is an explicit request, so it skips the hold entirely. The dead time
+    /// still applies, so the camera cannot pile a scan on top of what was just typed.
+    func noteManualEntry() {
+        lastAcceptedAt = Date()
     }
 }
 
@@ -365,8 +408,11 @@ struct PosScanView: View {
         ZStack {
             if controller.status == .running {
                 CameraPreview(session: controller.session)
+                // Green frame while a scan is held: it reads at a glance that the code
+                // landed and the item has to move away before the next one counts.
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color.white.opacity(0.7), lineWidth: 2)
+                    .stroke(controller.isHolding ? Color(hex: "#4ADE80") : Color.white.opacity(0.7),
+                            lineWidth: 2)
                     .padding(26)
                 VStack {
                     HStack {
@@ -381,8 +427,11 @@ struct PosScanView: View {
                         }
                     }
                     Spacer()
-                    Text(mode.aimHint)
+                    Text(controller.isHolding
+                         ? "Scanned — move the item away for the next one"
+                         : mode.aimHint)
                         .font(.system(size: 11)).foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 12).padding(.vertical, 5)
                         .background(Color.black.opacity(0.4)).clipShape(Capsule())
                 }
@@ -479,7 +528,7 @@ struct PosScanView: View {
             feedback = Feedback(tone: .warning, message: "Enter or scan a code first.")
             return
         }
-        controller.clearDebounce()
+        controller.noteManualEntry()
         resolve(code)
     }
 
