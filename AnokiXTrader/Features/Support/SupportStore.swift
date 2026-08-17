@@ -1,15 +1,52 @@
 import SwiftUI
 
+// MARK: - Lenient list decoding
+
+/// Wraps one element so a row the app does not recognise decodes to nil instead of
+/// throwing and taking the whole response with it.
+private struct FailableElement<T: Decodable>: Decodable {
+    let value: T?
+    init(from decoder: Decoder) throws {
+        value = try? T(from: decoder)
+    }
+}
+
+extension KeyedDecodingContainer {
+    /// Decodes a list element by element, dropping any element that fails, and returning
+    /// `[]` when the key is missing or null.
+    ///
+    /// The Support endpoints grow fields as the knowledge base fills up — `categories`
+    /// and `popular` shipped as empty arrays and later gained real rows with different
+    /// keys — and one unexpected row must never blank the entire Support Centre.
+    func decodeLenientList<T: Decodable>(_ type: T.Type, forKey key: Key) -> [T] {
+        guard let rows = try? decode([FailableElement<T>].self, forKey: key) else { return [] }
+        return rows.compactMap(\.value)
+    }
+}
+
 // MARK: - Support DTOs (GET api/common/support/*)
 
 /// Envelope `data` for the Support Centre landing screen.
 struct SupportOverviewData: Decodable {
     let channels: SupportChannels?
     /// Help-article topics. Empty while the knowledge base is still being written.
-    let categories: [SupportCategoryDTO]?
-    let popular: [SupportArticleDTO]?
-    let tickets: [SupportTicketDTO]?
+    let categories: [SupportCategoryDTO]
+    let popular: [SupportArticleDTO]
+    let tickets: [SupportTicketDTO]
     let inbox_awaiting: Int?
+
+    private enum CodingKeys: String, CodingKey {
+        case channels, categories, popular, tickets, inbox_awaiting
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        channels = try? c.decode(SupportChannels.self, forKey: .channels)
+        categories = c.decodeLenientList(SupportCategoryDTO.self, forKey: .categories)
+        popular = c.decodeLenientList(SupportArticleDTO.self, forKey: .popular)
+        tickets = c.decodeLenientList(SupportTicketDTO.self, forKey: .tickets)
+        inbox_awaiting = try? c.decode(Int.self, forKey: .inbox_awaiting)
+    }
 }
 
 /// Envelope `data` shared by create / detail / reply / close — all return the ticket.
@@ -20,8 +57,17 @@ struct SupportTicketData: Decodable {
 /// Envelope `data` for GET .../articles/search.
 struct SupportArticlesData: Decodable {
     let query: String?
-    let articles: [SupportArticleDTO]?
+    let articles: [SupportArticleDTO]
     let total: Int?
+
+    private enum CodingKeys: String, CodingKey { case query, articles, total }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        query = try? c.decode(String.self, forKey: .query)
+        articles = c.decodeLenientList(SupportArticleDTO.self, forKey: .articles)
+        total = try? c.decode(Int.self, forKey: .total)
+    }
 }
 
 /// Which ways of reaching support are switched on for this merchant.
@@ -72,17 +118,40 @@ struct SupportPhone: Decodable {
     let number: String?
 }
 
+/// A help-article topic. The API identifies it by `slug`; earlier builds of the endpoint
+/// called that field `key`, so both are accepted and `code` picks whichever arrived.
 struct SupportCategoryDTO: Decodable, Identifiable, Hashable {
-    let key: String
-    let name: String
+    let id: Int
+    let slug: String?
+    let key: String?
+    let name: String?
+    let description: String?
+    let icon: String?
+    let article_count: Int?
 
-    var id: String { key }
+    /// What goes to the API as `category` when a ticket is raised under this topic.
+    var code: String { slug ?? key ?? String(id) }
+
+    var label: String { name ?? slug ?? "" }
 }
 
+/// One help article. The API calls the sub-line `summary`; earlier builds called it
+/// `excerpt`, so both are accepted and `blurb` picks whichever arrived.
 struct SupportArticleDTO: Decodable, Identifiable, Hashable {
     let id: Int
+    let slug: String?
     let title: String?
+    let summary: String?
     let excerpt: String?
+    let category_id: Int?
+    let view_count: Int?
+    let is_popular: Bool?
+    let updated_at: String?
+
+    var blurb: String? {
+        let text = (summary?.isEmpty == false ? summary : excerpt) ?? ""
+        return text.isEmpty ? nil : text
+    }
 }
 
 /// One support ticket. `messages` is only populated by the detail endpoint.
@@ -205,9 +274,9 @@ final class SupportStore: ObservableObject {
         do {
             let data = try await APIClient.shared.getSupportOverview()
             channels = data.channels
-            categories = data.categories ?? []
-            tickets = data.tickets ?? []
-            popular = data.popular ?? []
+            categories = data.categories
+            tickets = data.tickets
+            popular = data.popular
             if activeQuery == nil { articles = popular }
         } catch {
             self.error = (error as? LocalizedError)?.errorDescription
@@ -236,7 +305,7 @@ final class SupportStore: ObservableObject {
         do {
             let data = try await APIClient.shared.searchSupportArticles(query: q)
             activeQuery = q
-            articles = data.articles ?? []
+            articles = data.articles
         } catch {
             self.error = (error as? LocalizedError)?.errorDescription
                 ?? "Could not search help articles."
