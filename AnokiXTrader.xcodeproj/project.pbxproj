@@ -9,13 +9,10 @@
 /* Begin PBXBuildFile section */
 		0095424E02EAEFB39A1D6877 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F75C1AF3A56E1801EF1281F /* Router.swift */; };
 		089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBED6C6 /* AirtimeView.swift */; };
-		089E251C090E74AC57FA0005 /* VasCatalogSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */; };
-		089E251C090E74AC57FA0003 /* VasCustomersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */; };
-		089E251C090E74AC57FA0006 /* VasDynamicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */; };
-		089E251C090E74AC57FA0002 /* VasOnboardSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */; };
-		089E251C090E74AC57FA0001 /* VasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA001 /* VasStore.swift */; };
-		089E251C090E74AC57FA0004 /* VasSubscriptionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */; };
+		0906AAB387256FA08A9D966F /* Pods_AnokiXTrader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565CA7DE88D535F2AAAB9491 /* Pods_AnokiXTrader.framework */; };
+		0A8CA1D3DB029B060D101518 /* SupportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9195969A53F40E3608DFEEDC /* SupportStore.swift */; };
 		0B1AB0EC013D8D8CDFE0D0FF /* LoginSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0BD4EA705CED9C275DB284 /* LoginSessionStore.swift */; };
+		15C353B33D145587F19E4041 /* TicketDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF3CC10A8EE7B3DF96917613 /* TicketDetailView.swift */; };
 		1842E1407450875EAAE44D2C /* NotificationsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769FAF853B246C981F194D0C /* NotificationsStore.swift */; };
 		2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */; };
 		2369EDFE471C35354D6997E3 /* Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = A058E017BA9BA068BC2E1877 /* Countries.swift */; };
@@ -28,7 +25,6 @@
 		2E0B39DF03179E89939D61E9 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6DAFD016859ED78D8D45E23 /* CartView.swift */; };
 		2E51E622B0213BC63968E4D7 /* SellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7082192B3DDD613321065A12 /* SellView.swift */; };
 		2EC4BAB894F6CDB12B62C03C /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DECDA888C08ACE1B86A0781B /* CollectionView.swift */; };
-		2F11CFE517B946EDE833629A /* Pods_AnokiXTrader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 710750FD48DB95CB33EC5D09 /* Pods_AnokiXTrader.framework */; };
 		34582004C88BF77B66CFE030 /* CountryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47BD78E4A8DD0FA0CED8681 /* CountryPicker.swift */; };
 		3659A9B45D723EFE347AB8FE /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85815C108EB14B5430C3EA /* DashboardView.swift */; };
 		3725C1D11D64A40150C99D62 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CFF0CFD267320664843B8F /* AppState.swift */; };
@@ -42,18 +38,18 @@
 		48B95C52921CAC08C9EF7EEB /* DrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53374834E1AC2497ECAEA4B /* DrawerView.swift */; };
 		492108A66D59B7100387F5F1 /* FinancesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FFDED181FB33A7C847AEBE4 /* FinancesView.swift */; };
 		4A2290C14A17C19DBD8221D4 /* CategoryProductsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F016AAC1A2787D3E2D0A3259 /* CategoryProductsStore.swift */; };
+		4D33851EF0CD539059722C26 /* ReportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC7C9B882C9EBB6CFB598B6 /* ReportsStore.swift */; };
+		4D432D3EC6018D90113E801F /* VasDynamicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E0BF25EBF42C53B30E5D8D /* VasDynamicSection.swift */; };
 		4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33EB8CFD0367FAAB3893276F /* WalletView.swift */; };
+		4E2BB14107AAC53511E9A646 /* VasOnboardSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F293D63E294C1FFED7C76B /* VasOnboardSection.swift */; };
 		4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06637A2B06D216E2F1B0658 /* RegisterStore.swift */; };
 		53812E40F29C21E91AFA708F /* DistributorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C90FCEF9CF3611879C11FCD /* DistributorsView.swift */; };
 		60ECBBB292F95D184EF3B8D9 /* GoodsReceivedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9269454048A047F3893596 /* GoodsReceivedStore.swift */; };
+		6638C641999242A38460CC6C /* PosScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B1FA93ABE2AE92EED5ED39 /* PosScannerView.swift */; };
 		677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB04209 /* SupportView.swift */; };
-		677B5C29C764B279D6F9DA01 /* SupportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */; };
-		677B5C29C764B279D6F9DA02 /* TicketDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */; };
-		E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */; };
-		E5931ABD3B33362FDF1EDA04 /* StaffStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA04 /* StaffStore.swift */; };
-		E5931ABD3B33362FDF1EDA05 /* StaffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578DA05 /* StaffView.swift */; };
 		6CA2E6E526E270A298991A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */; };
 		6D219969E4FD69F7DE0951A9 /* PendingApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C502BC529C4C1BBC3C28B7DC /* PendingApprovalView.swift */; };
+		6DE837D0040F219AB56F0FF9 /* VasCustomersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B12C412A69EFF40A458D2A2 /* VasCustomersSection.swift */; };
 		721EE0D0B8ABD611948249E1 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DE7437334DA56F6AD49A88 /* MarketplaceView.swift */; };
 		729ED384727D56B70CFA732F /* PromotionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3DBA1D66EFDA2BE7A8DA88 /* PromotionsStore.swift */; };
 		779D758D64356A4B138522C7 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CCBD2699E321399EB3D035E /* RegisterView.swift */; };
@@ -71,26 +67,30 @@
 		9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A20C9413C35FB20B0B107 /* FormControls.swift */; };
 		A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */; };
 		A2CDDDB7DAAFE31A6826465F /* GoogleMapsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646DCD9992E8853358C469A6 /* GoogleMapsConfig.swift */; };
+		A624FD51F0B67C1EA06C552C /* StaffStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3BA8019084FD147BC488A9 /* StaffStore.swift */; };
 		ACB47341F1822723610294AB /* CategoryFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD0B2B3D2EA2C1E4200F6F /* CategoryFilterSheet.swift */; };
 		AD604D9B696B45022E451A80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C23167F101A111EA84DC70 /* ImagePicker.swift */; };
 		AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */; };
 		B2227D7A07E6D7951EE50C72 /* OrdersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C6EFE6FE72F72F58C22DFC /* OrdersStore.swift */; };
+		B2FB195DE8FEA9F74E8D62C7 /* StaffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C95D2936F2B61271BD4ED08E /* StaffView.swift */; };
 		B3EEA239B2C155F0AA87D629 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E529C7B1DAFFD3AF6115A1FE /* SettingsStore.swift */; };
 		B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45ABCF6DDF19CCCBC918459 /* APIClient.swift */; };
 		B7FE79C560EA947DE6A5F1C0 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */; };
 		BD6AE32B880CBF9E9A214C7E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8E2816C9AA8FA5DD1EB8BE /* NotificationsView.swift */; };
 		BD7DA638C431380ABC6D72FE /* ListModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F35932C814CC82ABBC7B893 /* ListModules.swift */; };
+		BE2B42FFD0A4A094DFF3820B /* VasSubscriptionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B135D0DEFC8A33E89EC776B6 /* VasSubscriptionSection.swift */; };
 		C63A23ACD6ED6B0712EA0313 /* InvoicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCABD1C8C98F030AA4E35535 /* InvoicesView.swift */; };
 		CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */; };
 		CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DE3F070404C0632ED5C5B /* Rows.swift */; };
 		CE65F3EE276DC1E3E30EC877 /* PosStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2953B76239F2C95A2E756AA8 /* PosStore.swift */; };
-		CE65F3EE276DC1E3E30EC878 /* PosScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2953B76239F2C95A2E756AA9 /* PosScannerView.swift */; };
 		CF355F71848EC8C248CDA429 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E94660470A7F090BF9FC18 /* PushManager.swift */; };
+		D057F6D03A05DAF13FC9A9C7 /* VasCatalogSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A25D880E4EB411BCF50319D /* VasCatalogSection.swift */; };
 		D9689BE5E91E7EF0F6FFC897 /* PromotionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 896B4C430CD03267D678732A /* PromotionsView.swift */; };
 		DD649D6F74AFA986EAEEF9DD /* AllCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D4CACE4F4473AF6D680216 /* AllCategoriesView.swift */; };
 		DE17AE0DFFD598D9C24C36AE /* InventoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02E8A3DA0FC91E4B365D7F /* InventoryStore.swift */; };
 		DEF1FCA355BF842F6349EAD0 /* GoodsReturnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */; };
 		DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD2 /* RewardsView.swift */; };
+		E2B6785F1D0163E2AD36F68B /* VasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7A08FB54AC95DA45563273 /* VasStore.swift */; };
 		E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578A29E /* ReportsView.swift */; };
 		E70206EE4C1DD86CA1B92DB8 /* InvoicesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33A859C7376D341F499F337 /* InvoicesStore.swift */; };
 		F06E668924D75A5A7528933A /* CollectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666633CA9A56BF13DF4DB944 /* CollectionStore.swift */; };
@@ -102,21 +102,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0253750B6D5BCED6762D6F42 /* Pods-AnokiXTrader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.release.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.release.xcconfig"; sourceTree = "<group>"; };
 		06FBF424F9F984CD97815E7B /* ScrollVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollVisibility.swift; sourceTree = "<group>"; };
 		07E94660470A7F090BF9FC18 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		0CFD0B2B3D2EA2C1E4200F6F /* CategoryFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFilterSheet.swift; sourceTree = "<group>"; };
+		0D3BA8019084FD147BC488A9 /* StaffStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffStore.swift; sourceTree = "<group>"; };
+		0E7A08FB54AC95DA45563273 /* VasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasStore.swift; sourceTree = "<group>"; };
 		11CD2B00377D56966727ED1C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		13F8675480A0D9DBAEFCCDBE /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		1A47C4FD93E9A214C578A29E /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
-		1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsStore.swift; sourceTree = "<group>"; };
-		1A47C4FD93E9A214C578DA04 /* StaffStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffStore.swift; sourceTree = "<group>"; };
-		1A47C4FD93E9A214C578DA05 /* StaffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffView.swift; sourceTree = "<group>"; };
-		608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportStore.swift; sourceTree = "<group>"; };
-		608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailView.swift; sourceTree = "<group>"; };
 		1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
+		24F293D63E294C1FFED7C76B /* VasOnboardSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasOnboardSection.swift; sourceTree = "<group>"; };
 		2953B76239F2C95A2E756AA8 /* PosStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosStore.swift; sourceTree = "<group>"; };
-		2953B76239F2C95A2E756AA9 /* PosScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosScannerView.swift; sourceTree = "<group>"; };
+		2B12C412A69EFF40A458D2A2 /* VasCustomersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCustomersSection.swift; sourceTree = "<group>"; };
+		2BC7C9B882C9EBB6CFB598B6 /* ReportsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsStore.swift; sourceTree = "<group>"; };
 		2FFDED181FB33A7C847AEBE4 /* FinancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesView.swift; sourceTree = "<group>"; };
 		30EC97510470126022012D6C /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		33EB8CFD0367FAAB3893276F /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
@@ -126,11 +124,14 @@
 		3D85815C108EB14B5430C3EA /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		3F4F80FD3B29A95F61A789B4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		3F75C1AF3A56E1801EF1281F /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		4798EDBDD49C57DFB7CD4297 /* Pods-AnokiXTrader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.release.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.release.xcconfig"; sourceTree = "<group>"; };
 		480ADE15FE92A9892833F379 /* AnokiXTrader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnokiXTrader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B02E8A3DA0FC91E4B365D7F /* InventoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryStore.swift; sourceTree = "<group>"; };
 		4DEAA2988953FDC67C3CD299 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		51577DA880A26AF354B85026 /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		51A7CB16714ECF11A5961575 /* Charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Charts.swift; sourceTree = "<group>"; };
+		53E0BF25EBF42C53B30E5D8D /* VasDynamicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasDynamicSection.swift; sourceTree = "<group>"; };
+		565CA7DE88D535F2AAAB9491 /* Pods_AnokiXTrader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXTrader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F0BD4EA705CED9C275DB284 /* LoginSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSessionStore.swift; sourceTree = "<group>"; };
 		5F35932C814CC82ABBC7B893 /* ListModules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListModules.swift; sourceTree = "<group>"; };
 		5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMedia.swift; sourceTree = "<group>"; };
@@ -141,7 +142,6 @@
 		666633CA9A56BF13DF4DB944 /* CollectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionStore.swift; sourceTree = "<group>"; };
 		6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnokiXTraderApp.swift; sourceTree = "<group>"; };
 		7082192B3DDD613321065A12 /* SellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SellView.swift; sourceTree = "<group>"; };
-		710750FD48DB95CB33EC5D09 /* Pods_AnokiXTrader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXTrader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72B9CD271808E91C6276A68A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		769FAF853B246C981F194D0C /* NotificationsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsStore.swift; sourceTree = "<group>"; };
 		7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceRealView.swift; sourceTree = "<group>"; };
@@ -152,6 +152,9 @@
 		8B589B818C89B8738187D91C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8C9269454048A047F3893596 /* GoodsReceivedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReceivedStore.swift; sourceTree = "<group>"; };
 		8D9DE3F070404C0632ED5C5B /* Rows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rows.swift; sourceTree = "<group>"; };
+		9195969A53F40E3608DFEEDC /* SupportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportStore.swift; sourceTree = "<group>"; };
+		97B1FA93ABE2AE92EED5ED39 /* PosScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosScannerView.swift; sourceTree = "<group>"; };
+		9A25D880E4EB411BCF50319D /* VasCatalogSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCatalogSection.swift; sourceTree = "<group>"; };
 		9C719EC9CD9BDEABDF7BC9BD /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
 		A058E017BA9BA068BC2E1877 /* Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countries.swift; sourceTree = "<group>"; };
 		A40821D1A0F4B489085DF015 /* AuthViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViews.swift; sourceTree = "<group>"; };
@@ -160,6 +163,8 @@
 		AAE6BA0B5EB7344BC6CB33E4 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
 		AB80068A9FE9DCC4FDF43B6B /* LogoCrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoCrop.swift; sourceTree = "<group>"; };
 		ADC260DDC3352A2C5183A6AB /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
+		AF3CC10A8EE7B3DF96917613 /* TicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailView.swift; sourceTree = "<group>"; };
+		B135D0DEFC8A33E89EC776B6 /* VasSubscriptionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasSubscriptionSection.swift; sourceTree = "<group>"; };
 		B40D502CBEB08D436613B429 /* GoodsReceivedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReceivedView.swift; sourceTree = "<group>"; };
 		B9C5B6B5A06A214A5053FED5 /* FinancesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesStore.swift; sourceTree = "<group>"; };
 		BC3DBA1D66EFDA2BE7A8DA88 /* PromotionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionsStore.swift; sourceTree = "<group>"; };
@@ -169,22 +174,17 @@
 		C1C6EFE6FE72F72F58C22DFC /* OrdersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersStore.swift; sourceTree = "<group>"; };
 		C502BC529C4C1BBC3C28B7DC /* PendingApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingApprovalView.swift; sourceTree = "<group>"; };
 		C6B7C23EF6695669B46657AB /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		C95D2936F2B61271BD4ED08E /* StaffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffView.swift; sourceTree = "<group>"; };
 		CE42037E5EC246A2151C3F48 /* ImageCompression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompression.swift; sourceTree = "<group>"; };
 		D33A859C7376D341F499F337 /* InvoicesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesStore.swift; sourceTree = "<group>"; };
 		D3DE53611F2413423FBED6C6 /* AirtimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeView.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCatalogSection.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasCustomersSection.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasDynamicSection.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasOnboardSection.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA001 /* VasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasStore.swift; sourceTree = "<group>"; };
-		D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasSubscriptionSection.swift; sourceTree = "<group>"; };
 		D6D4F331CC341D3A0F0125C4 /* CategoryProductsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryProductsView.swift; sourceTree = "<group>"; };
 		D6DAFD016859ED78D8D45E23 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		DB612ABA91D12C36D7EED74B /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		DCABD1C8C98F030AA4E35535 /* InvoicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicesView.swift; sourceTree = "<group>"; };
 		DECDA888C08ACE1B86A0781B /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
-		DF05BE0EC9017F61E4AEF035 /* Pods-AnokiXTrader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.debug.xcconfig"; sourceTree = "<group>"; };
 		E06637A2B06D216E2F1B0658 /* RegisterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterStore.swift; sourceTree = "<group>"; };
+		E0986F1605BDDBE43D098344 /* Pods-AnokiXTrader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXTrader.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader.debug.xcconfig"; sourceTree = "<group>"; };
 		E3F74BEB997D7CF8424A7DA3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E45ABCF6DDF19CCCBC918459 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		E47BD78E4A8DD0FA0CED8681 /* CountryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryPicker.swift; sourceTree = "<group>"; };
@@ -201,11 +201,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		FCC6B0FB928860DF8F40C4B4 /* Frameworks */ = {
+		4DA131C23E4FDD42098074E5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F11CFE517B946EDE833629A /* Pods_AnokiXTrader.framework in Frameworks */,
+				0906AAB387256FA08A9D966F /* Pods_AnokiXTrader.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,12 +244,12 @@
 			isa = PBXGroup;
 			children = (
 				D3DE53611F2413423FBED6C6 /* AirtimeView.swift */,
-				D3DE53611F2413423FBEA005 /* VasCatalogSection.swift */,
-				D3DE53611F2413423FBEA003 /* VasCustomersSection.swift */,
-				D3DE53611F2413423FBEA006 /* VasDynamicSection.swift */,
-				D3DE53611F2413423FBEA002 /* VasOnboardSection.swift */,
-				D3DE53611F2413423FBEA001 /* VasStore.swift */,
-				D3DE53611F2413423FBEA004 /* VasSubscriptionSection.swift */,
+				9A25D880E4EB411BCF50319D /* VasCatalogSection.swift */,
+				2B12C412A69EFF40A458D2A2 /* VasCustomersSection.swift */,
+				53E0BF25EBF42C53B30E5D8D /* VasDynamicSection.swift */,
+				24F293D63E294C1FFED7C76B /* VasOnboardSection.swift */,
+				0E7A08FB54AC95DA45563273 /* VasStore.swift */,
+				B135D0DEFC8A33E89EC776B6 /* VasSubscriptionSection.swift */,
 			);
 			path = Airtime;
 			sourceTree = "<group>";
@@ -281,6 +281,15 @@
 			path = Finances;
 			sourceTree = "<group>";
 		};
+		309AE29AE1CFD518F138CF42 /* Staff */ = {
+			isa = PBXGroup;
+			children = (
+				0D3BA8019084FD147BC488A9 /* StaffStore.swift */,
+				C95D2936F2B61271BD4ED08E /* StaffView.swift */,
+			);
+			path = Staff;
+			sourceTree = "<group>";
+		};
 		34A76ECF5B4F0863E9AA3CEB /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -310,9 +319,9 @@
 		358157AE6940D676FA4C820C /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				608FEEC642C83E3A7CB0DA01 /* SupportStore.swift */,
+				9195969A53F40E3608DFEEDC /* SupportStore.swift */,
 				608FEEC642C83E3A7CB04209 /* SupportView.swift */,
-				608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */,
+				AF3CC10A8EE7B3DF96917613 /* TicketDetailView.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -333,8 +342,8 @@
 			children = (
 				350A4D40187E3A7C5296A489 /* AnokiXTrader */,
 				A03BFA308D2320DDBD9096FC /* Products */,
-				722ACFCB76644B37C7267D56 /* Pods */,
-				4DCBA7CACF860B603C778E15 /* Frameworks */,
+				A87920248C30746FBED5AA41 /* Pods */,
+				775A2A9DC3F05A02C20AAA04 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -344,14 +353,6 @@
 				3D85815C108EB14B5430C3EA /* DashboardView.swift */,
 			);
 			path = Dashboard;
-			sourceTree = "<group>";
-		};
-		4DCBA7CACF860B603C778E15 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				710750FD48DB95CB33EC5D09 /* Pods_AnokiXTrader.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		574F9FEAF9FB19CE75C21E97 /* Distributors */ = {
@@ -400,15 +401,6 @@
 			path = Inventory;
 			sourceTree = "<group>";
 		};
-		722ACFCB76644B37C7267D56 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				DF05BE0EC9017F61E4AEF035 /* Pods-AnokiXTrader.debug.xcconfig */,
-				0253750B6D5BCED6762D6F42 /* Pods-AnokiXTrader.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		756C23A3BD8E77A123F7C68B /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -431,11 +423,19 @@
 				E92BF74EBA358C1F946B514D /* Rewards */,
 				C571E0BFEB3B5853FAB32160 /* Sell */,
 				79FBC6A258795BB76854C21E /* Settings */,
-				C757C805EBF59FB2AFAA0FDA /* Staff */,
+				309AE29AE1CFD518F138CF42 /* Staff */,
 				358157AE6940D676FA4C820C /* Support */,
 				9EDCB7D214B49EE4323357E9 /* Wallet */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		775A2A9DC3F05A02C20AAA04 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				565CA7DE88D535F2AAAB9491 /* Pods_AnokiXTrader.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		79FBC6A258795BB76854C21E /* Settings */ = {
@@ -490,6 +490,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A87920248C30746FBED5AA41 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E0986F1605BDDBE43D098344 /* Pods-AnokiXTrader.debug.xcconfig */,
+				4798EDBDD49C57DFB7CD4297 /* Pods-AnokiXTrader.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		B05F20D1F87FD4B18FBB69ED /* Marketplace */ = {
 			isa = PBXGroup;
 			children = (
@@ -526,7 +535,7 @@
 			isa = PBXGroup;
 			children = (
 				BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */,
-				2953B76239F2C95A2E756AA9 /* PosScannerView.swift */,
+				97B1FA93ABE2AE92EED5ED39 /* PosScannerView.swift */,
 				2953B76239F2C95A2E756AA8 /* PosStore.swift */,
 				7082192B3DDD613321065A12 /* SellView.swift */,
 			);
@@ -536,19 +545,10 @@
 		C757C805EBF59FB2AFAA0F7F /* Reports */ = {
 			isa = PBXGroup;
 			children = (
-				1A47C4FD93E9A214C578DA03 /* ReportsStore.swift */,
+				2BC7C9B882C9EBB6CFB598B6 /* ReportsStore.swift */,
 				1A47C4FD93E9A214C578A29E /* ReportsView.swift */,
 			);
 			path = Reports;
-			sourceTree = "<group>";
-		};
-		C757C805EBF59FB2AFAA0FDA /* Staff */ = {
-			isa = PBXGroup;
-			children = (
-				1A47C4FD93E9A214C578DA04 /* StaffStore.swift */,
-				1A47C4FD93E9A214C578DA05 /* StaffView.swift */,
-			);
-			path = Staff;
 			sourceTree = "<group>";
 		};
 		DAEA340379A1B59D9733D0F0 /* Auth */ = {
@@ -585,12 +585,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC637E665592A8178E1D1211 /* Build configuration list for PBXNativeTarget "AnokiXTrader" */;
 			buildPhases = (
-				83E650DB7F20AD164011EA01 /* [CP] Check Pods Manifest.lock */,
+				018A124C889A13DE4928A061 /* [CP] Check Pods Manifest.lock */,
 				9B7ECE0C125BAB8B092E47CA /* Sources */,
 				052DFADCF26CAAC1E67112D3 /* Resources */,
-				FCC6B0FB928860DF8F40C4B4 /* Frameworks */,
-				1CEA83F908665BCAF1BBBD0C /* [CP] Embed Pods Frameworks */,
-				E32CE18A2EBB5AC36E3F13C3 /* [CP] Copy Pods Resources */,
+				4DA131C23E4FDD42098074E5 /* Frameworks */,
+				1F6710C4EDD22A6260D3BBEF /* [CP] Embed Pods Frameworks */,
+				FD50D006CF1DD4EBC7C5DF1A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -648,28 +648,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1CEA83F908665BCAF1BBBD0C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		83E650DB7F20AD164011EA01 /* [CP] Check Pods Manifest.lock */ = {
+		018A124C889A13DE4928A061 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -691,7 +670,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E32CE18A2EBB5AC36E3F13C3 /* [CP] Copy Pods Resources */ = {
+		1F6710C4EDD22A6260D3BBEF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXTrader/Pods-AnokiXTrader-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FD50D006CF1DD4EBC7C5DF1A /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -721,12 +721,6 @@
 			files = (
 				B407F5B308E19FB886BC9BBB /* APIClient.swift in Sources */,
 				089E251C090E74AC57F95C52 /* AirtimeView.swift in Sources */,
-				089E251C090E74AC57FA0005 /* VasCatalogSection.swift in Sources */,
-				089E251C090E74AC57FA0003 /* VasCustomersSection.swift in Sources */,
-				089E251C090E74AC57FA0006 /* VasDynamicSection.swift in Sources */,
-				089E251C090E74AC57FA0002 /* VasOnboardSection.swift in Sources */,
-				089E251C090E74AC57FA0001 /* VasStore.swift in Sources */,
-				089E251C090E74AC57FA0004 /* VasSubscriptionSection.swift in Sources */,
 				DD649D6F74AFA986EAEEF9DD /* AllCategoriesView.swift in Sources */,
 				2099EBA1F0CE190C4E0D7D08 /* AnalyticsView.swift in Sources */,
 				A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */,
@@ -782,7 +776,7 @@
 				B2227D7A07E6D7951EE50C72 /* OrdersStore.swift in Sources */,
 				41D6B2D1E0FEF1819044BA23 /* OrdersView.swift in Sources */,
 				6D219969E4FD69F7DE0951A9 /* PendingApprovalView.swift in Sources */,
-				CE65F3EE276DC1E3E30EC878 /* PosScannerView.swift in Sources */,
+				6638C641999242A38460CC6C /* PosScannerView.swift in Sources */,
 				CE65F3EE276DC1E3E30EC877 /* PosStore.swift in Sources */,
 				AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */,
 				729ED384727D56B70CFA732F /* PromotionsStore.swift in Sources */,
@@ -791,9 +785,7 @@
 				4EF2C66BD3B7C6C5E9DFA3B5 /* RegisterStore.swift in Sources */,
 				779D758D64356A4B138522C7 /* RegisterView.swift in Sources */,
 				CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */,
-				E5931ABD3B33362FDF1EDA03 /* ReportsStore.swift in Sources */,
-				E5931ABD3B33362FDF1EDA04 /* StaffStore.swift in Sources */,
-				E5931ABD3B33362FDF1EDA05 /* StaffView.swift in Sources */,
+				4D33851EF0CD539059722C26 /* ReportsStore.swift in Sources */,
 				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
 				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
 				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,
@@ -802,10 +794,18 @@
 				2E51E622B0213BC63968E4D7 /* SellView.swift in Sources */,
 				B3EEA239B2C155F0AA87D629 /* SettingsStore.swift in Sources */,
 				932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */,
-				677B5C29C764B279D6F9DA01 /* SupportStore.swift in Sources */,
+				A624FD51F0B67C1EA06C552C /* StaffStore.swift in Sources */,
+				B2FB195DE8FEA9F74E8D62C7 /* StaffView.swift in Sources */,
+				0A8CA1D3DB029B060D101518 /* SupportStore.swift in Sources */,
 				677B5C29C764B279D6F9D692 /* SupportView.swift in Sources */,
-				677B5C29C764B279D6F9DA02 /* TicketDetailView.swift in Sources */,
 				458BC0E954255207E98812AC /* Theme.swift in Sources */,
+				15C353B33D145587F19E4041 /* TicketDetailView.swift in Sources */,
+				D057F6D03A05DAF13FC9A9C7 /* VasCatalogSection.swift in Sources */,
+				6DE837D0040F219AB56F0FF9 /* VasCustomersSection.swift in Sources */,
+				4D432D3EC6018D90113E801F /* VasDynamicSection.swift in Sources */,
+				4E2BB14107AAC53511E9A646 /* VasOnboardSection.swift in Sources */,
+				E2B6785F1D0163E2AD36F68B /* VasStore.swift in Sources */,
+				BE2B42FFD0A4A094DFF3820B /* VasSubscriptionSection.swift in Sources */,
 				4D5B0D35C1248A9D3585AB12 /* WalletView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -826,12 +826,11 @@
 /* Begin XCBuildConfiguration section */
 		0464EAD31C31DA38F728A6A3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DF05BE0EC9017F61E4AEF035 /* Pods-AnokiXTrader.debug.xcconfig */;
+			baseConfigurationReference = E0986F1605BDDBE43D098344 /* Pods-AnokiXTrader.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXTrader/AnokiXTrader.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = W792YDC6GY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -852,7 +851,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -861,12 +860,11 @@
 		};
 		BD5476E3E29C05D58D7A2B76 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0253750B6D5BCED6762D6F42 /* Pods-AnokiXTrader.release.xcconfig */;
+			baseConfigurationReference = 4798EDBDD49C57DFB7CD4297 /* Pods-AnokiXTrader.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXTrader/AnokiXTrader.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = W792YDC6GY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -887,7 +885,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -949,7 +947,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1010,7 +1008,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
