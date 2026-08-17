@@ -186,8 +186,8 @@ struct SupportView: View {
                                 Text(article.title ?? "—")
                                     .font(.system(size: 13))
                                     .foregroundColor(Brand.textPrimary)
-                                if let excerpt = article.excerpt, !excerpt.isEmpty {
-                                    Text(excerpt)
+                                if let blurb = article.blurb {
+                                    Text(blurb)
                                         .font(.system(size: 11))
                                         .foregroundColor(Brand.textSecondary)
                                         .lineLimit(2)
@@ -455,7 +455,7 @@ private struct SupportRequestSheet: View {
         }
         .sheet(isPresented: $showCategoryPicker) {
             SelectOptionsSheet(title: "Topic",
-                               options: categories.map { ($0.key, $0.name) },
+                               options: categories.map { ($0.code, $0.label) },
                                selection: $category)
         }
         .sheet(isPresented: $showAudiencePicker) {
@@ -515,7 +515,7 @@ private struct SupportRequestSheet: View {
     }
 
     private var selectedCategoryName: String {
-        categories.first(where: { $0.key == category })?.name ?? ""
+        categories.first(where: { $0.code == category })?.label ?? ""
     }
 
     private var canSubmit: Bool {
