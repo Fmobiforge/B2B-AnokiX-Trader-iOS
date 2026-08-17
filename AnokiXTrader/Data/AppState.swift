@@ -41,6 +41,11 @@ final class Cart: ObservableObject {
         }
     }
 
+    /// Units of this product already on the sale — 0 if it is not on it.
+    func qty(of id: String) -> Int {
+        lines.first(where: { $0.id == id })?.qty ?? 0
+    }
+
     func setQty(_ id: String, _ qty: Int) {
         guard let idx = lines.firstIndex(where: { $0.id == id }) else { return }
         if qty <= 0 {

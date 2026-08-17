@@ -84,6 +84,7 @@
 		CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA91A73B54FD1CD38D72BAA /* RemoteMedia.swift */; };
 		CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9DE3F070404C0632ED5C5B /* Rows.swift */; };
 		CE65F3EE276DC1E3E30EC877 /* PosStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2953B76239F2C95A2E756AA8 /* PosStore.swift */; };
+		CE65F3EE276DC1E3E30EC878 /* PosScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2953B76239F2C95A2E756AA9 /* PosScannerView.swift */; };
 		CF355F71848EC8C248CDA429 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E94660470A7F090BF9FC18 /* PushManager.swift */; };
 		D9689BE5E91E7EF0F6FFC897 /* PromotionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 896B4C430CD03267D678732A /* PromotionsView.swift */; };
 		DD649D6F74AFA986EAEEF9DD /* AllCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D4CACE4F4473AF6D680216 /* AllCategoriesView.swift */; };
@@ -115,6 +116,7 @@
 		608FEEC642C83E3A7CB0DA02 /* TicketDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailView.swift; sourceTree = "<group>"; };
 		1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoodsReturnsView.swift; sourceTree = "<group>"; };
 		2953B76239F2C95A2E756AA8 /* PosStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosStore.swift; sourceTree = "<group>"; };
+		2953B76239F2C95A2E756AA9 /* PosScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosScannerView.swift; sourceTree = "<group>"; };
 		2FFDED181FB33A7C847AEBE4 /* FinancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesView.swift; sourceTree = "<group>"; };
 		30EC97510470126022012D6C /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		33EB8CFD0367FAAB3893276F /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 			isa = PBXGroup;
 			children = (
 				BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */,
+				2953B76239F2C95A2E756AA9 /* PosScannerView.swift */,
 				2953B76239F2C95A2E756AA8 /* PosStore.swift */,
 				7082192B3DDD613321065A12 /* SellView.swift */,
 			);
@@ -779,6 +782,7 @@
 				B2227D7A07E6D7951EE50C72 /* OrdersStore.swift in Sources */,
 				41D6B2D1E0FEF1819044BA23 /* OrdersView.swift in Sources */,
 				6D219969E4FD69F7DE0951A9 /* PendingApprovalView.swift in Sources */,
+				CE65F3EE276DC1E3E30EC878 /* PosScannerView.swift in Sources */,
 				CE65F3EE276DC1E3E30EC877 /* PosStore.swift in Sources */,
 				AEE5E9B4FC7DCA8A8B3E57F3 /* ProductDetailView.swift in Sources */,
 				729ED384727D56B70CFA732F /* PromotionsStore.swift in Sources */,
@@ -834,7 +838,7 @@
 				INFOPLIST_FILE = AnokiXTrader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan product barcodes and QR codes at the till, and capture your store logo and verification documents.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show your position on the map and help you find and confirm delivery addresses when placing orders.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -869,7 +873,7 @@
 				INFOPLIST_FILE = AnokiXTrader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AnokiX Trader";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Capture your store logo and verification documents.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan product barcodes and QR codes at the till, and capture your store logo and verification documents.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show your position on the map and help you find and confirm delivery addresses when placing orders.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Attach your store logo and verification documents.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
