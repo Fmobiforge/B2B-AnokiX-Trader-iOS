@@ -64,8 +64,8 @@ enum MockData {
         // Hidden for now — anokiX wallet and anokiX rewards are not part of the
         // current release. Keep these entries so the menu can be restored later.
         // (The wallet screen itself is still in the build — Tab.wallet / WalletView.)
-        // MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
-        // MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
+        MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
+        MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
         MenuItem("airtime", "Airtime & VAS", subtitle: "    ", icon: "antenna.radiowaves.left.and.right"),
         MenuItem("analytics", "Analytics", icon: "chart.bar.fill"),
         MenuItem("reports", "Reports", icon: "doc.text.fill"),
