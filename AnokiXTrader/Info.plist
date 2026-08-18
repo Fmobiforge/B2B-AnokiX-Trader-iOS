@@ -32,5 +32,24 @@
 		<string>tel</string>
 		<string>mailto</string>
 	</array>
+	<!--
+		anokix:// — the return_url handed to PayCloud when a wallet top-up starts, so the
+		checkout page can hand the trader back to the app when it is done. It carries no
+		result we act on: the wallet is credited by PayCloud's signed webhook, verified
+		server-side, so the redirect only prompts a status poll (see TopUpSheet).
+	-->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.anokix.traderapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>anokix</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

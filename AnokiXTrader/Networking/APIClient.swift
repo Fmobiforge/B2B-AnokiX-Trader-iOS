@@ -110,9 +110,65 @@ final class APIClient {
 
     /// Live wallet balance. The `data` block is the wallet object itself — the same
     /// shape as the dashboard's `wallet` node — so it reuses `DashWalletDTO`.
-    func getWallet() async throws -> DashWalletDTO {
-        let data = try await get("api/common/wallet", query: [:])
+    ///
+    /// `refresh` sends `refresh=1` to bypass the server's short-lived balance cache —
+    /// what the manual refresh button on the Wallet screen wants, so a trader who has
+    /// just been paid sees it immediately.
+    func getWallet(refresh: Bool = false) async throws -> DashWalletDTO {
+        let data = try await get("api/common/wallet", query: refresh ? ["refresh": "1"] : [:])
         return try decode(data)
+    }
+
+    // MARK: Wallet — top-ups + debit orders
+
+    /// Start a PayCloud Hosted Checkout to fund the wallet. The response carries the
+    /// `pay_url` to open in a browser and the `merchant_order_no` to poll
+    /// `getTopupStatus` with afterwards. `returnUrl` is where PayCloud sends the trader
+    /// once the checkout page is finished with.
+    func createTopup(amount: String, returnUrl: String) async throws -> TopupCreateDTO {
+        let data = try await postForm("api/common/topup/create",
+                                      form: ["amount": amount,
+                                             "portal": "trader",
+                                             "return_url": returnUrl])
+        return try decode(data)
+    }
+
+    /// Where a top-up got to. `status=paid` only means the card was taken — the money is
+    /// in the wallet when `credit_status=credited`.
+    func getTopupStatus(merchantOrderNo: String) async throws -> TopupStatusDTO {
+        let data = try await get("api/common/topup/status",
+                                 query: ["merchant_order_no": merchantOrderNo])
+        return try decode(data)
+    }
+
+    /// Debit orders standing against the trader's own wallet, plus the create-form limits.
+    func getDebitRequests() async throws -> DebitRequestsData {
+        let data = try await get("api/common/debit-requests", query: [:])
+        return try decode(data)
+    }
+
+    /// Authorise IMB to debit the trader's own wallet. `onceOff` true collects once and
+    /// both dates are ignored; false is a monthly recurring debit and BOTH dates are then
+    /// required ("yyyy-MM-dd") — IMB debits monthly from `nextDebitDate` up to and
+    /// including `finalDebitDate`.
+    ///
+    /// The account debited is resolved server-side from the caller's wallet, so nothing
+    /// here identifies an account.
+    @discardableResult
+    func createDebitRequest(amount: String, reference: String, onceOff: Bool,
+                            nextDebitDate: String?, finalDebitDate: String?)
+        async throws -> (DebitRequestDTO, String?) {
+        var form = ["amount": amount,
+                    "reference": reference,
+                    "once_off": onceOff ? "true" : "false",
+                    "portal": "trader"]
+        if !onceOff {
+            form["next_debit_date"] = nextDebitDate ?? ""
+            form["final_debit_date"] = finalDebitDate ?? ""
+        }
+        let (data, message) = try await postFormWithMessage("api/common/debit-requests", form: form)
+        let created: DebitRequestDTO = try decode(data)
+        return (created, message)
     }
 
     func getMarketplace(distributorId: String?) async throws -> MarketplaceData {

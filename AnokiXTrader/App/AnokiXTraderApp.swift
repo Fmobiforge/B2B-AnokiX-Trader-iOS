@@ -37,6 +37,16 @@ struct AnokiXTraderApp: App {
                 .environmentObject(session)
                 .environmentObject(MarketStore.shared)
                 .tint(Brand.purple)
+                .onOpenURL { url in
+                    // anokix://topup-return — PayCloud is finished with the wallet
+                    // top-up checkout page. It carries no result we would trust: the
+                    // wallet is credited by PayCloud's signed webhook, verified
+                    // server-side, so all this does is close the browser and let the
+                    // Top Up sheet ask the server where the order actually got to.
+                    if url.scheme?.lowercased() == "anokix", url.host == "topup-return" {
+                        NotificationCenter.default.post(name: .topupReturned, object: nil)
+                    }
+                }
         }
     }
 }
