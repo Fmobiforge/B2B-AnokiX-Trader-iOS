@@ -28,7 +28,7 @@ struct MakeOrderView: View {
 
     private let payments: [(key: String, title: String, subtitle: String)] = [
         ("wallet", "Wallet Balance", "anokiX wallet"),
-        ("credit", "Credit Account", "Pay on terms"),
+        //("credit", "Credit Account", "Pay on terms"),
         ("card", "Card Payment", "Visa, Mastercard"),
         ("bank", "Bank Transfer", "EFT / Instant EFT")
     ]
