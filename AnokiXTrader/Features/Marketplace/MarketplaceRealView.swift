@@ -384,7 +384,7 @@ struct MarketplaceRealView: View {
     private func onMenu(_ idx: Int, _ proxy: ScrollViewProxy) {
         switch idx {
         case 0, 3: router.presented = nil; router.tab = .orders
-        case 1: router.presented = nil; router.tab = .wallet
+        case 1: router.presented = .wallet
         case 2: toastMsg = "Coming soon"
         case 4: withAnimation { proxy.scrollTo("promotions", anchor: .top) }
         case 5: router.presented = .airtime

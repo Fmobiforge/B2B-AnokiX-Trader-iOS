@@ -5,6 +5,10 @@ import UIKit
 /// two things a trader can actually do with it from a phone — put money in with a card
 /// (PayCloud top-up) and stand a debit order against it.
 ///
+/// Presented as a module of its own (`Module.wallet`) rather than a tab, so Close returns
+/// the trader to whatever they were doing — the counterpart of Android `WalletActivity`.
+/// `ModuleHost` supplies the navigation bar and the Close button.
+///
 /// The web portal's Send Money / Pay Bills / Move to Bank / QR tiles are not here. There
 /// is no API behind any of them for a trader, and a wallet screen that offers to move a
 /// shopkeeper's money and then cannot is worse than one that does not offer.
@@ -17,24 +21,20 @@ struct WalletView: View {
     @State private var toastMsg: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScreenHeader(title: "anokiX wallet", subtitle: "Manage your money — Powered by IMB")
-            ScrollView {
-                // Stacked in the portal's reading order (wallet01.png): balance, then
-                // the settlement account, then the actions grid, then the two lists.
-                VStack(spacing: 16) {
-                    balanceCard
-                    accountCard
-                    actionGrid
-                    transactionsCard
-                    debitOrdersCard
-                }
-                .padding(16)
+        ScrollView {
+            // Stacked in the portal's reading order (wallet01.png): balance, then
+            // the settlement account, then the actions grid, then the two lists.
+            VStack(spacing: 16) {
+                balanceCard
+                accountCard
+                actionGrid
+                transactionsCard
+                debitOrdersCard
             }
-            .background(Brand.background)
-            .refreshable { await store.load() }
+            .padding(16)
         }
-        .navigationBarHidden(true)
+        .background(Brand.background)
+        .refreshable { await store.load() }
         .toast($toastMsg)
         .task { if store.wallet == nil { await store.load() } }
         .sheet(isPresented: $showTopUp) {
@@ -200,7 +200,7 @@ struct WalletView: View {
                     .foregroundColor(tint)
                     .frame(width: 46, height: 46)
                     .background(tile)
-                    .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .clipShape(Circle())
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Brand.textPrimary)
@@ -228,37 +228,68 @@ struct WalletView: View {
         showDebitOrder = true
     }
 
-    // MARK: - IMB account
+    // MARK: - Settlement account
 
     private var accountCard: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "building.columns")
-                .font(.system(size: 16))
-                .foregroundColor(Brand.purple)
-                .frame(width: 40, height: 40)
-                .background(Brand.purpleLight)
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-            VStack(alignment: .leading, spacing: 2) {
-                Text("IMB Business Account")
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                Text(store.accountNumber ?? "—")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Settlement Account")
+                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+
+            HStack(spacing: 12) {
+                Image(systemName: "building.columns")
+                    .font(.system(size: 16))
+                    .foregroundColor(Brand.purple)
+                    .frame(width: 42, height: 42)
+                    .background(Brand.purpleLight)
+                    .clipShape(Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("IMB Business Account")
+                        .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    Text(store.accountNumber.map(spacedOut) ?? "—")
+                        .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                }
+                Spacer()
+                if let number = store.accountNumber {
+                    Button {
+                        UIPasteboard.general.string = number
+                        toastMsg = "Account number copied"
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 15))
+                            .foregroundColor(Brand.purple)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Copy account number")
+                }
+            }
+
+            if WalletFmt.parse(store.wallet?.activated_at) != nil {
+                Text("Activated \(WalletFmt.day(store.wallet?.activated_at))")
                     .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
             }
-            Spacer()
-            if let number = store.accountNumber {
-                Button {
-                    UIPasteboard.general.string = number
-                    toastMsg = "Account number copied"
-                } label: {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 15))
-                        .foregroundColor(Brand.textSecondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Copy account number")
+
+            Button { router.presented = .finances } label: {
+                Text("View statement")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Brand.purple)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Brand.purple, lineWidth: 1))
             }
+            .buttonStyle(.plain)
         }
         .card(padding: 14)
+    }
+
+    /// Groups an 11-digit account number as 462 103 060 83 so it can be read back aloud.
+    private func spacedOut(_ number: String) -> String {
+        var out = ""
+        for (i, ch) in number.enumerated() {
+            if i > 0 && i % 3 == 0 { out.append(" ") }
+            out.append(ch)
+        }
+        return out
     }
 
     // MARK: - Recent transactions
@@ -269,14 +300,31 @@ struct WalletView: View {
             if store.transactions.isEmpty {
                 emptyLine("No transactions yet.")
             } else {
+                // Grouped under date headers as it is laid out: the list arrives flat
+                // and newest-first, and a run of bare timestamps reads as a log.
                 VStack(spacing: 0) {
                     ForEach(Array(store.transactions.enumerated()), id: \.offset) { idx, t in
+                        let day = WalletFmt.dayHeader(t.date)
+                        if idx == 0 || day != WalletFmt.dayHeader(store.transactions[idx - 1].date) {
+                            dayHeader(day)
+                        } else {
+                            Divider()
+                        }
                         transactionRow(t)
-                        if idx < store.transactions.count - 1 { Divider() }
                     }
                 }
             }
         }
+    }
+
+    private func dayHeader(_ label: String) -> some View {
+        Text(label.uppercased())
+            .font(.system(size: 11, weight: .bold))
+            .kerning(0.6)
+            .foregroundColor(Brand.textTertiary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 12)
+            .padding(.bottom, 2)
     }
 
     private func transactionRow(_ t: DashWalletTxnDTO) -> some View {
@@ -285,17 +333,21 @@ struct WalletView: View {
         let value = Double(t.amount ?? "0") ?? 0
         let incoming = value >= 0
         let tone = incoming ? Brand.success : Brand.danger
+        // Pale tile behind a saturated glyph — both opaque, so the icon reads clearly
+        // whatever the row happens to sit on.
+        let tile = incoming ? Brand.successBg : Brand.dangerBg
         return HStack(spacing: 12) {
             Image(systemName: incoming ? "arrow.down.left" : "arrow.up.right")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(tone)
                 .frame(width: 38, height: 38)
-                .background(tone.opacity(0.12))
+                .background(tile)
                 .clipShape(Circle())
             VStack(alignment: .leading, spacing: 2) {
                 Text(incoming ? "Money in" : "Money out")
                     .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                Text(WalletFmt.dateTime(t.date))
+                // The date is already on the group header above, so the row shows the time.
+                Text(WalletFmt.time(t.date) ?? "—")
                     .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
             }
             Spacer()

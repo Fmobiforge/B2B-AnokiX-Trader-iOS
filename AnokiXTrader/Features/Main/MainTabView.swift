@@ -87,8 +87,6 @@ struct MainTabView: View {
             NavigationStack { SellView() }
         case .orders:
             NavigationStack { OrdersView() }
-        case .wallet:
-            NavigationStack { WalletView() }
         case .more:
             NavigationStack { MoreView() }
         }
@@ -138,6 +136,7 @@ struct ModuleHost: View {
                 case .notifications: NotificationsView()
                 case .settings:      SettingsView()
                 case .support:       SupportView()
+                case .wallet:        WalletView()
                 }
             }
             .navigationTitle(hidesSystemNavBar ? "" : module.title)

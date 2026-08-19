@@ -361,6 +361,17 @@ enum WalletFmt {
         return formatter("dd MMM yyyy").string(from: d)
     }
 
+    /// The header a run of transactions sits under: "Today" / "Yesterday" / "07 Aug 2026".
+    /// The wallet API returns one flat, newest-first list, so the grouping is derived
+    /// here — ten bare timestamps in a column is a log, not a statement.
+    static func dayHeader(_ raw: String?) -> String {
+        guard let d = parse(raw) else { return "Earlier" }
+        let cal = Calendar.current
+        if cal.isDateInToday(d) { return "Today" }
+        if cal.isDateInYesterday(d) { return "Yesterday" }
+        return formatter("dd MMM yyyy").string(from: d)
+    }
+
     /// The API's date format for both debit dates.
     static func apiDay(_ date: Date) -> String {
         formatter("yyyy-MM-dd").string(from: date)

@@ -231,14 +231,14 @@ struct DashboardView: View {
             }
 
             HStack(spacing: 10) {
-                Button { router.tab = .wallet } label: {
+                Button { router.presented = .wallet } label: {
                     Text("Add Money")
                         .font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
                         .frame(maxWidth: .infinity).padding(.vertical, 10)
                         .background(Brand.purple)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
-                Button { router.tab = .wallet } label: {
+                Button { router.presented = .wallet } label: {
                     Text("Send Money")
                         .font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
                         .frame(maxWidth: .infinity).padding(.vertical, 10)
@@ -250,7 +250,7 @@ struct DashboardView: View {
             .buttonStyle(.plain)
             .padding(.top, 14)
 
-            Button("View Transactions →") { router.tab = .wallet }
+            Button("View Transactions →") { router.presented = .wallet }
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(Brand.purple)
                 .padding(.top, 12)

@@ -1,12 +1,17 @@
 import SwiftUI
 
-enum Tab: Hashable { case home, sell, orders, wallet, more }
+enum Tab: Hashable { case home, sell, orders, more }
 
 /// Secondary modules reached from the drawer / More tab / quick actions.
 /// Presented as a full-screen cover over the tab bar (matches the Android Activities).
 enum Module: String, Identifiable, Hashable {
     case inventory, marketplace, cart, payments, airtime, rewards, sales, invoices, finances, distributors
     case promotions, customers, analytics, reports, staff, notifications, settings, support
+    /// The anokiX wallet is a screen of its own, not a tab — it is opened from the
+    /// drawer, the dashboard card and a returning PayCloud checkout, and closing it
+    /// should return the trader to whatever they were doing (matches Android
+    /// `WalletActivity`).
+    case wallet
     /// Raw values match the drawer keys so Router.route can resolve them.
     case goodsReceived = "goods_received"
     case goodsReturns = "goods_returns"
@@ -34,6 +39,7 @@ enum Module: String, Identifiable, Hashable {
         case .notifications: return "Notifications"
         case .settings: return "Settings"
         case .support: return "Support Centre"
+        case .wallet: return "anokiX wallet"
         }
     }
 }
@@ -66,7 +72,7 @@ final class Router: ObservableObject {
         case "home":   tab = .home
         case "sell":   tab = .sell
         case "orders": tab = .orders
-        case "wallet": tab = .wallet
+        case "wallet": presented = .wallet
         default:
             if let m = Module(rawValue: key) { presented = m }
         }
@@ -102,7 +108,7 @@ final class Router: ObservableObject {
         case .returns:       presented = .goodsReturns
         case .invoice:       presented = .invoices
         case .finance:       presented = .finances
-        case .wallet:        presented = nil; tab = .wallet
+        case .wallet:        presented = .wallet
         case .inventory:     presented = .inventory
         case .vas:           presented = .airtime
         case .promotion:     presented = .promotions

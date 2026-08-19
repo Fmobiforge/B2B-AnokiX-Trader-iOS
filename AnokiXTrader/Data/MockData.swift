@@ -63,7 +63,7 @@ enum MockData {
         MenuItem("distributors", "Distributors", icon: "building.2.fill"),
         // Hidden for now — anokiX wallet and anokiX rewards are not part of the
         // current release. Keep these entries so the menu can be restored later.
-        // (The wallet screen itself is still in the build — Tab.wallet / WalletView.)
+        // (The wallet screen itself is still in the build — Module.wallet / WalletView.)
         MenuItem("wallet", "anokiX wallet", subtitle: "Powered by IMB", icon: "wallet.pass.fill"),
         MenuItem("rewards", "anokiX rewards", subtitle: "Powered by Limes", icon: "gift.fill"),
         MenuItem("airtime", "Airtime & VAS", subtitle: "    ", icon: "antenna.radiowaves.left.and.right"),

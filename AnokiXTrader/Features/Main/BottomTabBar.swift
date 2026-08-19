@@ -16,11 +16,9 @@ struct BottomTabBar: View {
         Item(tab: .home, title: "Dashboard", icon: "house.fill"),
         Item(tab: .sell, title: "POS", icon: "bag.fill"),
         Item(tab: .orders, title: "Orders", icon: "shippingbox.fill"),
-        // Hidden for now — the anokiX wallet is not a bottom-nav destination in the
-        // current release (matches Android `MainActivity.hideWalletTab()`). `Tab.wallet`
-        // still exists and still renders WalletView: the drawer entry and the Dashboard
-        // wallet card route to it. Uncomment this line to bring the tab back.
-        // Item(tab: .wallet, title: "Wallet", icon: "wallet.pass.fill"),
+        // No wallet tab: the anokiX wallet is a screen of its own (`Module.wallet`,
+        // matching Android `WalletActivity`), opened from the drawer and the Dashboard
+        // wallet card rather than lived in as a tab.
         Item(tab: .more, title: "More", icon: "ellipsis"),
     ]
 
