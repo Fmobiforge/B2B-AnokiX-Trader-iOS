@@ -20,10 +20,12 @@ struct WalletView: View {
         VStack(spacing: 0) {
             ScreenHeader(title: "anokiX wallet", subtitle: "Manage your money — Powered by IMB")
             ScrollView {
+                // Stacked in the portal's reading order (wallet01.png): balance, then
+                // the settlement account, then the actions grid, then the two lists.
                 VStack(spacing: 16) {
                     balanceCard
-                    actionGrid
                     accountCard
+                    actionGrid
                     transactionsCard
                     debitOrdersCard
                 }
@@ -168,33 +170,43 @@ struct WalletView: View {
 
     // MARK: - Quick actions
 
+    /// The tiles sit inside one card, as on the portal, rather than being four cards.
     private var actionGrid: some View {
-        HStack(spacing: 8) {
-            action("Add Money", "plus", Brand.success) { openTopUp() }
-            action("Debit Order", "calendar", Brand.info) { openDebitOrder() }
-            action("Buy Airtime", "antenna.radiowaves.left.and.right", Brand.warning) {
-                router.presented = .airtime
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quick Actions")
+                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+            HStack(spacing: 4) {
+                action("Add Money", "plus", Brand.success, Brand.successBg) { openTopUp() }
+                action("Debit Order", "calendar", Brand.info, Brand.infoBg) { openDebitOrder() }
+                action("Buy Airtime", "antenna.radiowaves.left.and.right",
+                       Brand.warning, Brand.warningBg) { router.presented = .airtime }
+                // "Statement" is the wallet ledger, which is exactly what Finances shows.
+                action("Statement", "doc.text", Brand.purple, Brand.purpleLight) {
+                    router.presented = .finances
+                }
             }
-            // "Statement" is the wallet ledger, which is exactly what Finances shows.
-            action("Statement", "doc.text", Brand.purple) { router.presented = .finances }
         }
+        .card()
     }
 
-    private func action(_ title: String, _ icon: String, _ tint: Color,
+    /// Pale tile, saturated glyph — the tile colour must stay far lighter than the icon
+    /// colour or the icon disappears into its own background.
+    private func action(_ title: String, _ icon: String, _ tint: Color, _ tile: Color,
                         _ tap: @escaping () -> Void) -> some View {
         Button(action: tap) {
             VStack(spacing: 8) {
-                Image(systemName: icon).font(.system(size: 17)).foregroundColor(tint)
+                Image(systemName: icon)
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundColor(tint)
+                    .frame(width: 46, height: 46)
+                    .background(tile)
+                    .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Brand.textPrimary)
-                    .lineLimit(1).minimumScaleFactor(0.85)
+                    .lineLimit(1).minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(Brand.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
         }
         .buttonStyle(.plain)
     }

@@ -119,6 +119,30 @@ final class APIClient {
         return try decode(data)
     }
 
+    // MARK: anokiX rewards (Limes)
+
+    /// The whole rewards screen in one round trip: balance, benefits, tier, the points
+    /// ledger (paged), the voucher catalog, promotions and the invite code.
+    func getRewardsOverview(page: Int = 1, perPage: Int = 20) async throws -> RewardsOverviewData {
+        let data = try await get("api/common/rewards/overview",
+                                 query: ["page": String(max(1, page)),
+                                         "per_page": String(perPage <= 0 ? 20 : perPage)])
+        return try decode(data)
+    }
+
+    /// Spend points on a catalog voucher. Limes airtime/data fulfil live (points are
+    /// refunded server-side if the upstream call fails); everything else is recorded
+    /// pending. Fails 422 on an insufficient balance or an invalid voucher.
+    ///
+    /// `msisdn` is only required by vouchers whose `needs_msisdn` is set.
+    func redeemReward(voucherId: Int, msisdn: String?) async throws -> (RewardRedeemData, String?) {
+        var form = ["voucher_id": String(voucherId)]
+        if let msisdn, !msisdn.isEmpty { form["msisdn"] = msisdn }
+        let (data, message) = try await postFormWithMessage("api/common/rewards/redeem", form: form)
+        let result: RewardRedeemData = try decode(data)
+        return (result, message)
+    }
+
     // MARK: Wallet — top-ups + debit orders
 
     /// Start a PayCloud Hosted Checkout to fund the wallet. The response carries the

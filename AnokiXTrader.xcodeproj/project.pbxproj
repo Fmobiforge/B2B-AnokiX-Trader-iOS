@@ -92,6 +92,7 @@
 		DE17AE0DFFD598D9C24C36AE /* InventoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02E8A3DA0FC91E4B365D7F /* InventoryStore.swift */; };
 		DEF1FCA355BF842F6349EAD0 /* GoodsReturnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B440F41CEFFA4580F72D401 /* GoodsReturnsView.swift */; };
 		DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD2 /* RewardsView.swift */; };
+		DF90FE0FF952C350C8D56171 /* RewardsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B441A49508967E56949CD3 /* RewardsStore.swift */; };
 		E2B6785F1D0163E2AD36F68B /* VasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7A08FB54AC95DA45563273 /* VasStore.swift */; };
 		E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47C4FD93E9A214C578A29E /* ReportsView.swift */; };
 		E70206EE4C1DD86CA1B92DB8 /* InvoicesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33A859C7376D341F499F337 /* InvoicesStore.swift */; };
@@ -195,6 +196,7 @@
 		E529C7B1DAFFD3AF6115A1FE /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		E65DC1F1908F16554337AF74 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
 		E9B441A49508967E56949CD2 /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
+		E9B441A49508967E56949CD3 /* RewardsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsStore.swift; sourceTree = "<group>"; };
 		F016AAC1A2787D3E2D0A3259 /* CategoryProductsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryProductsStore.swift; sourceTree = "<group>"; };
 		F0BDEBEF2FBD9D26222961A5 /* DeliverySlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliverySlot.swift; sourceTree = "<group>"; };
 		F0D6C5570AC1DF95DDD24BDC /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
@@ -579,6 +581,7 @@
 		E92BF74EBA358C1F946B514D /* Rewards */ = {
 			isa = PBXGroup;
 			children = (
+				E9B441A49508967E56949CD3 /* RewardsStore.swift */,
 				E9B441A49508967E56949CD2 /* RewardsView.swift */,
 			);
 			path = Rewards;
@@ -793,6 +796,7 @@
 				CBF1D6685AF5949F6941BA1D /* RemoteMedia.swift in Sources */,
 				4D33851EF0CD539059722C26 /* ReportsStore.swift in Sources */,
 				E5931ABD3B33362FDF1E7FE2 /* ReportsView.swift in Sources */,
+				DF90FE0FF952C350C8D56171 /* RewardsStore.swift in Sources */,
 				DF90FE0FF952C350C8D56170 /* RewardsView.swift in Sources */,
 				0095424E02EAEFB39A1D6877 /* Router.swift in Sources */,
 				CC87D065D30ECAE49BC8FF45 /* Rows.swift in Sources */,
