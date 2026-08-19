@@ -25,6 +25,12 @@ struct WalletView: View {
             // Stacked in the portal's reading order (wallet01.png): balance, then
             // the settlement account, then the actions grid, then the two lists.
             VStack(spacing: 16) {
+                // The strapline reads as a line of page copy rather than nav-bar chrome,
+                // so it gets the full width instead of ellipsising next to the title.
+                // Same placement as RewardsView.
+                Text("Manage your money — Powered by IMB")
+                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 balanceCard
                 accountCard
                 actionGrid
