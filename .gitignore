@@ -1,64 +1,46 @@
-# Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+# ─── Secrets — never commit ──────────────────────────────────────────────
+# Apple APNs auth keys, signing certs and provisioning profiles.
+# The .p8 is a private key: anyone holding it can send push as you.
+*.p8
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+AuthKey_*
 
-## User settings
-xcuserdata/
+# Firebase config — generate your own from your Firebase project.
+GoogleService-Info.plist
 
-## Obj-C/Swift specific
-*.hmap
+# API keys / endpoints.
+.env
+.env.*
 
-## App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-#
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
-
-.build/
-
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
+# ─── CocoaPods ───────────────────────────────────────────────────────────
+# Pods are restored by `pod install`; Podfile.lock stays tracked.
 Pods/
-Podfile.lock
-#
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
+!Podfile.lock
 
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
+# ─── XcodeGen ────────────────────────────────────────────────────────────
+# The project is generated from project.yml — run `xcodegen generate`.
+# Delete these two lines if you would rather track the generated project.
+*.xcodeproj/
+*.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
 
-Carthage/Build/
+# ─── Xcode build ─────────────────────────────────────────────────────────
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
 
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo.
-# Instead, use fastlane to re-generate the screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/#source-control
-
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
-
+# ─── OS ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
