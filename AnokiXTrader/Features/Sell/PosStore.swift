@@ -78,24 +78,67 @@ struct PosPagination: Decodable {
     let total_pages: Int
 }
 
+// MARK: - Card machines (api/common/pos/terminals)
+
+/// The trader's card machines (PayCloud terminals), offered when a POS sale is paid
+/// by card. `configured` is the store-level flag: false means no machine has been set
+/// up at all, which is a different problem to "set up, but all switched off".
+struct PosTerminalsData: Decodable {
+    let configured: Bool
+    let terminals: [PosTerminalDTO]?
+
+    /// The machines that can actually take a payment. Inactive ones are still returned
+    /// (so the portal can list them), but sending to one would only fail at the
+    /// gateway, so they are never offered as a choice.
+    var active: [PosTerminalDTO] { (terminals ?? []).filter { $0.is_active } }
+}
+
+struct PosTerminalDTO: Decodable, Identifiable, Hashable {
+    let id: Int
+    let terminal_sn: String?
+    let label: String?
+    let store_no: String?
+    let is_active: Bool
+    let last_used_at: String?
+
+    /// What the cashier sees in the picker. Traders name their machines ("Front
+    /// counter"), but the label is nullable, so fall back to the serial number —
+    /// never a blank row that cannot be told apart from the next one.
+    var displayName: String {
+        if let label, !label.trimmingCharacters(in: .whitespaces).isEmpty {
+            return label.trimmingCharacters(in: .whitespaces)
+        }
+        if let sn = terminal_sn, !sn.trimmingCharacters(in: .whitespaces).isEmpty {
+            return sn.trimmingCharacters(in: .whitespaces)
+        }
+        return "Card machine #\(id)"
+    }
+}
+
 // MARK: - Payment methods
 
 /// POS payment-method keys accepted by the API + their display labels.
+///
+/// Cash, Wallet and QR Payment are recorded through `api/trader/pos/sale`; Card is
+/// taken on a physical card machine instead (see `CheckoutView`).
 enum PosPayment: String, CaseIterable, Identifiable {
-    case cash, wallet, card, qr, other
+    case cash, wallet, card, qr
     var id: String { rawValue }
     var label: String {
         switch self {
         case .cash:   return "Cash"
         case .wallet: return "Wallet"
         case .card:   return "Card"
-        case .qr:     return "QR"
-        case .other:  return "Other"
+        case .qr:     return "QR Payment"
         }
     }
+    /// Label for a stored `payment_method`. Past receipts can carry keys the till no
+    /// longer offers (notably "other"), so an unknown key is capitalised rather than
+    /// shown raw — sales history has to read properly for those too.
     static func label(for key: String?) -> String {
-        guard let key, let m = PosPayment(rawValue: key.lowercased()) else { return key ?? "" }
-        return m.label
+        guard let key, !key.isEmpty else { return "" }
+        if let m = PosPayment(rawValue: key.lowercased()) { return m.label }
+        return key.prefix(1).uppercased() + key.dropFirst()
     }
 }
 
@@ -328,7 +371,7 @@ struct SalesView: View {
     }
 }
 
-// MARK: - Sale Completed receipt (mirrors POS-After-Complete-Sale.png)
+// MARK: - Sale Recorded receipt (mirrors POS_Sale_RecordedMessage.png)
 
 struct PosReceiptView: View {
     let sale: PosSaleDTO
@@ -337,7 +380,7 @@ struct PosReceiptView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("Sale Completed").font(.system(size: 19, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Sale Recorded").font(.system(size: 19, weight: .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button(action: onDone) {
                     Image(systemName: "xmark").font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.textSecondary)

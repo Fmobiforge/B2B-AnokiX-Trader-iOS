@@ -466,7 +466,8 @@ final class APIClient {
 
     /// Complete a POS sale (api/trader/pos/sale, JSON). `items` is a list of
     /// `["product_id": Int, "quantity": Int, "unit_price": Double]`; `paymentMethod`
-    /// is one of cash|wallet|card|qr|other. Returns the receipt.
+    /// is one of cash|wallet|qr — card is taken on a terminal instead, via
+    /// `sendPosPayment`. Returns the receipt.
     @discardableResult
     func createPosSale(items: [[String: Any]], paymentMethod: String, discount: Double) async throws -> PosSaleDTO {
         let payload: [String: Any] = [
@@ -477,6 +478,35 @@ final class APIClient {
         let data = try await postJSON("api/trader/pos/sale", json: payload)
         let wrapper: PosSaleData = try decode(data)
         return wrapper.sale
+    }
+
+    /// The trader's card machines (PayCloud terminals) — api/common/pos/terminals.
+    /// Read when a POS sale is being paid by card, so the cashier can pick which
+    /// machine the amount goes to.
+    func getPosTerminals() async throws -> PosTerminalsData {
+        let data = try await get("api/common/pos/terminals", query: [:])
+        return try decode(data)
+    }
+
+    /// Push an amount to a card machine (api/common/pos/payments, JSON). The backend
+    /// relays it to the terminal, where the customer taps or inserts their card; the
+    /// sale itself is recorded server-side once the gateway reports the result, so
+    /// this call deliberately does **not** go through `api/trader/pos/sale`.
+    ///
+    /// Only `status`/`message` are read back: a failure carries the gateway's own
+    /// wording (e.g. "[E07507]The device is not turned on…"), which is what the
+    /// cashier needs to see.
+    func sendPosPayment(amount: Double, terminalId: Int,
+                        description: String, referenceType: String) async throws {
+        let payload: [String: Any] = [
+            // Two decimals: the machine must be asked for exactly what the till
+            // showed, not a binary-floating-point neighbour of it.
+            "amount": (amount * 100).rounded() / 100,
+            "terminal_id": terminalId,
+            "description": description,
+            "reference_type": referenceType
+        ]
+        try await postJSONStatus("api/common/pos/payments", json: payload)
     }
 
     /// POS sales history + summary (api/trader/pos/sales). Filters optional.
@@ -974,6 +1004,14 @@ final class APIClient {
         let request = AF.request(baseURL + path, method: .post, parameters: json,
                                  encoding: JSONEncoding.default, headers: authHeaders)
         return try await dataNode(request)
+    }
+
+    /// POST a JSON body where only `status`/`message` matter — for endpoints whose
+    /// `data` node is null or not worth decoding (e.g. pushing a card-machine payment).
+    private func postJSONStatus(_ path: String, json: [String: Any]) async throws {
+        let request = AF.request(baseURL + path, method: .post, parameters: json,
+                                 encoding: JSONEncoding.default, headers: authHeaders)
+        try await statusOnly(request)
     }
 
     /// POST form where only `status`/`message` matter (cart mutations return `data: []`).

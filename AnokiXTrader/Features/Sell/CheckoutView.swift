@@ -1,9 +1,18 @@
 import SwiftUI
 
 /// POS "Current Sale" / Complete Sale (Pagamio). Review lines (qty steppers + remove),
-/// apply a discount, pick a payment method, and commit the sale via
-/// `api/trader/pos/sale`. VAT (15%) is extracted from the inclusive total; on success
-/// a receipt sheet mirrors the portal's Sale Completed modal.
+/// apply a discount, pick a payment method, and complete the sale. VAT (15%) is
+/// extracted from the inclusive total.
+///
+/// The four payment methods split into two flows:
+/// - **Cash, Wallet, QR Payment** — recorded straight away through
+///   `api/trader/pos/sale` with the matching `payment_method`; the receipt sheet
+///   mirrors the portal's Sale Recorded modal.
+/// - **Card** — the money is taken on a physical card machine, so nothing is recorded
+///   here. The trader's terminals are read from `api/common/pos/terminals`, they pick
+///   one, and the amount is pushed to it via `api/common/pos/payments`
+///   (`CardMachineSheet`). The backend records that sale when the gateway reports the
+///   card payment.
 struct CheckoutView: View {
     @EnvironmentObject var cart: Cart
     @Environment(\.dismiss) private var dismiss
@@ -12,6 +21,13 @@ struct CheckoutView: View {
     @State private var submitting = false
     @State private var receipt: PosSaleDTO?
     @State private var errorMsg: String?
+    @State private var cardMachines: [PosTerminalDTO] = []
+    @State private var showCardMachines = false
+    /// Card-machine problems get their own alert — "Sale failed" would be wrong
+    /// wording for "no machine is switched on".
+    @State private var cardMachineMsg: String?
+    /// Set when the sheet reports a successful send, read by its `onDismiss`.
+    @State private var paymentSentToMachine = false
 
     private var inclusive: Double { cart.subtotal }
     private var discount: Double { min(max(0, Double(discountText) ?? 0), inclusive) }
@@ -123,15 +139,82 @@ struct CheckoutView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showCardMachines, onDismiss: {
+            // Runs once the sheet is fully gone, so popping the till here cannot race
+            // the sheet's own dismissal.
+            guard paymentSentToMachine else { return }
+            paymentSentToMachine = false
+            // The amount is on the machine and the backend owns the rest of that
+            // sale, so the till is finished with it — clear and step back.
+            cart.clear()
+            dismiss()
+        }) {
+            CardMachineSheet(amount: total,
+                             amountText: Money.rand(total),
+                             description: saleDescription,
+                             machines: cardMachines) {
+                paymentSentToMachine = true
+                showCardMachines = false
+            }
+            .presentationDetents([.medium])
+        }
         .alert("Sale failed", isPresented: .constant(errorMsg != nil)) {
             Button("OK") { errorMsg = nil }
         } message: {
             Text(errorMsg ?? "")
         }
+        .alert("Card machine payment", isPresented: .constant(cardMachineMsg != nil)) {
+            Button("OK") { cardMachineMsg = nil }
+        } message: {
+            Text(cardMachineMsg ?? "")
+        }
     }
 
     private func completeSale() async {
         guard !cart.isEmpty, !submitting else { return }
+        if payment == .card {
+            await startCardMachinePayment()
+        } else {
+            await recordSale()
+        }
+    }
+
+    // MARK: Card — pay on a card machine
+
+    /// Load the trader's card machines, then offer them. The list is fetched per sale
+    /// rather than cached, so a machine switched on (or off) since the last sale is
+    /// reflected without the cashier having to restart anything.
+    private func startCardMachinePayment() async {
+        submitting = true
+        do {
+            let data = try await APIClient.shared.getPosTerminals()
+            let machines = data.active
+            if machines.isEmpty {
+                // "None set up" and "all switched off" are different problems, and
+                // only the trader can tell them apart from the wording.
+                cardMachineMsg = data.configured
+                    ? "None of your card machines are active right now. Switch one on and try again."
+                    : "No card machines are set up for your store yet. Add one in the trader portal to take card payments."
+            } else {
+                cardMachines = machines
+                showCardMachines = true
+            }
+        } catch {
+            cardMachineMsg = (error as? LocalizedError)?.errorDescription
+                ?? "Could not load your card machines."
+        }
+        submitting = false
+    }
+
+    /// What the payment is for, worded as the portal does it: "Sale · 3 items".
+    private var saleDescription: String {
+        let count = cart.itemCount
+        return "Sale · \(count) \(count == 1 ? "item" : "items")"
+    }
+
+    // MARK: Cash / Wallet / QR — record the sale
+
+    private func recordSale() async {
         submitting = true
         let items: [[String: Any]] = cart.lines.map {
             ["product_id": Int($0.id) ?? 0, "quantity": $0.qty, "unit_price": $0.unitPrice]
@@ -165,5 +248,166 @@ private struct QtyStepper: View {
             Text("\(qty)").font(.system(size: 15, weight: .bold)).frame(minWidth: 20)
             Button(action: inc) { Image(systemName: "plus.circle.fill").foregroundColor(Brand.purple) }
         }
+    }
+}
+
+// MARK: - Card machine payment (mirrors POS_Sale_LetUserChooseTerminal.png)
+
+/// Pushes a POS sale total to one of the trader's PayCloud terminals via
+/// `api/common/pos/payments`.
+///
+/// The sheet's job ends at "the amount is on the machine" — the customer still has to
+/// tap or insert their card there, and the backend records the sale once the gateway
+/// reports it, so this never claims the customer has paid.
+///
+/// Failures are shown in the sheet rather than as an alert, because the gateway's
+/// wording is the actionable part ("[E07507]The device is not turned on, please start
+/// the device and cashier application") and it is usually fixable on the spot — so
+/// Send stays available for a retry once the trader has switched the terminal on.
+struct CardMachineSheet: View {
+    let amount: Double
+    let amountText: String
+    let description: String
+    let machines: [PosTerminalDTO]
+    /// Called after a successful send, once the trader taps Done.
+    let onSent: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var index = 0
+    @State private var sending = false
+    /// True once the amount is on a machine — Send must not fire a second payment.
+    @State private var sent = false
+    @State private var status: StatusLine?
+
+    private struct StatusLine {
+        let text: String
+        let ok: Bool
+    }
+
+    /// Guarded rather than force-indexed: the caller only ever passes a non-empty
+    /// list, but a crash at the till would be a poor way to find that out.
+    private var selected: PosTerminalDTO? {
+        machines.indices.contains(index) ? machines[index] : machines.first
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Card machine payment")
+                    .font(.system(size: 19, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.textSecondary)
+                }
+            }
+            .padding(.bottom, 16)
+
+            // Amount being pushed to the machine
+            HStack {
+                Text("Amount").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Spacer()
+                Text(amountText).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
+            }
+            .padding(16)
+            .background(Brand.surfaceVariant)
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            Text("Card machine")
+                .font(.system(size: 13, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .padding(.top, 16).padding(.bottom, 8)
+
+            Menu {
+                ForEach(Array(machines.enumerated()), id: \.element.id) { i, machine in
+                    Button(machine.displayName) {
+                        index = i
+                        // A different machine deserves a clean slate — the previous
+                        // machine's error says nothing about this one.
+                        status = nil
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(selected?.displayName ?? "")
+                        .font(.system(size: 14)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                }
+                .padding(.horizontal, 14).frame(height: 48)
+                .background(Brand.surfaceVariant)
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .disabled(sending || sent)
+
+            if let status {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: status.ok ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                        .font(.system(size: 15))
+                        .foregroundColor(status.ok ? Brand.success : Brand.danger)
+                    Text(status.text)
+                        .font(.system(size: 13))
+                        .foregroundColor(status.ok ? Brand.success : Brand.danger)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 14)
+            }
+
+            HStack(spacing: 10) {
+                Spacer()
+                // After a send it is the parent that closes the sheet (and then the
+                // till), so Done hands off rather than dismissing here as Close does.
+                Button(sent ? "Done" : "Close") {
+                    if sent { onSent() } else { dismiss() }
+                }
+                .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textSecondary)
+                .padding(.horizontal, 20).padding(.vertical, 12)
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+
+                if !sent {
+                    Button {
+                        Task { await send() }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "creditcard.fill").font(.system(size: 15))
+                            Text(sending ? "Sending…" : "Send \(amountText)")
+                        }
+                        .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                        .padding(.horizontal, 20).padding(.vertical, 12)
+                        .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .disabled(sending || selected == nil)
+                    .opacity(sending ? 0.6 : 1)
+                }
+            }
+            .padding(.top, 18)
+
+            Spacer(minLength: 0)
+        }
+        .padding(20)
+    }
+
+    private func send() async {
+        guard let terminal = selected, !sending, !sent else { return }
+        sending = true
+        status = nil
+        do {
+            try await APIClient.shared.sendPosPayment(
+                amount: amount, terminalId: terminal.id,
+                description: description, referenceType: "pos_sale")
+            sent = true
+            status = StatusLine(
+                text: "Sent to \(terminal.displayName). Ask the customer to complete the payment on the card machine.",
+                ok: true)
+        } catch {
+            status = StatusLine(
+                text: (error as? LocalizedError)?.errorDescription
+                    ?? "Could not send the payment to the card machine.",
+                ok: false)
+        }
+        sending = false
     }
 }
