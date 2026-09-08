@@ -156,7 +156,9 @@ struct CheckoutView: View {
                 paymentSentToMachine = true
                 showCardMachines = false
             }
-            .presentationDetents([.medium])
+            // .large stays available because a gateway error can run to several lines
+            // and must not be clipped behind the buttons.
+            .presentationDetents([.medium, .large])
         }
         .alert("Sale failed", isPresented: .constant(errorMsg != nil)) {
             Button("OK") { errorMsg = nil }
@@ -356,31 +358,41 @@ struct CardMachineSheet: View {
                 .padding(.top, 14)
             }
 
-            HStack(spacing: 10) {
-                Spacer()
-                // After a send it is the parent that closes the sheet (and then the
-                // till), so Done hands off rather than dismissing here as Close does.
-                Button(sent ? "Done" : "Close") {
-                    if sent { onSent() } else { dismiss() }
+            // Stacked full-width rather than a side-by-side row: the Send label carries
+            // the amount, so a row clips it on a narrow screen, at a large Dynamic Type
+            // size, or simply on a bigger sale. Full width also gives the one action
+            // that moves money the tap target it deserves.
+            VStack(spacing: 10) {
+                // Once sent, Done takes over the primary button: it is the only action
+                // left, so leaving it as the quieter of the two would read as the lesser
+                // of a choice that no longer exists.
+                Button {
+                    // After a send it is the parent that closes the sheet (and then the
+                    // till), so Done hands off rather than dismissing here.
+                    if sent { onSent() } else { Task { await send() } }
+                } label: {
+                    HStack(spacing: 8) {
+                        if !sent {
+                            Image(systemName: "creditcard.fill").font(.system(size: 15))
+                        }
+                        Text(sent ? "Done" : (sending ? "Sending…" : "Send \(amountText)"))
+                            .lineLimit(1).minimumScaleFactor(0.8)
+                    }
+                    .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                    .frame(maxWidth: .infinity).padding(.vertical, 14)
+                    .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-                .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textSecondary)
-                .padding(.horizontal, 20).padding(.vertical, 12)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+                .disabled(sending || selected == nil)
+                .opacity(sending ? 0.6 : 1)
 
                 if !sent {
-                    Button {
-                        Task { await send() }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "creditcard.fill").font(.system(size: 15))
-                            Text(sending ? "Sending…" : "Send \(amountText)")
-                        }
-                        .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
-                        .padding(.horizontal, 20).padding(.vertical, 12)
-                        .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
+                    Button { dismiss() } label: {
+                        Text("Close")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(Brand.textSecondary)
+                            .frame(maxWidth: .infinity).padding(.vertical, 13)
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
                     }
-                    .disabled(sending || selected == nil)
-                    .opacity(sending ? 0.6 : 1)
                 }
             }
             .padding(.top, 18)
