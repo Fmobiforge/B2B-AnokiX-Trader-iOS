@@ -28,6 +28,13 @@ struct CheckoutView: View {
     @State private var cardMachineMsg: String?
     /// Set when the sheet reports a successful send, read by its `onDismiss`.
     @State private var paymentSentToMachine = false
+    @State private var showPaymentPicker = false
+
+    /// `SelectOptionsSheet` stores the raw key, so bridge it back to the enum.
+    private var paymentSelection: Binding<String> {
+        Binding(get: { payment.rawValue },
+                set: { payment = PosPayment(rawValue: $0) ?? payment })
+    }
 
     private var inclusive: Double { cart.subtotal }
     private var discount: Double { min(max(0, Double(discountText) ?? 0), inclusive) }
@@ -99,14 +106,14 @@ struct CheckoutView: View {
                 }
                 .card()
 
-                // Payment method
+                // Payment method — a `SelectOptionsSheet`, not a native `Menu`. A Menu
+                // pop-up is drawn in its own UIKit context that ignores the screen's
+                // pinned light scheme, so in system Dark Mode its rows came out
+                // near-white over the light backdrop and were unreadable. The sheet
+                // draws its own rows in explicit Brand colours instead.
                 VStack(alignment: .leading, spacing: 10) {
                     SectionHeader(title: "Payment Method")
-                    Menu {
-                        ForEach(PosPayment.allCases) { m in
-                            Button(m.label) { payment = m }
-                        }
-                    } label: {
+                    Button { showPaymentPicker = true } label: {
                         HStack {
                             Text(payment.label).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
                             Spacer()
@@ -117,6 +124,7 @@ struct CheckoutView: View {
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
+                    .buttonStyle(.plain)
                 }
                 .card()
 
@@ -131,13 +139,17 @@ struct CheckoutView: View {
         .background(Brand.background)
         .navigationTitle("Current Sale")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPaymentPicker) {
+            SelectOptionsSheet(title: "Payment Method",
+                               options: PosPayment.allCases.map { ($0.rawValue, $0.label) },
+                               selection: paymentSelection)
+        }
         .sheet(item: $receipt) { sale in
             PosReceiptView(sale: sale) {
                 cart.clear()
                 receipt = nil
                 dismiss()
             }
-            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showCardMachines, onDismiss: {
             // Runs once the sheet is fully gone, so popping the till here cannot race
@@ -156,9 +168,6 @@ struct CheckoutView: View {
                 paymentSentToMachine = true
                 showCardMachines = false
             }
-            // .large stays available because a gateway error can run to several lines
-            // and must not be clipped behind the buttons.
-            .presentationDetents([.medium, .large])
         }
         .alert("Sale failed", isPresented: .constant(errorMsg != nil)) {
             Button("OK") { errorMsg = nil }
@@ -280,6 +289,7 @@ struct CardMachineSheet: View {
     /// True once the amount is on a machine — Send must not fire a second payment.
     @State private var sent = false
     @State private var status: StatusLine?
+    @State private var showMachinePicker = false
 
     private struct StatusLine {
         let text: String
@@ -290,6 +300,18 @@ struct CardMachineSheet: View {
     /// list, but a crash at the till would be a poor way to find that out.
     private var selected: PosTerminalDTO? {
         machines.indices.contains(index) ? machines[index] : machines.first
+    }
+
+    /// `SelectOptionsSheet` stores a String key, so address machines by their id.
+    private var machineSelection: Binding<String> {
+        Binding(get: { selected.map { String($0.id) } ?? "" },
+                set: { key in
+                    guard let i = machines.firstIndex(where: { String($0.id) == key }) else { return }
+                    index = i
+                    // A different machine deserves a clean slate — the previous
+                    // machine's error says nothing about this one.
+                    status = nil
+                })
     }
 
     var body: some View {
@@ -320,16 +342,10 @@ struct CardMachineSheet: View {
                 .font(.system(size: 13, weight: .bold)).foregroundColor(Brand.textPrimary)
                 .padding(.top, 16).padding(.bottom, 8)
 
-            Menu {
-                ForEach(Array(machines.enumerated()), id: \.element.id) { i, machine in
-                    Button(machine.displayName) {
-                        index = i
-                        // A different machine deserves a clean slate — the previous
-                        // machine's error says nothing about this one.
-                        status = nil
-                    }
-                }
-            } label: {
+            // A `SelectOptionsSheet` rather than a native `Menu`, for the same reason
+            // as the payment-method field above: a Menu pop-up ignores this screen's
+            // pinned light scheme and renders unreadably in system Dark Mode.
+            Button { showMachinePicker = true } label: {
                 HStack {
                     Text(selected?.displayName ?? "")
                         .font(.system(size: 14)).foregroundColor(Brand.textPrimary).lineLimit(1)
@@ -342,6 +358,7 @@ struct CardMachineSheet: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
+            .buttonStyle(.plain)
             .disabled(sending || sent)
 
             if let status {
@@ -400,6 +417,21 @@ struct CardMachineSheet: View {
             Spacer(minLength: 0)
         }
         .padding(20)
+        // Self-styled sheet drawn on an explicit opaque Brand background + forced light
+        // scheme, matching SelectOptionsSheet and the app's other pickers. Without this
+        // the sheet inherited a clear backing and the Current Sale screen showed straight
+        // through it. .large stays available because a gateway error can run to several
+        // lines and must not be clipped behind the buttons.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Brand.background.ignoresSafeArea())
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.light)
+        .sheet(isPresented: $showMachinePicker) {
+            SelectOptionsSheet(title: "Card machine",
+                               options: machines.map { (String($0.id), $0.displayName) },
+                               selection: machineSelection)
+        }
     }
 
     private func send() async {

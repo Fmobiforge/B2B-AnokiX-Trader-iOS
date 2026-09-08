@@ -415,6 +415,14 @@ struct PosReceiptView: View {
             .padding(.top, 18)
         }
         .padding(20)
+        // Self-styled sheet on an explicit opaque background + forced light scheme,
+        // matching SelectOptionsSheet and the app's other pickers. Without this the
+        // sheet inherits a clear backing and the till behind it shows through.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Brand.background.ignoresSafeArea())
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.light)
     }
 
     private func row(_ label: String, _ value: String, emphasised: Bool = false) -> some View {
