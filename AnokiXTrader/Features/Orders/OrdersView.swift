@@ -14,10 +14,21 @@ struct OrdersView: View {
     var body: some View {
         VStack(spacing: 0) {
             ScreenHeader(title: "Orders", subtitle: "Track and manage your orders")
-            filterBar
-            statusTabs
-            Divider()
-            content
+
+            // The search box, distributor/date filters and the status tabs scroll away
+            // with the list: stacked as fixed chrome under the header they left roughly
+            // two orders visible on a short screen. The header stays pinned (it is the
+            // way to the drawer) and so does the pagination bar.
+            ScrollView {
+                VStack(spacing: 0) {
+                    filterBar
+                    statusTabs
+                    Divider()
+                    content
+                }
+            }
+            .background(Brand.background)
+
             paginationBar
         }
         .navigationBarHidden(true)
@@ -104,23 +115,22 @@ struct OrdersView: View {
 
     // MARK: - Content
 
+    // Lives inside the body's ScrollView, so it lays rows out directly rather than
+    // opening a second, nested scroll view.
     @ViewBuilder
     private var content: some View {
         if store.loading && store.orders.isEmpty {
-            Spacer(); ProgressView(); Spacer()
+            ProgressView().padding(.top, 60)
         } else if store.orders.isEmpty {
             emptyState
         } else {
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(store.orders) { order in
-                        NavigationLink(value: order) { OrderRow(order: order) }
-                            .buttonStyle(.plain)
-                    }
+            LazyVStack(spacing: 12) {
+                ForEach(store.orders) { order in
+                    NavigationLink(value: order) { OrderRow(order: order) }
+                        .buttonStyle(.plain)
                 }
-                .padding(16)
             }
-            .background(Brand.background)
+            .padding(16)
         }
     }
 
@@ -129,7 +139,8 @@ struct OrdersView: View {
             Image(systemName: "shippingbox").font(.system(size: 50)).foregroundColor(Brand.textTertiary)
             Text("No orders found.").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 60)
         .background(Brand.background)
     }
 

@@ -19,7 +19,7 @@ struct MainTabView: View {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
                     .transition(.opacity)
-                    .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { router.drawerOpen = false } }
+                    .onTapGesture { router.drawerOpen = false }
                 DrawerView()
                     .frame(width: 300)
                     .transition(.move(edge: .leading))
@@ -167,11 +167,16 @@ struct ScreenHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Button { withAnimation { router.drawerOpen = true } } label: {
+            // The ZStack in MainTabView already animates on `drawerOpen`, so this only
+            // has to flip the flag — wrapping it in a second `withAnimation` nested one
+            // animation inside the other and made the slide start late.
+            Button { router.drawerOpen = true } label: {
                 Image(systemName: "line.3.horizontal")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(Brand.textPrimary)
+                    .tapTarget()
             }
+            .accessibilityLabel("Open menu")
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
                 if let subtitle {
@@ -195,7 +200,9 @@ struct ScreenHeader: View {
                                     .offset(x: 8, y: -8)
                             }
                         }
+                        .tapTarget()
                 }
+                .accessibilityLabel("Cart")
             }
             Button { router.presented = .notifications } label: {
                 Image(systemName: "bell")
@@ -212,7 +219,9 @@ struct ScreenHeader: View {
                                 .offset(x: 8, y: -8)
                         }
                     }
+                    .tapTarget()
             }
+            .accessibilityLabel("Notifications")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

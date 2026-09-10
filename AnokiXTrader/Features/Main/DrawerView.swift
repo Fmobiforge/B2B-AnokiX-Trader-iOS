@@ -69,11 +69,16 @@ struct DrawerView: View {
                 } label: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .foregroundColor(Brand.purpleTextLt)
+                        .tapTarget()
                 }
+                .accessibilityLabel("Sign out")
             }
             .padding(18)
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Brand.drawerBg.ignoresSafeArea())
+        // Swallow taps that land on the drawer's own padding — without this they fall
+        // through to the scrim behind it and close the drawer the user just opened.
+        .contentShape(Rectangle())
     }
 }

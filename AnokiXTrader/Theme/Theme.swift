@@ -89,6 +89,19 @@ extension View {
     func card(padding: CGFloat = 16) -> some View {
         Card(padding: padding) { self }
     }
+
+    /// Grows a small control's *hit* area towards the 44×44pt minimum without moving
+    /// anything on screen — the outer negative padding hands the extra space back to the
+    /// parent, so layout is unchanged.
+    ///
+    /// The header icons are 18–20pt glyphs, which on their own are only about half the
+    /// minimum target. That is why a first tap on the drawer button so often appeared to
+    /// do nothing: it simply landed outside the button.
+    func tapTarget(inset: CGFloat = 12) -> some View {
+        padding(inset)
+            .contentShape(Rectangle())
+            .padding(-inset)
+    }
 }
 
 // MARK: - Status badge (pill)

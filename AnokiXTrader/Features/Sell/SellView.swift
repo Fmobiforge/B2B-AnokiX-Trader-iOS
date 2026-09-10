@@ -29,58 +29,19 @@ struct SellView: View {
         }
     }
 
+    // Only the header (the way to the drawer) and the Current Sale bar (the way to check
+    // out) stay pinned. The search row and the category chips scroll away with the grid —
+    // stacked as fixed chrome they left barely one row of products visible on a short
+    // screen. Same single-scroll arrangement as FinancesView.
     var body: some View {
         VStack(spacing: 0) {
             header
 
-            // search + scan + QR
-            HStack(spacing: 8) {
-                HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass").foregroundColor(Brand.textSecondary)
-                    TextField("Search products by name, barcode or SKU…", text: $searchText)
-                        .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
-                        .autocorrectionDisabled()
-                }
-                .padding(.horizontal, 12).frame(height: 44)
-                .background(Brand.surfaceVariant)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                scannerButton("Scan", icon: "barcode.viewfinder") { scanMode = .barcode }
-                scannerButton("QR", icon: "qrcode.viewfinder") { scanMode = .qr }
-            }
-            .padding(.horizontal, 12).padding(.vertical, 10)
-            .background(Brand.surface)
-
-            // category chips
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(store.categories, id: \.self) { c in
-                        FilterChip(label: c, selected: c == selectedCategory) { selectedCategory = c }
-                    }
-                }
-                .padding(.horizontal, 12).padding(.vertical, 8)
-            }
-            .background(Brand.surface)
-
-            // product grid
             ScrollView {
-                if store.isLoading {
-                    ProgressView().padding(.top, 60)
-                } else if products.isEmpty {
-                    Text("No products available.")
-                        .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
-                        .padding(.top, 60)
-                } else {
-                    LazyVGrid(columns: grid, spacing: 12) {
-                        ForEach(products) { p in
-                            PosProductCard(product: p) {
-                                cart.add(product: p)
-                                toastMsg = "Added \(p.name ?? "")"
-                            }
-                        }
-                    }
-                    .padding(12)
+                VStack(spacing: 0) {
+                    searchRow
+                    categoryChips
+                    productGrid
                 }
             }
             .background(Brand.background)
@@ -101,12 +62,72 @@ struct SellView: View {
         .toast($toastMsg)
     }
 
+    // MARK: - Scrolling chrome
+
+    /// search + scan + QR
+    private var searchRow: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass").foregroundColor(Brand.textSecondary)
+                TextField("Search products by name, barcode or SKU…", text: $searchText)
+                    .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                    .autocorrectionDisabled()
+            }
+            .padding(.horizontal, 12).frame(height: 44)
+            .background(Brand.surfaceVariant)
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            scannerButton("Scan", icon: "barcode.viewfinder") { scanMode = .barcode }
+            scannerButton("QR", icon: "qrcode.viewfinder") { scanMode = .qr }
+        }
+        .padding(.horizontal, 12).padding(.vertical, 10)
+        .background(Brand.surface)
+    }
+
+    private var categoryChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(store.categories, id: \.self) { c in
+                    FilterChip(label: c, selected: c == selectedCategory) { selectedCategory = c }
+                }
+            }
+            .padding(.horizontal, 12).padding(.vertical, 8)
+        }
+        .background(Brand.surface)
+    }
+
+    @ViewBuilder
+    private var productGrid: some View {
+        if store.isLoading {
+            ProgressView().padding(.top, 60)
+        } else if products.isEmpty {
+            Text("No products available.")
+                .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                .padding(.top, 60)
+        } else {
+            LazyVGrid(columns: grid, spacing: 12) {
+                ForEach(products) { p in
+                    PosProductCard(product: p) {
+                        cart.add(product: p)
+                        toastMsg = "Added \(p.name ?? "")"
+                    }
+                }
+            }
+            .padding(12)
+        }
+    }
+
     private var header: some View {
         HStack(spacing: 12) {
-            Button { withAnimation { router.drawerOpen = true } } label: {
+            // MainTabView's ZStack already animates on `drawerOpen`; flipping the flag is
+            // all this needs, and it avoids nesting one animation inside another.
+            Button { router.drawerOpen = true } label: {
                 Image(systemName: "line.3.horizontal")
                     .font(.system(size: 20, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .tapTarget()
             }
+            .accessibilityLabel("Open menu")
             VStack(alignment: .leading, spacing: 2) {
                 Text("POS").font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
                 Text("Scan and sell products at your store")
@@ -116,6 +137,7 @@ struct SellView: View {
             Button { router.presented = .sales } label: {
                 Image(systemName: "doc.text")
                     .font(.system(size: 18, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .tapTarget()
             }
             .accessibilityLabel("Sales History")
         }
