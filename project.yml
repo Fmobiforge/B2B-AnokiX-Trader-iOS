@@ -37,7 +37,7 @@ targets:
         CODE_SIGN_ENTITLEMENTS: AnokiXTrader/AnokiXTrader.entitlements
         ENABLE_PREVIEWS: YES
         # Merge approach: a checked-in Info.plist holds the ATS cleartext-HTTP
-        # exception for 155.117.20.51, while GENERATE_INFOPLIST_FILE merges the
+        # exception for 109.176.30.129, while GENERATE_INFOPLIST_FILE merges the
         # INFOPLIST_KEY_* values below into it at build time (matches the
         # original hand-built .xcodeproj exactly).
         GENERATE_INFOPLIST_FILE: YES

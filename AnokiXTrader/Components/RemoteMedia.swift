@@ -6,7 +6,7 @@ import Kingfisher
 // MARK: - Media URL normalisation (Android `MediaUrls`)
 
 enum MediaUrls {
-    private static let baseURL = "http://155.117.20.51/ax/"
+    private static let baseURL = "http://109.176.30.129/ax/"
 
     static func resolve(_ raw: String?) -> String? {
         guard var url = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !url.isEmpty else { return nil }

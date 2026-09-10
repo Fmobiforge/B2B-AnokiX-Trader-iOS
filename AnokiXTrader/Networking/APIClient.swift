@@ -32,12 +32,12 @@ final class APIClient {
     static let shared = APIClient()
 
     /// Matches the Android `ApiClient.BASE_URL`.
-    let baseURL = "http://155.117.20.51/ax/"
+    let baseURL = "http://109.176.30.129/ax/"
 
     /// Report files come from a separate download service on its own port, which
     /// authenticates with the token in the JSON body rather than a Bearer header.
     /// Same host, so the existing ATS exception in Info.plist already covers it.
-    let reportDownloadURL = "http://155.117.20.51:5720/api/report-download"
+    let reportDownloadURL = "http://109.176.30.129:5720/api/report-download"
 
     private static let tokenKey = "auth_token"
 
