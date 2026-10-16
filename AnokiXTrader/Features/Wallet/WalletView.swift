@@ -29,7 +29,7 @@ struct WalletView: View {
                 // so it gets the full width instead of ellipsising next to the title.
                 // Same placement as RewardsView.
                 Text("Manage your money — Powered by IMB")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 balanceCard
                 accountCard
@@ -67,7 +67,7 @@ struct WalletView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
                 Text("Total Wallet Balance")
-                    .font(.system(size: 13)).foregroundColor(Color(hex: "#E9DDFF"))
+                    .font(.app(13)).foregroundColor(Color(hex: "#E9DDFF"))
                 Spacer()
                 // A nil icon turns the button into a spinner — it stands in for the
                 // first load as well as a manual refresh, so the card is never silently
@@ -84,7 +84,7 @@ struct WalletView: View {
             }
 
             Text(store.cardMoney(store.balance?.current))
-                .font(.system(size: 30, weight: .bold)).foregroundColor(.white)
+                .font(.app(30, .bold)).foregroundColor(.white)
 
             HStack(spacing: 20) {
                 figure("Available Balance", store.cardMoney(store.balance?.available))
@@ -92,7 +92,7 @@ struct WalletView: View {
             }
 
             if let asOf = store.asOfLabel {
-                Text(asOf).font(.system(size: 11)).foregroundColor(Color(hex: "#C9B6FF"))
+                Text(asOf).font(.app(11)).foregroundColor(Color(hex: "#C9B6FF"))
             }
 
             // Top-ups need a live wallet to land in, so the button goes away and says why.
@@ -101,7 +101,7 @@ struct WalletView: View {
                     showTopUp = true
                 } label: {
                     Label("Top Up Wallet", systemImage: "plus")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.app(15, .semibold))
                         .foregroundColor(Brand.purple)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
@@ -111,7 +111,7 @@ struct WalletView: View {
                 .buttonStyle(.plain)
             } else if store.wallet != nil {
                 Text(inactiveNotice)
-                    .font(.system(size: 12)).foregroundColor(.white)
+                    .font(.app(12)).foregroundColor(.white)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(12)
@@ -123,11 +123,11 @@ struct WalletView: View {
 
             HStack {
                 Text("anokiX wallet · Powered by IMB")
-                    .font(.system(size: 10)).foregroundColor(Color(hex: "#D6C4FF"))
+                    .font(.app(10)).foregroundColor(Color(hex: "#D6C4FF"))
                 Spacer()
                 if !store.statusLabel.isEmpty {
                     Text(store.statusLabel)
-                        .font(.system(size: 10, weight: .semibold)).foregroundColor(.white)
+                        .font(.app(10, .semibold)).foregroundColor(.white)
                         .padding(.horizontal, 10).padding(.vertical, 3)
                         .background(Color.white.opacity(0.2))
                         .clipShape(Capsule())
@@ -148,8 +148,8 @@ struct WalletView: View {
 
     private func figure(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 11)).foregroundColor(Color(hex: "#D6C4FF"))
-            Text(value).font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+            Text(label).font(.app(11)).foregroundColor(Color(hex: "#D6C4FF"))
+            Text(value).font(.app(15, .semibold)).foregroundColor(.white)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -180,7 +180,7 @@ struct WalletView: View {
     private var actionGrid: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
             HStack(spacing: 4) {
                 action("Add Money", "plus", Brand.success, Brand.successBg) { openTopUp() }
                 action("Debit Order", "calendar", Brand.info, Brand.infoBg) { openDebitOrder() }
@@ -208,7 +208,7 @@ struct WalletView: View {
                     .background(tile)
                     .clipShape(Circle())
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.app(11, .medium))
                     .foregroundColor(Brand.textPrimary)
                     .lineLimit(1).minimumScaleFactor(0.8)
             }
@@ -239,7 +239,7 @@ struct WalletView: View {
     private var accountCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Settlement Account")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
 
             HStack(spacing: 12) {
                 Image(systemName: "building.columns")
@@ -250,9 +250,9 @@ struct WalletView: View {
                     .clipShape(Circle())
                 VStack(alignment: .leading, spacing: 2) {
                     Text("IMB Business Account")
-                        .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                     Text(store.accountNumber.map(spacedOut) ?? "—")
-                        .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        .font(.app(13)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 if let number = store.accountNumber {
@@ -271,12 +271,12 @@ struct WalletView: View {
 
             if WalletFmt.parse(store.wallet?.activated_at) != nil {
                 Text("Activated \(WalletFmt.day(store.wallet?.activated_at))")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
             }
 
             Button { router.presented = .finances } label: {
                 Text("View statement")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.app(14, .semibold))
                     .foregroundColor(Brand.purple)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 11)
@@ -325,7 +325,7 @@ struct WalletView: View {
 
     private func dayHeader(_ label: String) -> some View {
         Text(label.uppercased())
-            .font(.system(size: 11, weight: .bold))
+            .font(.app(11, .bold))
             .kerning(0.6)
             .foregroundColor(Brand.textTertiary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -351,15 +351,15 @@ struct WalletView: View {
                 .clipShape(Circle())
             VStack(alignment: .leading, spacing: 2) {
                 Text(incoming ? "Money in" : "Money out")
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                 // The date is already on the group header above, so the row shows the time.
                 Text(WalletFmt.time(t.date) ?? "—")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 3) {
                 Text("\(incoming ? "+" : "−")R\(WalletFmt.decimal(abs(value)))")
-                    .font(.system(size: 14, weight: .bold)).foregroundColor(tone)
+                    .font(.app(14, .bold)).foregroundColor(tone)
                 if t.pending == true {
                     StatusBadge(text: "Pending", fg: Brand.warning, bg: Brand.warningBg)
                 }
@@ -374,12 +374,12 @@ struct WalletView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Debit Orders")
-                    .font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 if store.debitAvailable {
                     Button { showDebitOrder = true } label: {
                         Label("New", systemImage: "plus")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.app(13, .semibold))
                             .foregroundColor(Brand.purple)
                     }
                     .buttonStyle(.plain)
@@ -391,7 +391,7 @@ struct WalletView: View {
             Text(store.debitAvailable
                  ? "Standing instructions for IMB to draw money into this wallet."
                  : "Debit orders are not available on this account yet.")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             if store.debitOrders.isEmpty {
@@ -419,21 +419,21 @@ struct WalletView: View {
                     .clipShape(Circle())
                 VStack(alignment: .leading, spacing: 2) {
                     Text(r.reference?.isEmpty == false ? r.reference! : "—")
-                        .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                     Text(r.scheduleLabel)
-                        .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        .font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 3) {
                     Text(r.money)
-                        .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                     StatusBadge(text: r.statusLabel, fg: r.statusTone.fg, bg: r.statusTone.bg)
                 }
             }
             // A failed instruction is only useful if it says why IMB refused it.
             if r.isFailed, let reason = r.last_error, !reason.isEmpty {
                 Text(reason)
-                    .font(.system(size: 11)).foregroundColor(Brand.danger)
+                    .font(.app(11)).foregroundColor(Brand.danger)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(8)
@@ -447,7 +447,7 @@ struct WalletView: View {
 
     private func emptyLine(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            .font(.app(13)).foregroundColor(Brand.textSecondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 22)
     }

@@ -199,17 +199,17 @@ struct SalesView: View {
         ScrollView {
             VStack(spacing: 16) {
                 Text("Review your sales performance and receipts.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 // Date range — tap to pick start + end together
                 Button { showDatePicker = true } label: {
                     HStack(spacing: 10) {
                         Text(Self.dispFmt.string(from: fromDate))
-                            .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                            .font(.app(13)).foregroundColor(Brand.textPrimary)
                         Image(systemName: "arrow.right").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
                         Text(Self.dispFmt.string(from: toDate))
-                            .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                            .font(.app(13)).foregroundColor(Brand.textPrimary)
                         Spacer()
                         Image(systemName: "calendar").foregroundColor(Brand.textSecondary)
                     }
@@ -236,7 +236,7 @@ struct SalesView: View {
                     ProgressView().padding(.top, 40)
                 } else if sales.isEmpty {
                     Text("No sales in this period yet.")
-                        .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                        .font(.app(14)).foregroundColor(Brand.textSecondary)
                         .padding(.top, 40)
                 } else {
                     VStack(spacing: 0) {
@@ -267,22 +267,22 @@ struct SalesView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(row.sale_number ?? "")
-                    .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.purple)
+                    .font(.app(14, .bold)).foregroundColor(Brand.purple)
                 Text(Self.formatDateTime(row.created_at))
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
                 Text(Money.rand(row.total_amount))
-                    .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 HStack(spacing: 8) {
                     Text(PosPayment.label(for: row.payment_method))
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.app(11, .semibold))
                         .padding(.horizontal, 10).padding(.vertical, 3)
                         .foregroundColor(Self.paymentTint(row.payment_method))
                         .overlay(Capsule().stroke(Self.paymentTint(row.payment_method), lineWidth: 1))
                     Text("\(row.item_count) \(row.item_count == 1 ? "item" : "items")")
-                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                        .font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
             }
         }
@@ -293,7 +293,7 @@ struct SalesView: View {
         HStack {
             Text(totalCount == 0 ? "Showing 0 sales"
                  : "Showing \((page - 1) * Self.perPage + 1)–\((page - 1) * Self.perPage + sales.count) of \(totalCount) sales")
-                .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                .font(.app(13)).foregroundColor(Brand.textSecondary)
             Spacer()
             Button { if page > 1 { page -= 1; Task { await load() } } } label: {
                 Image(systemName: "chevron.left").frame(width: 36, height: 36)
@@ -380,7 +380,7 @@ struct PosReceiptView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("Sale Recorded").font(.system(size: 19, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Sale Recorded").font(.app(19, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button(action: onDone) {
                     Image(systemName: "xmark").font(.system(size: 16, weight: .semibold)).foregroundColor(Brand.textSecondary)
@@ -389,7 +389,7 @@ struct PosReceiptView: View {
             .padding(.bottom, 16)
 
             Text(sale.sale_number ?? "")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.purple)
+                .font(.app(15, .bold)).foregroundColor(Brand.purple)
                 .padding(.bottom, 8)
 
             ForEach(sale.items ?? []) { item in
@@ -408,7 +408,7 @@ struct PosReceiptView: View {
             HStack {
                 Spacer()
                 Button("Done", action: onDone)
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                    .font(.app(15, .semibold)).foregroundColor(.white)
                     .padding(.horizontal, 28).padding(.vertical, 12)
                     .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
             }
@@ -428,11 +428,11 @@ struct PosReceiptView: View {
     private func row(_ label: String, _ value: String, emphasised: Bool = false) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: emphasised ? 16 : 14, weight: emphasised ? .bold : .regular))
+                .font(.app(emphasised ? 16 : 14, emphasised ? .bold : .regular))
                 .foregroundColor(emphasised ? Brand.purple : Brand.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: emphasised ? 16 : 14, weight: emphasised ? .bold : .regular))
+                .font(.app(emphasised ? 16 : 14, emphasised ? .bold : .regular))
                 .foregroundColor(emphasised ? Brand.purple : Brand.textPrimary)
         }
         .padding(.vertical, 3)

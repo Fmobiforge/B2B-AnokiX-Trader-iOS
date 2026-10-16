@@ -69,7 +69,7 @@ struct RewardsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Earn and redeem Limes points — Powered by Limes")
-                        .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        .font(.app(12)).foregroundColor(Brand.textSecondary)
                     balanceCard
                     benefitsCard
                     quickRedeemCard(proxy)
@@ -104,7 +104,7 @@ struct RewardsView: View {
     private var balanceCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Your Limes Points Balance")
-                .font(.system(size: 13)).foregroundColor(Color(hex: "#D9FBE7"))
+                .font(.app(13)).foregroundColor(Color(hex: "#D9FBE7"))
 
             HStack(spacing: 12) {
                 Image(systemName: "star.fill")
@@ -114,12 +114,12 @@ struct RewardsView: View {
                     .background(Color.white.opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 Text("\(RewardsFmt.points(store.points)) pts")
-                    .font(.system(size: 30, weight: .bold)).foregroundColor(.white)
+                    .font(.app(30, .bold)).foregroundColor(.white)
                 Spacer()
             }
 
             Text("≈ \(RewardsFmt.rand(store.balance?.value)) value")
-                .font(.system(size: 13)).foregroundColor(Color(hex: "#D9FBE7"))
+                .font(.app(13)).foregroundColor(Color(hex: "#D9FBE7"))
 
             Divider().background(Color.white.opacity(0.3)).padding(.top, 4)
 
@@ -132,7 +132,7 @@ struct RewardsView: View {
             HStack {
                 Spacer()
                 Text("LIMES")
-                    .font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+                    .font(.app(10, .bold)).foregroundColor(.white)
                     .padding(.horizontal, 10).padding(.vertical, 3)
                     .background(Color.white.opacity(0.2))
                     .clipShape(Capsule())
@@ -156,9 +156,9 @@ struct RewardsView: View {
 
     private func heroFigure(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 11)).foregroundColor(Color(hex: "#B7F0CD"))
+            Text(label).font(.app(11)).foregroundColor(Color(hex: "#B7F0CD"))
             Text(value)
-                .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                .font(.app(15, .semibold)).foregroundColor(.white)
                 .lineLimit(1).minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -169,7 +169,7 @@ struct RewardsView: View {
     private var benefitsCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Your Benefits")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 .padding(.bottom, 2)
             benefitRow("Cashback Available", "dollarsign.circle.fill", Brand.success, Brand.successBg,
                        RewardsFmt.rand(store.benefits?.cashback))
@@ -187,10 +187,10 @@ struct RewardsView: View {
                             _ tile: Color, _ value: String) -> some View {
         HStack(spacing: 12) {
             iconTile(icon, tint, tile, size: 36)
-            Text(label).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+            Text(label).font(.app(13)).foregroundColor(Brand.textPrimary)
             Spacer()
             Text(value)
-                .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
         }
         .padding(.vertical, 8)
     }
@@ -200,7 +200,7 @@ struct RewardsView: View {
     private func quickRedeemCard(_ proxy: ScrollViewProxy) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Quick Redeem")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
             LazyVGrid(columns: grid, spacing: 16) {
                 ForEach(quickRedeem) { service in
                     Button { run(service, proxy) } label: {
@@ -208,7 +208,7 @@ struct RewardsView: View {
                             iconTile(service.icon, service.tint,
                                      service.tint.opacity(0.12), size: 46)
                             Text(service.title)
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.app(11, .medium))
                                 .foregroundColor(Brand.textPrimary)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2).minimumScaleFactor(0.8)
@@ -227,10 +227,10 @@ struct RewardsView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text("VAS Services")
-                    .font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button("View all") { router.presented = .airtime }
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    .font(.app(13, .semibold)).foregroundColor(Brand.purple)
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -241,10 +241,10 @@ struct RewardsView: View {
                                          service.tint.opacity(0.12), size: 40)
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(service.title)
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.app(14, .semibold))
                                         .foregroundColor(Brand.textPrimary)
                                     Text(service.subtitle)
-                                        .font(.system(size: 11))
+                                        .font(.app(11))
                                         .foregroundColor(Brand.textSecondary)
                                         .lineLimit(2)
                                         .fixedSize(horizontal: false, vertical: true)
@@ -280,17 +280,17 @@ struct RewardsView: View {
     private var promotionsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Promotions & Offers")
-                .font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(store.promotions) { promo in
                         HStack(alignment: .top, spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(promo.title ?? "—")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.app(14, .semibold))
                                     .foregroundColor(Brand.textPrimary)
                                 Text(promo.description ?? "")
-                                    .font(.system(size: 12))
+                                    .font(.app(12))
                                     .foregroundColor(Brand.textSecondary)
                                     .lineLimit(3)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -315,7 +315,7 @@ struct RewardsView: View {
     private var vouchersSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Redeem with Limes")
-                .font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                 .id(voucherAnchor)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -334,24 +334,24 @@ struct RewardsView: View {
         let affordable = store.points >= v.points
         return VStack(spacing: 8) {
             Text(v.initial)
-                .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                .font(.app(20, .bold)).foregroundColor(.white)
                 .frame(width: 46, height: 46)
                 .background(v.brandColor)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             Text(v.brand ?? "—")
-                .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                 .lineLimit(1)
             Text(v.title ?? "")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2).frame(height: 28, alignment: .top)
             Text(v.pointsLabel)
-                .font(.system(size: 14, weight: .bold))
+                .font(.app(14, .bold))
                 .foregroundColor(affordable ? Brand.success : Brand.textTertiary)
 
             Button { redeeming = v } label: {
                 Text("Redeem")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.app(12, .semibold))
                     .foregroundColor(affordable ? Brand.success : Brand.textTertiary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 9)
@@ -375,11 +375,11 @@ struct RewardsView: View {
     private var activityCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Points Activity")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
 
             if store.activity.isEmpty {
                 Text("No points activity yet.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity).padding(.vertical, 22)
             } else {
                 VStack(spacing: 0) {
@@ -393,7 +393,7 @@ struct RewardsView: View {
                         Task { await store.loadMore() }
                     } label: {
                         Text(store.loadingMore ? "Loading…" : "Load more")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.app(13, .semibold))
                             .foregroundColor(Brand.purple)
                             .frame(maxWidth: .infinity).padding(.vertical, 10)
                     }
@@ -404,7 +404,7 @@ struct RewardsView: View {
             }
 
             Text("Total Points Earned (\(store.currentMonth)): +\(RewardsFmt.points(store.balance?.earned_this_month ?? 0)) pts")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
                 .padding(.top, 6)
         }
         .card()
@@ -415,15 +415,15 @@ struct RewardsView: View {
             iconTile(e.icon, e.tone, e.tone.opacity(0.12), size: 38)
             VStack(alignment: .leading, spacing: 2) {
                 Text(e.title ?? "—")
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                 Text(e.description ?? "")
-                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                    .font(.app(11)).foregroundColor(Brand.textSecondary).lineLimit(1)
                 Text(RewardsFmt.dateTime(e.date))
-                    .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                    .font(.app(11)).foregroundColor(Brand.textTertiary)
             }
             Spacer()
             Text(e.signedPoints)
-                .font(.system(size: 14, weight: .bold)).foregroundColor(e.tone)
+                .font(.app(14, .bold)).foregroundColor(e.tone)
         }
         .padding(.vertical, 10)
     }
@@ -436,17 +436,17 @@ struct RewardsView: View {
                 Image(systemName: "crown.fill")
                     .font(.system(size: 15)).foregroundColor(Brand.purple)
                 Text(store.tier?.level.map { "\($0) Level" } ?? "—")
-                    .font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
             }
 
             Text(tierAwayLabel)
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
 
             ProgressView(value: store.tier?.fraction ?? 0)
                 .tint(Brand.success)
 
             Text("\(RewardsFmt.points(store.tier?.current ?? 0)) / \(RewardsFmt.points(store.tier?.target ?? 0)) pts")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
         }
         .card()
     }
@@ -464,21 +464,21 @@ struct RewardsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Invite & Earn")
-                    .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 iconTile("person.badge.plus", Brand.purple, Brand.purpleLight, size: 40)
             }
 
             Text(inviteBody)
-                .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                .font(.app(13)).foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             if let code = store.referral?.code, !code.isEmpty {
                 HStack(spacing: 6) {
                     Text("Your code:")
-                        .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        .font(.app(13)).foregroundColor(Brand.textSecondary)
                     Text(code)
-                        .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                         .kerning(1)
                     Spacer()
                     Button {
@@ -507,7 +507,7 @@ struct RewardsView: View {
 
                     ShareLink(item: "Join me on anokiX and use my invite code \(code) — we both earn Limes points.") {
                         Text("Share")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.app(14, .semibold))
                             .foregroundColor(Brand.textPrimary)
                             .padding(.horizontal, 18).padding(.vertical, 14)
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
@@ -570,30 +570,30 @@ struct RedeemSheet: View {
                     if voucher.needsNumber {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Recipient mobile number")
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.app(13, .medium))
                                 .foregroundColor(Brand.textSecondary)
                             TextField("e.g. 0821234567", text: $msisdn)
                                 .keyboardType(.phonePad)
-                                .font(.system(size: 15))
+                                .font(.app(15))
                                 .foregroundColor(Brand.textPrimary)
                                 .padding(14)
                                 .background(Brand.surface)
                                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             Text("The airtime is loaded straight onto this number.")
-                                .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                                .font(.app(11)).foregroundColor(Brand.textTertiary)
                         }
                     }
 
                     Text(voucher.fulfilsLive
                          ? "Points are spent as soon as you confirm. Limes loads this straight away, and your points come back if it fails."
                          : "Points are spent as soon as you confirm. The voucher is recorded and issued to you shortly afterwards.")
-                        .font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+                        .font(.app(12)).foregroundColor(Brand.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let error {
                         Label(error, systemImage: "exclamationmark.circle")
-                            .font(.system(size: 12)).foregroundColor(Brand.danger)
+                            .font(.app(12)).foregroundColor(Brand.danger)
                     }
 
                     Button(submitting ? "Please wait…" : "Confirm redemption") {
@@ -618,15 +618,15 @@ struct RedeemSheet: View {
     private var header: some View {
         HStack(spacing: 12) {
             Text(voucher.initial)
-                .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                .font(.app(20, .bold)).foregroundColor(.white)
                 .frame(width: 46, height: 46)
                 .background(voucher.brandColor)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
                 Text(voucher.brand ?? "—")
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
                 Text(voucher.title ?? "")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
             }
             Spacer()
         }
@@ -636,15 +636,15 @@ struct RedeemSheet: View {
     private var figures: some View {
         HStack(spacing: 20) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Costs").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                Text("Costs").font(.app(12)).foregroundColor(Brand.textSecondary)
                 Text(voucher.pointsLabel)
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Balance after").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                Text("Balance after").font(.app(12)).foregroundColor(Brand.textSecondary)
                 Text("\(RewardsFmt.points(max(0, balance - voucher.points))) pts")
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

@@ -76,14 +76,14 @@ struct InventoryView: View {
         HStack(spacing: 10) {
             Button { showAdjustPicker = true } label: {
                 Label("Adjust Stock", systemImage: "slider.horizontal.3")
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
+                    .font(.app(13, .semibold)).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
                     .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .buttonStyle(.plain)
             Button { router.presented = .goodsReturns } label: {
                 Label("Return Stock (GRN)", systemImage: "arrowshape.turn.up.left")
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    .font(.app(13, .semibold)).foregroundColor(Brand.purple)
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
                     .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
             }
@@ -95,10 +95,10 @@ struct InventoryView: View {
     private func errorCard(_ message: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Brand.danger)
-            Text(message).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+            Text(message).font(.app(13)).foregroundColor(Brand.textPrimary)
             Spacer()
             Button("Retry") { Task { await store.load() } }
-                .font(.system(size: 13, weight: .semibold))
+                .font(.app(13, .semibold))
                 .foregroundColor(Brand.purple)
         }
         .padding(14)
@@ -124,8 +124,8 @@ struct InventoryView: View {
                         }
                     }
                     VStack(spacing: 1) {
-                        Text("\(store.summary?.total_products ?? 0)").font(.system(size: 22, weight: .bold)).foregroundColor(Brand.textPrimary)
-                        Text("Products").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                        Text("\(store.summary?.total_products ?? 0)").font(.app(22, .bold)).foregroundColor(Brand.textPrimary)
+                        Text("Products").font(.app(11)).foregroundColor(Brand.textSecondary)
                     }
                 }
                 .frame(width: 150, height: 150)
@@ -134,9 +134,9 @@ struct InventoryView: View {
                     ForEach(Array(store.chart.enumerated()), id: \.offset) { _, s in
                         HStack(spacing: 8) {
                             Circle().fill(Color(hex: s.color ?? "#E2E8F0")).frame(width: 10, height: 10)
-                            Text(s.type ?? "").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                            Text(s.type ?? "").font(.app(12)).foregroundColor(Brand.textSecondary)
                             Spacer()
-                            Text(String(format: "%.0f%%", s.value ?? 0)).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                            Text(String(format: "%.0f%%", s.value ?? 0)).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                         }
                     }
                 }
@@ -147,7 +147,7 @@ struct InventoryView: View {
 
     private func emptyProducts(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            .font(.app(13)).foregroundColor(Brand.textSecondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding(.top, 24)
@@ -155,7 +155,7 @@ struct InventoryView: View {
 
     private func emptyLine(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            .font(.app(13)).foregroundColor(Brand.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 6)
     }
@@ -178,11 +178,11 @@ struct InventoryView: View {
             ForEach(store.fastMoving) { m in
                 HStack(spacing: 12) {
                     Text("\(m.rank ?? 0)")
-                        .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
+                        .font(.app(12, .bold)).foregroundColor(Brand.purple)
                         .frame(width: 26, height: 26).background(Brand.purpleLight).clipShape(Circle())
-                    Text(m.name ?? "—").font(.system(size: 13)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                    Text(m.name ?? "—").font(.app(13)).foregroundColor(Brand.textPrimary).lineLimit(1)
                     Spacer()
-                    Text("\(m.units ?? 0) units").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    Text("\(m.units ?? 0) units").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                 }
                 .padding(.vertical, 8)
             }
@@ -203,7 +203,7 @@ struct InventoryView: View {
 
     private var productsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Products").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text("Products").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
 
             searchField
             HStack(spacing: 10) {
@@ -248,7 +248,7 @@ extension InventoryView {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 13)).foregroundColor(Brand.textTertiary)
             TextField("Search by product name, SKU or barcode…", text: $store.search)
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textPrimary)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
@@ -280,7 +280,7 @@ extension InventoryView {
         } label: {
             HStack(spacing: 6) {
                 Text(title)
-                    .font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                    .font(.app(12)).foregroundColor(Brand.textPrimary)
                     .lineLimit(1)
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.down")
@@ -316,20 +316,20 @@ private struct InventoryRowCard: View {
             HStack(spacing: 12) {
                 InitialBadge(text: String((row.name ?? "?").prefix(1)), color: Color(hex: row.imageColor ?? "#7C3AED"), size: 46)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(row.name ?? "—").font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
-                    Text(row.sku ?? "").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text(row.name ?? "—").font(.app(15, .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                    Text(row.sku ?? "").font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 StatusBadge(text: row.statusLabel, fg: row.statusTone.fg, bg: row.statusTone.bg)
             }
             Text("\(row.category ?? "") · \(row.warehouse ?? "") · \(row.updatedAt ?? "")")
-                .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                .font(.app(11)).foregroundColor(Brand.textTertiary)
                 .frame(maxWidth: .infinity, alignment: .leading).lineLimit(1)
             ProgressView(value: row.stockPercent, total: 100).tint(Color(hex: row.imageColor ?? "#7C3AED"))
             HStack {
-                Text("\(row.onHand) / \(row.capacity ?? 0) units").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                Text("\(row.onHand) / \(row.capacity ?? 0) units").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                 Spacer()
-                Text(InvFmt.money(row.value)).font(.system(size: 13, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(InvFmt.money(row.value)).font(.app(13, .bold)).foregroundColor(Brand.textPrimary)
             }
         }
         .card()
@@ -345,13 +345,13 @@ struct MovementRow: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
-                Text(sub).font(.system(size: 11)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                Text(title).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                Text(sub).font(.app(11)).foregroundColor(Brand.textSecondary).lineLimit(1)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 1) {
-                Text(qtyText).font(.system(size: 13, weight: .bold)).foregroundColor(qtyColor)
-                Text("Bal \(m.balance_after ?? 0)").font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                Text(qtyText).font(.app(13, .bold)).foregroundColor(qtyColor)
+                Text("Bal \(m.balance_after ?? 0)").font(.app(11)).foregroundColor(Brand.textTertiary)
             }
         }
         .padding(.vertical, 8)
@@ -392,8 +392,8 @@ private struct AdjustStockSheet: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(row.name ?? "—").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    Text(row.sku ?? "").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text(row.name ?? "—").font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
+                    Text(row.sku ?? "").font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 StatusBadge(text: row.statusLabel, fg: row.statusTone.fg, bg: row.statusTone.bg)
@@ -408,14 +408,14 @@ private struct AdjustStockSheet: View {
                 VStack(alignment: .leading, spacing: 14) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("On hand: \(row.onHand) · Value \(InvFmt.money(row.value))")
-                            .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                            .font(.app(13)).foregroundColor(Brand.textPrimary)
                         Text("\(row.brand ?? "") · \(row.category ?? "") · \(row.warehouse ?? "")")
-                            .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                            .font(.app(12)).foregroundColor(Brand.textSecondary)
                     }
 
                     Button(action: onHistory) {
                         Label("View Stock History", systemImage: "clock")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.app(13, .semibold))
                             .foregroundColor(Brand.textPrimary)
                             .frame(maxWidth: .infinity).padding(.vertical, 11)
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -424,7 +424,7 @@ private struct AdjustStockSheet: View {
 
                     Divider()
 
-                    Text("Adjust Stock").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text("Adjust Stock").font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                     Picker("", selection: $isAdd) {
                         Text("Add (+)").tag(true)
                         Text("Remove (−)").tag(false)
@@ -432,12 +432,12 @@ private struct AdjustStockSheet: View {
                     .pickerStyle(.segmented)
 
                     HStack {
-                        Text("Quantity").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        Text("Quantity").font(.app(13)).foregroundColor(Brand.textSecondary)
                         Spacer()
                         HStack(spacing: 0) {
                             Button { amount = max(1, amount - 1) } label: { Image(systemName: "minus").frame(width: 36, height: 36) }
                                 .buttonStyle(.plain)
-                            Text("\(amount)").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary).frame(minWidth: 40)
+                            Text("\(amount)").font(.app(16, .bold)).foregroundColor(Brand.textPrimary).frame(minWidth: 40)
                             Button { amount += 1 } label: { Image(systemName: "plus").frame(width: 36, height: 36) }
                                 .buttonStyle(.plain)
                         }
@@ -461,10 +461,10 @@ private struct AdjustStockSheet: View {
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
                     }
 
-                    Text("New on hand: \(newOnHand)").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    Text("New on hand: \(newOnHand)").font(.app(13)).foregroundColor(Brand.textSecondary)
 
                     if let errorMsg {
-                        Text(errorMsg).font(.system(size: 12, weight: .medium)).foregroundColor(Brand.danger)
+                        Text(errorMsg).font(.app(12, .medium)).foregroundColor(Brand.danger)
                     }
                 }
                 .padding(16)
@@ -475,7 +475,7 @@ private struct AdjustStockSheet: View {
                     if submitting { ProgressView().tint(.white) }
                     Text(submitting ? "Applying…" : "Apply Adjustment")
                 }
-                .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                .font(.app(15, .semibold)).foregroundColor(.white)
                 .frame(maxWidth: .infinity).padding(.vertical, 14)
                 .background(Brand.purple.opacity(submitting ? 0.7 : 1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -524,7 +524,7 @@ struct StockHistoryView: View {
                 } else if loading {
                     ProgressView().padding(.top, 60)
                 } else {
-                    Text(error ?? "No history.").font(.system(size: 13)).foregroundColor(Brand.textSecondary).padding(.top, 60)
+                    Text(error ?? "No history.").font(.app(13)).foregroundColor(Brand.textSecondary).padding(.top, 60)
                 }
             }
             .padding(16)
@@ -539,7 +539,7 @@ struct StockHistoryView: View {
     private func snapshot(_ d: InventoryHistoryData) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("SKU: \(d.product?.sku ?? "—")").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                Text("SKU: \(d.product?.sku ?? "—")").font(.app(12)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 let tone = InvFmt.statusTone(d.status)
                 StatusBadge(text: InvFmt.statusLabel(d.status), fg: tone.fg, bg: tone.bg)
@@ -558,7 +558,7 @@ struct StockHistoryView: View {
             SectionHeader(title: "Movement Ledger")
             let moves = d.movements ?? []
             if moves.isEmpty {
-                Text("No movements recorded yet.").font(.system(size: 12)).foregroundColor(Brand.textSecondary).padding(.vertical, 6)
+                Text("No movements recorded yet.").font(.app(12)).foregroundColor(Brand.textSecondary).padding(.vertical, 6)
             } else {
                 ForEach(moves) { m in MovementRow(m: m, showProduct: false) }
             }
@@ -568,9 +568,9 @@ struct StockHistoryView: View {
 
     private func kv(_ label: String, _ value: String) -> some View {
         HStack {
-            Text(label).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(13)).foregroundColor(Brand.textSecondary)
             Spacer()
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(value).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
         }
     }
 
@@ -616,7 +616,7 @@ struct InventoryAnalyticsView: View {
                 } else if loading {
                     ProgressView().padding(.top, 60)
                 } else {
-                    Text(error ?? "No analytics.").font(.system(size: 13)).foregroundColor(Brand.textSecondary).padding(.top, 60)
+                    Text(error ?? "No analytics.").font(.app(13)).foregroundColor(Brand.textSecondary).padding(.top, 60)
                 }
             }
             .padding(16)
@@ -631,12 +631,12 @@ struct InventoryAnalyticsView: View {
     private func grossProfit(_ d: InventoryAnalyticsData) -> some View {
         let gp = d.gross_profit
         return VStack(alignment: .leading, spacing: 10) {
-            Text("Gross Profit · Last \(d.window_days ?? 30) days").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            Text("Gross Profit · Last \(d.window_days ?? 30) days").font(.app(12)).foregroundColor(Brand.textSecondary)
             HStack {
-                Text(InvFmt.money(gp?.gross_profit ?? 0)).font(.system(size: 24, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(InvFmt.money(gp?.gross_profit ?? 0)).font(.app(24, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Text(String(format: "%.1f%% margin", gp?.margin_pct ?? 0))
-                    .font(.system(size: 11, weight: .semibold)).foregroundColor(Brand.success)
+                    .font(.app(11, .semibold)).foregroundColor(Brand.success)
                     .padding(.horizontal, 10).padding(.vertical, 4).background(Brand.successBg).clipShape(Capsule())
             }
             Divider()
@@ -655,12 +655,12 @@ struct InventoryAnalyticsView: View {
                     Circle().fill(Color(hex: b.color ?? "#E2E8F0")).frame(width: 10, height: 10)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(ageingLabel(b.label, idx))
-                            .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                            .font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                         Text("\(b.products ?? 0) products · \(b.units ?? 0) units")
-                            .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                            .font(.app(11)).foregroundColor(Brand.textSecondary)
                     }
                     Spacer()
-                    Text(InvFmt.money(b.value ?? 0)).font(.system(size: 13, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text(InvFmt.money(b.value ?? 0)).font(.app(13, .bold)).foregroundColor(Brand.textPrimary)
                 }
                 .padding(.vertical, 8)
             }
@@ -673,21 +673,21 @@ struct InventoryAnalyticsView: View {
             SectionHeader(title: "Reorder Suggestions")
             let list = d.reorder ?? []
             if list.isEmpty {
-                Text("Nothing needs reordering right now.").font(.system(size: 12)).foregroundColor(Brand.textSecondary).padding(.vertical, 6)
+                Text("Nothing needs reordering right now.").font(.app(12)).foregroundColor(Brand.textSecondary).padding(.vertical, 6)
             } else {
                 ForEach(list) { r in
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(r.name ?? "—").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                            Text(r.name ?? "—").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
                             Text("\(r.sku ?? "") · On hand \(r.on_hand ?? 0) / \(r.threshold ?? 0) · sold \(r.sold_last_30 ?? 0)")
-                                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                                .font(.app(11)).foregroundColor(Brand.textSecondary)
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 3) {
-                            Text("Order \(r.suggested ?? 0)").font(.system(size: 13, weight: .bold)).foregroundColor(Brand.purple)
+                            Text("Order \(r.suggested ?? 0)").font(.app(13, .bold)).foregroundColor(Brand.purple)
                             let tone = urgencyTone(r.urgency)
                             Text((r.urgency ?? "—").capitalized)
-                                .font(.system(size: 9, weight: .semibold)).foregroundColor(tone.fg)
+                                .font(.app(9, .semibold)).foregroundColor(tone.fg)
                                 .padding(.horizontal, 8).padding(.vertical, 2).background(tone.bg).clipShape(Capsule())
                         }
                     }
@@ -700,9 +700,9 @@ struct InventoryAnalyticsView: View {
 
     private func kv(_ label: String, _ value: String) -> some View {
         HStack {
-            Text(label).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(13)).foregroundColor(Brand.textSecondary)
             Spacer()
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(value).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
         }
     }
 

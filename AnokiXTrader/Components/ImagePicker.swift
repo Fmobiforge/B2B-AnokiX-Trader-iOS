@@ -70,7 +70,7 @@ struct ImageSourcePickerSheet: View {
                 if let onCancel { onCancel() } else { dismiss() }
             } label: {
                 Text("Cancel")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(.app(17, .semibold))
                     .foregroundColor(actionBlue)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -90,7 +90,7 @@ struct ImageSourcePickerSheet: View {
     private func optionButton(_ title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 17))
+                .font(.app(17))
                 .foregroundColor(actionBlue)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)

@@ -96,8 +96,8 @@ struct DonutChartView: View {
                     .rotationEffect(.degrees(-90))
             }
             VStack(spacing: 0) {
-                Text("Total").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-                Text("R86,420").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Total").font(.app(11)).foregroundColor(Brand.textSecondary)
+                Text("R86,420").font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
             }
         }
         .frame(width: size, height: size)

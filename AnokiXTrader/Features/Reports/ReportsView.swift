@@ -128,7 +128,7 @@ struct ReportsView: View {
                 .font(.system(size: 14))
                 .foregroundColor(Brand.textSecondary)
             TextField("Search report name or period…", text: $store.search)
-                .font(.system(size: 14))
+                .font(.app(14))
                 .foregroundColor(Brand.textPrimary)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
@@ -158,7 +158,7 @@ struct ReportsView: View {
                     Text(store.hasPeriodFilter
                          ? ReportFmt.range(store.periodFrom, store.periodTo)
                          : "Report period")
-                        .font(.system(size: 14))
+                        .font(.app(14))
                         .foregroundColor(Brand.textPrimary)
                         .lineLimit(1)
                     Spacer(minLength: 0)
@@ -169,7 +169,7 @@ struct ReportsView: View {
 
             if store.hasPeriodFilter {
                 Button("Clear") { store.clearPeriod() }
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.app(12, .semibold))
                     .foregroundColor(Brand.purple)
                     .buttonStyle(.plain)
             }
@@ -185,7 +185,7 @@ struct ReportsView: View {
     private var resultCount: some View {
         let n = store.filtered.count
         return Text("Showing \(n) \(n == 1 ? "report" : "reports")")
-            .font(.system(size: 12))
+            .font(.app(12))
             .foregroundColor(Brand.textSecondary)
     }
 
@@ -215,12 +215,12 @@ struct ReportsView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text(unfiltered ? "No reports yet" : "Nothing matches")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text(unfiltered
                  ? "Tap Generate Report to build your first one."
                  : "Try a different category, search or period.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -295,7 +295,7 @@ private struct ReportCard: View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(alignment: .top) {
                 Text(report.name ?? "—")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.app(15, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer(minLength: 8)
                 StatusBadge(text: report.statusLabel,
@@ -305,28 +305,28 @@ private struct ReportCard: View {
             HStack(spacing: 8) {
                 if let category = report.category, !category.isEmpty {
                     Text(category)
-                        .font(.system(size: 10))
+                        .font(.app(10))
                         .foregroundColor(Brand.purple)
                         .padding(.horizontal, 9).padding(.vertical, 3)
                         .background(Brand.purpleLight)
                         .clipShape(Capsule())
                 }
                 Text(report.metaLine)
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textSecondary)
                     .lineLimit(1)
             }
 
             Text(report.periodLabel)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textPrimary)
             Text("Generated \(ReportFmt.dateTime(report.created_at))")
-                .font(.system(size: 11))
+                .font(.app(11))
                 .foregroundColor(Brand.textSecondary)
 
             if let message = report.error, !message.isEmpty, !report.isReady {
                 Text(message)
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.danger)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(8)
@@ -338,12 +338,12 @@ private struct ReportCard: View {
 
             HStack {
                 Text(downloadsLabel)
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
                 Spacer()
                 Button(action: onDownload) {
                     Label("Download", systemImage: "arrow.down.circle")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.app(13, .semibold))
                         .foregroundColor(Brand.purple)
                         .padding(.horizontal, 14).padding(.vertical, 9)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.purple, lineWidth: 1))
@@ -396,7 +396,7 @@ private struct GenerateReportSheet: View {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Built from your own data and downloaded as a CSV, which opens in "
                          + "Excel, Numbers and Google Sheets.")
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(14)
@@ -410,7 +410,7 @@ private struct GenerateReportSheet: View {
                                       placeholder: "Choose a report") { showTypePicker = true }
                         if let about = selectedAbout, !about.isEmpty {
                             Text(about)
-                                .font(.system(size: 11))
+                                .font(.app(11))
                                 .foregroundColor(Brand.textSecondary)
                         }
                     }
@@ -420,7 +420,7 @@ private struct GenerateReportSheet: View {
 
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.danger)
                     }
 

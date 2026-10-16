@@ -138,10 +138,10 @@ struct CategoryFilterSheet: View {
                 .frame(height: 28)
             HStack {
                 Text(CurrencyFmt.format(lo, symbol: currency))
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 Text(CurrencyFmt.format(hi, symbol: currency) + (hi >= rangeMax ? "+" : ""))
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
             }
         }
     }
@@ -174,7 +174,7 @@ struct CategoryFilterSheet: View {
         HStack(spacing: 10) {
             Button { clearAll() } label: {
                 Text("Reset")
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
                     .frame(maxWidth: .infinity).padding(.vertical, 13)
                     .background(Brand.surface)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
@@ -184,7 +184,7 @@ struct CategoryFilterSheet: View {
 
             Button { apply() } label: {
                 Text("Apply Filters")
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                    .font(.app(15, .semibold)).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 13)
                     .background(Brand.purple)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -198,7 +198,7 @@ struct CategoryFilterSheet: View {
     // MARK: - Row helper
 
     private func sectionTitle(_ text: String) -> some View {
-        Text(text).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+        Text(text).font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
     }
 
     private func optionRow(_ label: String, _ count: Int?, _ checked: Bool,
@@ -208,10 +208,10 @@ struct CategoryFilterSheet: View {
                 Image(systemName: checked ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 18))
                     .foregroundColor(checked ? Brand.purple : Brand.textTertiary)
-                Text(label).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                Text(label).font(.app(14)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 if let count {
-                    Text("\(count)").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text("\(count)").font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
             }
             .padding(.vertical, 6)

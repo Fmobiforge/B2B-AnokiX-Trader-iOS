@@ -44,10 +44,10 @@ struct DistributorsView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("No distributors yet")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("Your assigned distributors will appear here.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -67,7 +67,7 @@ private struct DistributorCard: View {
             HStack(spacing: 14) {
                 DistributorAvatar(logoUrl: distributor.logo_url, initial: distributor.initial, size: 48)
                 Text(distributor.displayName)
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.purple)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
@@ -75,29 +75,29 @@ private struct DistributorCard: View {
 
             HStack {
                 Text("Products Available")
-                    .font(.system(size: 13))
+                    .font(.app(13))
                     .foregroundColor(Brand.textSecondary)
                 Spacer()
                 Text("\(distributor.products_available)+")
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.app(14, .bold))
                     .foregroundColor(Brand.textPrimary)
             }
 
             HStack(alignment: .top, spacing: 12) {
                 Label("Coverage Area", systemImage: "mappin.and.ellipse")
                     .labelStyle(.titleAndIcon)
-                    .font(.system(size: 13))
+                    .font(.app(13))
                     .foregroundColor(Brand.textSecondary)
                     .fixedSize()
                 Spacer(minLength: 8)
                 Text(distributor.address ?? "—")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.app(12, .semibold))
                     .foregroundColor(Brand.textPrimary)
                     .multilineTextAlignment(.trailing)
             }
 
             Text("View Distributor")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(Brand.purple)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -126,7 +126,7 @@ private struct DistributorDetailView: View {
                 performance
                 Button { showChangeForm = true } label: {
                     Text("Request Change Distributor")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.app(15, .semibold))
                         .foregroundColor(Brand.purple)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 15)
@@ -153,12 +153,12 @@ private struct DistributorDetailView: View {
             DistributorAvatar(logoUrl: distributor.logo_url, initial: distributor.initial, size: 56)
             VStack(alignment: .leading, spacing: 8) {
                 Text(distributor.displayName)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.app(20, .bold))
                     .foregroundColor(Brand.purple)
                 if distributor.isActive {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.seal.fill").font(.system(size: 11))
-                        Text("Your Preferred Distributor").font(.system(size: 11, weight: .semibold))
+                        Text("Your Preferred Distributor").font(.app(11, .semibold))
                     }
                     .foregroundColor(Brand.success)
                     .padding(.horizontal, 10).padding(.vertical, 4)
@@ -187,8 +187,8 @@ private struct DistributorDetailView: View {
 
     private func infoCell(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(label).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(label).font(.app(11)).foregroundColor(Brand.textSecondary)
+            Text(value).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -206,7 +206,7 @@ private struct DistributorDetailView: View {
     private func contactRow(_ icon: String, _ text: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon).font(.system(size: 15)).foregroundColor(Brand.purple).frame(width: 20)
-            Text(text).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+            Text(text).font(.app(14)).foregroundColor(Brand.textPrimary)
             Spacer(minLength: 0)
         }
     }
@@ -216,7 +216,7 @@ private struct DistributorDetailView: View {
     private var performance: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Distributor Performance")
-                .font(.system(size: 16, weight: .bold))
+                .font(.app(16, .bold))
                 .foregroundColor(Brand.topTitle)
             HStack(alignment: .top, spacing: 12) {
                 perfCell("On-time Delivery", "95%")
@@ -232,17 +232,17 @@ private struct DistributorDetailView: View {
 
     private func perfCell(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-            Text(value).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.topTitle)
+            Text(label).font(.app(12)).foregroundColor(Brand.textSecondary)
+            Text(value).font(.app(20, .bold)).foregroundColor(Brand.topTitle)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func ratingCell(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(12)).foregroundColor(Brand.textSecondary)
             HStack(spacing: 4) {
-                Text(value).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.topTitle)
+                Text(value).font(.app(20, .bold)).foregroundColor(Brand.topTitle)
                 Image(systemName: "star.fill").font(.system(size: 14)).foregroundColor(Color(hex: "#F59E0B"))
             }
         }
@@ -269,13 +269,13 @@ private struct ChangeDistributorForm: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Submit a request to change your distributor from \(distributor.displayName). Our team will review it and get back to you.")
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(Brand.textSecondary)
 
                     VStack(alignment: .trailing, spacing: 4) {
                         TextField("Reason for change (optional)", text: $reason, axis: .vertical)
                             .lineLimit(5...10)
-                            .font(.system(size: 14))
+                            .font(.app(14))
                             .padding(14)
                             .frame(maxWidth: .infinity, alignment: .topLeading)
                             .background(Brand.surface)
@@ -284,13 +284,13 @@ private struct ChangeDistributorForm: View {
                                 if newValue.count > maxLen { reason = String(newValue.prefix(maxLen)) }
                             }
                         Text("\(reason.count) / \(maxLen)")
-                            .font(.system(size: 11))
+                            .font(.app(11))
                             .foregroundColor(Brand.textTertiary)
                     }
 
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.app(12, .medium))
                             .foregroundColor(Brand.danger)
                     }
                 }

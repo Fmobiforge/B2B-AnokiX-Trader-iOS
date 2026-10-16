@@ -49,7 +49,7 @@ struct CartView: View {
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "cart").font(.system(size: 56)).foregroundColor(Brand.textTertiary)
-            Text("Your cart is empty.").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+            Text("Your cart is empty.").font(.app(14)).foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -71,7 +71,7 @@ struct CartView: View {
 
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill").foregroundColor(Brand.success)
-                    Text("You've unlocked FREE delivery!").font(.system(size: 13, weight: .semibold))
+                    Text("You've unlocked FREE delivery!").font(.app(13, .semibold))
                         .foregroundColor(Brand.success)
                     Spacer()
                 }
@@ -85,26 +85,26 @@ struct CartView: View {
 
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Order Summary").font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text("Order Summary").font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
             HStack {
-                Text("Subtotal").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("Subtotal").font(.app(14)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 Text(CurrencyFmt.format(store.selectedSubtotal, symbol: currency))
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
             }
             HStack {
-                Text("Delivery Fee").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("Delivery Fee").font(.app(14)).foregroundColor(Brand.textSecondary)
                 Spacer()
-                Text("FREE").font(.system(size: 14, weight: .bold)).foregroundColor(Brand.success)
+                Text("FREE").font(.app(14, .bold)).foregroundColor(Brand.success)
             }
             Divider()
             HStack {
-                Text("Total").font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Total").font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Text(CurrencyFmt.format(store.cartSubtotal, symbol: currency))
-                    .font(.system(size: 20, weight: .bold)).foregroundColor(Brand.purple)
+                    .font(.app(20, .bold)).foregroundColor(Brand.purple)
             }
-            Text("Incl. VAT").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+            Text("Incl. VAT").font(.app(11)).foregroundColor(Brand.textSecondary)
             Button("Proceed to Checkout") { proceedToCheckout() }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(.top, 4)
@@ -132,12 +132,12 @@ struct CartRow: View {
             RemoteImage(url: line.imageURL)
                 .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 6) {
-                Text(line.name).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(2)
+                Text(line.name).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary).lineLimit(2)
                 Text(CurrencyFmt.format(line.unitPrice, symbol: currency))
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
                 HStack(spacing: 0) {
                     Button(action: onMinus) { Image(systemName: "minus").frame(width: 32, height: 32) }
-                    Text("\(line.qty)").font(.system(size: 14, weight: .bold)).frame(width: 34)
+                    Text("\(line.qty)").font(.app(14, .bold)).frame(width: 34)
                     Button(action: onPlus) { Image(systemName: "plus").frame(width: 32, height: 32) }
                 }
                 .foregroundColor(Brand.textPrimary)
@@ -147,7 +147,7 @@ struct CartRow: View {
             VStack(alignment: .trailing, spacing: 18) {
                 Button(action: onDelete) { Image(systemName: "trash").foregroundColor(Brand.danger) }
                 Text(CurrencyFmt.format(line.lineTotal, symbol: currency))
-                    .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
             }
         }
         .padding(.vertical, 10)

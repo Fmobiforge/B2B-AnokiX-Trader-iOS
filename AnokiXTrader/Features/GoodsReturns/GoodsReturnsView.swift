@@ -64,10 +64,10 @@ struct GoodsReturnsView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("No returns yet")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("Return goods against a received delivery and track credit notes here.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -79,7 +79,7 @@ struct GoodsReturnsView: View {
     private var bottomBar: some View {
         Button { showForm = true } label: {
             Label("Return Goods", systemImage: "plus")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -106,16 +106,16 @@ private struct ReturnCard: View {
                     .font(.system(size: 17))
                     .foregroundColor(Brand.purple)
                 Text(grn.grn_number)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(Brand.purple)
                 Spacer()
                 StatusBadge(text: grn.statusLabel, fg: grn.statusTone.fg, bg: grn.statusTone.bg)
             }
             Text(grn.distributor_name ?? "—")
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textPrimary)
             Text("\(grn.lineCount) line(s) · \(grn.total_quantity ?? "0") × \(ReturnReasonOption.label(grn.reason))")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
 
             if grn.hasCreditNote {
@@ -124,13 +124,13 @@ private struct ReturnCard: View {
                         .font(.system(size: 11))
                         .foregroundColor(Brand.success)
                     Text("\(grn.credit_note_number ?? "") · \(GrnFmt.money(grn.credit_note_total ?? 0))")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.app(12, .semibold))
                         .foregroundColor(Brand.success)
                 }
             }
 
             Text(GrnFmt.date(grn.created_at))
-                .font(.system(size: 11))
+                .font(.app(11))
                 .foregroundColor(Brand.textTertiary)
 
             if expanded {
@@ -138,18 +138,18 @@ private struct ReturnCard: View {
                 ForEach(grn.lineItems) { item in
                     HStack(alignment: .top) {
                         Text(item.name ?? "—")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.app(13, .semibold))
                             .foregroundColor(Brand.textPrimary)
                         Spacer()
                         Text("\(item.qty) × \(ReturnReasonOption.label(item.reason))")
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.textSecondary)
                     }
                     .padding(.vertical, 4)
                 }
                 if let note = grn.decision_note, !note.isEmpty {
                     Text("Distributor note: \(note)")
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                         .padding(.top, 2)
                 }
@@ -197,7 +197,7 @@ private struct GoodsReturnForm: View {
                     noteSection
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.app(12, .medium))
                             .foregroundColor(Brand.danger)
                     }
                 }
@@ -225,13 +225,13 @@ private struct GoodsReturnForm: View {
 
     private var grvSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Return against delivery (GRV)").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text("Return against delivery (GRV)").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
             if loadingGrvs {
                 fieldBox { HStack { ProgressView().scaleEffect(0.8); Text("Loading deliveries…").foregroundColor(Brand.textSecondary) } }
             } else if returnableGrvs.isEmpty {
                 fieldBox { Text("No received goods to return").foregroundColor(Brand.textSecondary) }
                 Text("Confirm receipt of a delivery (GRV) before you can return goods.")
-                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    .font(.app(11)).foregroundColor(Brand.textSecondary)
             } else {
                 Menu {
                     ForEach(returnableGrvs) { g in
@@ -254,13 +254,13 @@ private struct GoodsReturnForm: View {
     private func itemsSection(_ grv: GrvDTO) -> some View {
         let items = grv.lineItems.filter { $0.received > 0 }
         return VStack(alignment: .leading, spacing: 4) {
-            Text("Items to return").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text("Items to return").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
             VStack(spacing: 0) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { idx, item in
                     HStack {
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(item.name ?? "—").font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                            Text("\(item.received) available").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                            Text(item.name ?? "—").font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
+                            Text("\(item.received) available").font(.app(11)).foregroundColor(Brand.textSecondary)
                         }
                         Spacer()
                         qtyStepper(item)
@@ -274,7 +274,7 @@ private struct GoodsReturnForm: View {
 
     private var reasonSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Reason").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text("Reason").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
             Menu {
                 ForEach(Array(ReturnReasonOption.keys.enumerated()), id: \.offset) { idx, key in
                     Button(ReturnReasonOption.labels[idx]) { reasonKey = key }
@@ -293,10 +293,10 @@ private struct GoodsReturnForm: View {
 
     private var noteSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Note (optional)").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text("Note (optional)").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
             TextField("Add a note for the distributor…", text: $note, axis: .vertical)
                 .lineLimit(3...6)
-                .font(.system(size: 14))
+                .font(.app(14))
                 .padding(14)
                 .background(Brand.surface)
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -310,7 +310,7 @@ private struct GoodsReturnForm: View {
                 Image(systemName: "minus").frame(width: 34, height: 34)
             }
             .buttonStyle(.plain)
-            Text("\(q)").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary).frame(minWidth: 34)
+            Text("\(q)").font(.app(15, .bold)).foregroundColor(Brand.textPrimary).frame(minWidth: 34)
             Button { setQty(item, q + 1) } label: {
                 Image(systemName: "plus").frame(width: 34, height: 34)
             }

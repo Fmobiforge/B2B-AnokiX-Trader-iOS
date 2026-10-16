@@ -91,25 +91,25 @@ struct MakeOrderView: View {
     private var addressCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text("Delivery Address").font(.system(size: 16, weight: .bold))
+                Text("Delivery Address").font(.app(16, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button("Change") { activeSheet = .address }
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.purple)
+                    .font(.app(14, .semibold)).foregroundColor(Brand.purple)
             }
             Text(address.isEmpty ? "No delivery address set." : address)
-                .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                .font(.app(14)).foregroundColor(Brand.textSecondary)
         }
         .card()
     }
 
     private var deliveryWindowCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Delivery Window").font(.system(size: 16, weight: .bold))
+            Text("Delivery Window").font(.app(16, .bold))
                 .foregroundColor(Brand.textPrimary)
             if slots.isEmpty {
                 Text("No delivery slots available.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
             } else {
                 ForEach(inlineSlots) { slot in
                     OrderOptionRow(title: slot.label, selected: slot.id == selectedSlotId) {
@@ -118,7 +118,7 @@ struct MakeOrderView: View {
                 }
                 if slots.count > 5 {
                     Button("View all slots") { activeSheet = .allSlots }
-                        .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.purple)
+                        .font(.app(14, .semibold)).foregroundColor(Brand.purple)
                         .padding(.top, 2)
                 }
             }
@@ -128,10 +128,10 @@ struct MakeOrderView: View {
 
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Special Instructions (Optional)").font(.system(size: 16, weight: .bold))
+            Text("Special Instructions (Optional)").font(.app(16, .bold))
                 .foregroundColor(Brand.textPrimary)
             TextField("E.g. Gate code, store hours, etc.", text: $notes, axis: .vertical)
-                .font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                .font(.app(14)).foregroundColor(Brand.textPrimary)
                 .lineLimit(3...6)
                 .padding(12)
                 .background(Brand.surface)
@@ -142,7 +142,7 @@ struct MakeOrderView: View {
 
     private var paymentCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Payment Method").font(.system(size: 16, weight: .bold))
+            Text("Payment Method").font(.app(16, .bold))
                 .foregroundColor(Brand.textPrimary)
             ForEach(payments, id: \.key) { p in
                 OrderOptionRow(title: p.title, subtitle: p.subtitle, selected: p.key == paymentKey) {
@@ -155,26 +155,26 @@ struct MakeOrderView: View {
 
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Order Summary").font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text("Order Summary").font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
             HStack {
-                Text("Subtotal").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("Subtotal").font(.app(14)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 Text(CurrencyFmt.format(subtotal, symbol: currency))
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
             }
             HStack {
-                Text("Delivery Fee").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("Delivery Fee").font(.app(14)).foregroundColor(Brand.textSecondary)
                 Spacer()
-                Text("FREE").font(.system(size: 14, weight: .bold)).foregroundColor(Brand.success)
+                Text("FREE").font(.app(14, .bold)).foregroundColor(Brand.success)
             }
             Divider()
             HStack {
-                Text("Total").font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Total").font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Text(CurrencyFmt.format(subtotal, symbol: currency))
-                    .font(.system(size: 20, weight: .bold)).foregroundColor(Brand.purple)
+                    .font(.app(20, .bold)).foregroundColor(Brand.purple)
             }
-            Text("Incl. VAT").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+            Text("Incl. VAT").font(.app(11)).foregroundColor(Brand.textSecondary)
             Button(placing ? "Placing order…" : "Order \(CurrencyFmt.format(subtotal, symbol: currency))") {
                 placeOrder()
             }
@@ -238,10 +238,10 @@ private struct OrderOptionRow: View {
                     .font(.system(size: 20))
                     .foregroundColor(selected ? Brand.purple : Brand.textTertiary)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    Text(title).font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                         .multilineTextAlignment(.leading)
                     if let subtitle {
-                        Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        Text(subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                     }
                 }
                 Spacer()
@@ -279,11 +279,11 @@ private struct AddressSearchSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Search delivery address").font(.system(size: 13, weight: .medium))
+                Text("Search delivery address").font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 HStack {
                     TextField("Search delivery address", text: $query)
-                        .font(.system(size: 15)).foregroundColor(Brand.textPrimary)
+                        .font(.app(15)).foregroundColor(Brand.textPrimary)
                         .onChange(of: query) { _ in search() }
                     if searching { ProgressView() }
                 }
@@ -298,7 +298,7 @@ private struct AddressSearchSheet: View {
                                 Button { resolve(s) } label: {
                                     HStack {
                                         Image(systemName: "mappin.circle").foregroundColor(Brand.purple)
-                                        Text(s.description).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                                        Text(s.description).font(.app(13)).foregroundColor(Brand.textPrimary)
                                             .multilineTextAlignment(.leading)
                                         Spacer()
                                     }
@@ -320,7 +320,7 @@ private struct AddressSearchSheet: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14))
 
                 Text("Tap the map to drop a pin, or drag the pin to set the location.")
-                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    .font(.app(11)).foregroundColor(Brand.textSecondary)
 
                 Button("Use this address") {
                     let chosen = localAddress.trimmingCharacters(in: .whitespacesAndNewlines)

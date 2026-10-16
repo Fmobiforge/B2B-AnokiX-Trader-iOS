@@ -39,12 +39,11 @@ struct RegisterView: View {
         } else {
             wizard
                 .task { await store.loadReference() }
-                // White status bar text/icons over the dark purple header: SwiftUI couples
-                // the status-bar style to the scene's color scheme, so we put the SCENE in
-                // dark (same trick as Login/Welcome) but keep the form itself light with an
-                // explicit environment override. Sheets/pickers force `.preferredColorScheme(.light)`.
+                // White portal header → dark status-bar icons. SwiftUI couples the status-bar
+                // style to the scene's color scheme, and the Welcome screen before this one
+                // put the scene in dark, so set it back to light explicitly.
                 .environment(\.colorScheme, .light)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(.light)
         }
     }
 
@@ -76,26 +75,27 @@ struct RegisterView: View {
                 if step == 0 { session.stage = .welcome } else { step -= 1 }
             } label: {
                 Image(systemName: "chevron.left").font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Brand.textPrimary)
                     .frame(width: 40, height: 40)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text("Create Account").font(.system(size: 16, weight: .bold)).foregroundColor(.white)
-                Text("Join anokiX as a trader").font(.system(size: 12)).foregroundColor(.white.opacity(0.85))
+                Text("Create Account").font(.app(16, .semibold)).foregroundColor(Brand.textPrimary)
+                Text("Join anokiX as a trader").font(.app(12)).foregroundColor(Brand.textSecondary)
             }
             Spacer()
         }
         .padding(.horizontal, 12)
         .padding(.top, 12)
         .padding(.bottom, 10)
-        .background(Brand.purpleDark.ignoresSafeArea(edges: .top))
+        // Portal page header: white bar (the stepper's divider sits right below it).
+        .background(Brand.surface.ignoresSafeArea(edges: .top))
     }
 
     private var footer: some View {
         HStack(spacing: 12) {
             Button { if step == 0 { session.stage = .welcome } else { step -= 1 } } label: {
                 Text("Back")
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.app(14, .bold))
                     .foregroundColor(Brand.textPrimary)
                     .padding(.horizontal, 26)
                     .frame(height: 48)
@@ -108,7 +108,7 @@ struct RegisterView: View {
                         ProgressView().tint(.white)
                     } else {
                         Text(step == lastStep ? "Register" : "Continue")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.app(14, .bold))
                             .foregroundColor(.white)
                     }
                 }
@@ -166,7 +166,7 @@ private struct OwnerStep: View {
             LabeledField(title: "ID Number", text: $store.idNumber, placeholder: "Enter ID number")
             LabeledField(title: "Passport Number", text: $store.passportNumber, placeholder: "Enter passport number")
             Text("Provide either your ID number or passport number.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
 
             InfoBox(title: "Account sign-in",
                     text: "Your email address and password will be used to log in to your trader account. Mobile number is required for verification.")
@@ -178,7 +178,7 @@ private struct OwnerStep: View {
             LabeledSecureField(title: "Password", text: $store.password, placeholder: "Enter password")
             LabeledSecureField(title: "Confirm Password", text: $store.confirmPassword, placeholder: "Confirm password")
             Text("Password must be at least 8 characters.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
         }
     }
 }
@@ -195,13 +195,13 @@ private struct PhoneField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack(spacing: 8) {
                 Button { showPicker = true } label: {
                     HStack(spacing: 4) {
-                        Text(country.flag).font(.system(size: 15))
-                        Text(country.dialCode).font(.system(size: 15, weight: .semibold))
+                        Text(country.flag).font(.app(15))
+                        Text(country.dialCode).font(.app(15, .semibold))
                             .foregroundColor(Brand.textPrimary)
                         Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
                             .foregroundColor(Brand.textSecondary)
@@ -211,7 +211,7 @@ private struct PhoneField: View {
                 Rectangle().fill(Brand.border).frame(width: 1, height: 24)
                 TextField(placeholder, text: $text)
                     .keyboardType(.phonePad)
-                    .font(.system(size: 15))
+                    .font(.app(15))
                     .foregroundColor(Brand.textPrimary)
             }
             .padding(14)
@@ -248,7 +248,7 @@ private struct BusinessStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Company Logo (Optional)").font(.system(size: 13, weight: .medium))
+                Text("Company Logo (Optional)").font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 Button { logoStage = .sourcePicker } label: {
                     ZStack {
@@ -256,8 +256,8 @@ private struct BusinessStep: View {
                             Image(uiImage: logo).resizable().scaledToFill()
                         } else {
                             VStack(spacing: 2) {
-                                Text("+").font(.system(size: 32, weight: .light)).foregroundColor(Brand.textSecondary)
-                                Text("Upload logo").font(.system(size: 12)).foregroundColor(Brand.purple)
+                                Text("+").font(.app(32, .light)).foregroundColor(Brand.textSecondary)
+                                Text("Upload logo").font(.app(12)).foregroundColor(Brand.purple)
                             }
                         }
                     }
@@ -331,12 +331,12 @@ private struct ClassificationStep: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("Primary Product Categories")
-                    .font(.system(size: 16, weight: .bold)).foregroundColor(Brand.topTitle)
+                    .font(.app(16, .bold)).foregroundColor(Brand.topTitle)
                 Button { showCategories = true } label: {
                     VStack(alignment: .leading, spacing: 8) {
                         if store.selectedCategoryIds.isEmpty {
                             HStack {
-                                Text("Select categories").font(.system(size: 15)).foregroundColor(Brand.textSecondary)
+                                Text("Select categories").font(.app(15)).foregroundColor(Brand.textSecondary)
                                 Spacer()
                                 Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(Brand.textSecondary)
@@ -377,7 +377,7 @@ private struct TraderTypeCard: View {
                     .font(.system(size: 22))
                     .foregroundColor(selected ? Brand.purple : Brand.textSecondary)
                 Text(name)
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(selected ? Brand.purple : Brand.textPrimary)
                     .multilineTextAlignment(.center)
             }
@@ -403,11 +403,11 @@ private struct LocationStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Address of your business").font(.system(size: 13, weight: .medium))
+            Text("Address of your business").font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack {
                 TextField("Search for your business address", text: $query)
-                    .font(.system(size: 15)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15)).foregroundColor(Brand.textPrimary)
                     .onChange(of: query) { _ in search() }
                 if searching { ProgressView() }
             }
@@ -421,7 +421,7 @@ private struct LocationStep: View {
                         Button { resolve(s) } label: {
                             HStack {
                                 Image(systemName: "mappin.circle").foregroundColor(Brand.purple)
-                                Text(s.description).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                                Text(s.description).font(.app(13)).foregroundColor(Brand.textPrimary)
                                     .multilineTextAlignment(.leading)
                                 Spacer()
                             }
@@ -436,7 +436,7 @@ private struct LocationStep: View {
             }
 
             if !store.address.isEmpty {
-                Text(store.address).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                Text(store.address).font(.app(13)).foregroundColor(Brand.textSecondary)
             }
 
             GoogleMapView(latitude: $store.latitude, longitude: $store.longitude,
@@ -445,7 +445,7 @@ private struct LocationStep: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
 
             Text("Tap the map to drop a pin, or drag the pin to set the location.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
         }
     }
 
@@ -512,11 +512,11 @@ private struct DocumentsStep: View {
                         .frame(width: 22)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.label + (row.required ? " *" : ""))
-                            .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                            .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                         if let doc = store.documents[row.field] {
-                            Text(doc.fileName).font(.system(size: 11)).foregroundColor(Brand.success).lineLimit(1)
+                            Text(doc.fileName).font(.app(11)).foregroundColor(Brand.success).lineLimit(1)
                         } else {
-                            Text(row.sub).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                            Text(row.sub).font(.app(11)).foregroundColor(Brand.textSecondary)
                         }
                     }
                     Spacer()
@@ -525,7 +525,7 @@ private struct DocumentsStep: View {
                         docSheet = .sourcePicker
                     } label: {
                         Text(store.documents[row.field] != nil ? "Replace" : "Upload")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
+                            .font(.app(12, .bold)).foregroundColor(Brand.purple)
                             .padding(.horizontal, 16).padding(.vertical, 9)
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
                     }
@@ -534,7 +534,7 @@ private struct DocumentsStep: View {
                 .padding(12).card(padding: 12)
             }
             Text("Accepted formats: JPG, PNG, PDF (Max 5MB)")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .sheet(item: $docSheet) { sheet in
@@ -599,11 +599,11 @@ private struct DistributorsStep: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Preferred Delivery Days").font(.system(size: 13, weight: .medium))
+                Text("Preferred Delivery Days").font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 DeliveryHoursGrid(rows: $store.deliveryRows)
                 Text("24-hour times (e.g. 8 = 08:00); leave a row blank to default to 8–18. The second pair is an optional split window.")
-                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    .font(.app(11)).foregroundColor(Brand.textSecondary)
             }
 
             SelectField(title: "Preferred Payment Method", placeholder: "Select payment method",
@@ -649,12 +649,12 @@ private struct WalletStep: View {
             .frame(maxWidth: .infinity, alignment: .center)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Benefits").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.topTitle)
+                Text("Benefits").font(.app(16, .bold)).foregroundColor(Brand.topTitle)
                 ForEach(benefits, id: \.self) { benefit in
                     HStack(spacing: 10) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 18)).foregroundColor(Brand.success)
-                        Text(benefit).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                        Text(benefit).font(.app(14)).foregroundColor(Brand.textPrimary)
                         Spacer()
                     }
                 }
@@ -694,7 +694,7 @@ private struct WalletStep: View {
             Image(systemName: "checkmark.shield.fill")
                 .font(.system(size: 15)).foregroundColor(Brand.purple)
             Text("Your bank account is opened in the owner's name, so IMB needs to verify their identity and residential address. This is separate from your business address.")
-                .font(.system(size: 12)).foregroundColor(Brand.purpleDark)
+                .font(.app(12)).foregroundColor(Brand.purpleDark)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -706,7 +706,7 @@ private struct WalletStep: View {
     private var identitySection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Owner Identity")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .font(.app(15, .bold)).foregroundColor(Brand.topTitle)
 
             SelectField(title: "ID Type", placeholder: "Select ID type",
                         options: RegisterStore.idTypeOptions.map { ($0.code, $0.label) },
@@ -736,7 +736,7 @@ private struct WalletStep: View {
                             if capped != v { store.walletPassportCountry = capped }
                         }
                     Text("Two-letter country code.")
-                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                        .font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
                 DatePickerField(title: "Passport Expiry Date", date: $store.walletPassportExpDate)
             }
@@ -758,7 +758,7 @@ private struct WalletStep: View {
     private var addressSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Residential Address")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .font(.app(15, .bold)).foregroundColor(Brand.topTitle)
                 .padding(.top, 4)
             LabeledField(title: "Street Address", text: $store.walletStreet, placeholder: "17 New Haven Ave")
             LabeledField(title: "Suburb", text: $store.walletSuburb, placeholder: "Bethesda")
@@ -773,7 +773,7 @@ private struct WalletStep: View {
     private var accessSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Wallet Access")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .font(.app(15, .bold)).foregroundColor(Brand.topTitle)
                 .padding(.top, 4)
             accessTile(title: "USSD access",
                        subtitle: "Check balances and transact from any phone, no data needed.",
@@ -810,7 +810,7 @@ private struct WalletStep: View {
     private func feedback(_ text: String, color: Color, icon: String?) -> some View {
         HStack(spacing: 4) {
             if let icon { Image(systemName: icon).font(.system(size: 11)).foregroundColor(color) }
-            Text(text).font(.system(size: 11)).foregroundColor(color)
+            Text(text).font(.app(11)).foregroundColor(color)
         }
     }
 
@@ -822,8 +822,8 @@ private struct WalletStep: View {
                     .font(.system(size: 22))
                     .foregroundColor(on ? Brand.purple : Brand.textTertiary)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(title).font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
+                    Text(subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
@@ -843,7 +843,7 @@ private struct WalletStep: View {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle")
                     .font(.system(size: 20))
                     .foregroundColor(selected ? Brand.info : Brand.textTertiary)
-                Text(title).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                Text(title).font(.app(14)).foregroundColor(Brand.textPrimary)
                 Spacer()
             }
             .padding(12)
@@ -868,9 +868,9 @@ private struct ReadOnlyField: View {
     var placeholder: String = ""
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.textSecondary)
+            Text(title).font(.app(13, .medium)).foregroundColor(Brand.textSecondary)
             Text(value.isEmpty ? placeholder : value)
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(value.isEmpty ? Brand.textTertiary : Brand.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(14)
@@ -892,14 +892,14 @@ private struct DatePickerField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.textSecondary)
+            Text(title).font(.app(13, .medium)).foregroundColor(Brand.textSecondary)
             Button {
                 temp = date ?? Date()
                 showing = true
             } label: {
                 HStack(spacing: 8) {
                     Text(date.map { WalletStep.displayDate.string(from: $0) } ?? placeholder)
-                        .font(.system(size: 15))
+                        .font(.app(15))
                         .foregroundColor(date == nil ? Brand.textTertiary : Brand.textPrimary)
                     Spacer(minLength: 8)
                     Image(systemName: "calendar").foregroundColor(Brand.textSecondary)
@@ -950,7 +950,7 @@ private struct TermsStep: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: binding.wrappedValue ? "checkmark.square.fill" : "square")
                     .foregroundColor(binding.wrappedValue ? Brand.purple : Brand.textTertiary)
-                Text(text).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                Text(text).font(.app(14)).foregroundColor(Brand.textPrimary)
                     .multilineTextAlignment(.leading)
                 Spacer()
             }
@@ -1010,18 +1010,18 @@ struct RegisterCompletedView: View {
             Spacer()
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 80)).foregroundColor(Brand.success)
-            Text("Application Submitted!").font(.system(size: 24, weight: .bold))
+            Text("Application Submitted!").font(.app(24, .bold))
                 .foregroundColor(Brand.textPrimary)
             Text("Your trader account is under review. This usually takes 24–48 hours.")
-                .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                .font(.app(14)).foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center).padding(.horizontal, 32)
 
             VStack(alignment: .leading, spacing: 14) {
-                Text("What happens next?").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("What happens next?").font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 ForEach(Array(steps.enumerated()), id: \.offset) { idx, item in
                     HStack(spacing: 12) {
                         Image(systemName: item.0).foregroundColor(Brand.purple).frame(width: 24)
-                        Text(item.1).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                        Text(item.1).font(.app(13)).foregroundColor(Brand.textPrimary)
                         Spacer()
                     }
                 }

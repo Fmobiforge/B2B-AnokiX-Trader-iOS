@@ -53,14 +53,14 @@ struct VasCatalogSection: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("1. Choose a category")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.app(15, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 if !categories.isEmpty {
                     Button(categoriesExpanded ? "Show less" : "View all") {
                         withAnimation { categoriesExpanded.toggle() }
                     }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
                 }
             }
@@ -97,15 +97,15 @@ struct VasCatalogSection: View {
     private var productSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("2. Select a product")
-                .font(.system(size: 15, weight: .bold))
+                .font(.app(15, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             if let category = selectedCategory {
                 // "<Category> powered by Limes", as on the web portal.
-                (Text(category.name).font(.system(size: 12, weight: .bold))
+                (Text(category.name).font(.app(12, .bold))
                     .foregroundColor(Brand.textPrimary)
-                 + Text(" powered by ").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                 + Text("Limes").font(.system(size: 12, weight: .bold))
+                 + Text(" powered by ").font(.app(12)).foregroundColor(Brand.textSecondary)
+                 + Text("Limes").font(.app(12, .bold))
                     .foregroundColor(Brand.success))
             }
 
@@ -113,7 +113,7 @@ struct VasCatalogSection: View {
                 ProgressView().frame(maxWidth: .infinity).padding(.vertical, 24)
             } else if products.isEmpty {
                 Text("No products available for this category.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
@@ -136,7 +136,7 @@ struct VasCatalogSection: View {
     private var orderSummary: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Order summary")
-                .font(.system(size: 15, weight: .bold))
+                .font(.app(15, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             VasField(title: "Recipient", text: $recipient, placeholder: "082 123 4567",
@@ -152,7 +152,7 @@ struct VasCatalogSection: View {
                 VasField(title: "Optional reference", text: $reference,
                          placeholder: "e.g. invoice, customer name")
                 Text("\(reference.count)/30")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -172,11 +172,11 @@ struct VasCatalogSection: View {
 
             HStack {
                 Text("Total")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.app(15, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Text(VasFormat.money(currentAmount))
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.purple)
             }
 
@@ -186,7 +186,7 @@ struct VasCatalogSection: View {
                 .opacity(submitting ? 0.6 : 1)
 
             Text("Paid from your anokiX wallet. Change how you pay in Settings → Preferences.")
-                .font(.system(size: 11))
+                .font(.app(11))
                 .foregroundColor(Brand.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -196,9 +196,9 @@ struct VasCatalogSection: View {
     private func summaryRow(_ label: String, _ value: String,
                             valueColor: Color = Brand.textPrimary) -> some View {
         HStack {
-            Text(label).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(13)).foregroundColor(Brand.textSecondary)
             Spacer()
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(valueColor)
+            Text(value).font(.app(13, .semibold)).foregroundColor(valueColor)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -328,12 +328,12 @@ private struct CategoryCard: View {
                     .background((selected ? Brand.success : Brand.purple).opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 Text(node.name)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.app(12, .semibold))
                     .foregroundColor(Brand.textPrimary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                 Text("\(node.productCount) \(node.productCount == 1 ? "bundle" : "bundles")")
-                    .font(.system(size: 10))
+                    .font(.app(10))
                     .foregroundColor(Brand.textSecondary)
             }
             .frame(maxWidth: .infinity)
@@ -358,7 +358,7 @@ private struct ProductCard: View {
                 HStack(alignment: .top) {
                     // Ad-hoc products show "Custom" over the name — the buyer sets the amount.
                     Text(product.isAdHoc ? "Custom" : (product.name ?? "—"))
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.app(13, .bold))
                         .foregroundColor(Brand.textPrimary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
@@ -370,7 +370,7 @@ private struct ProductCard: View {
                     }
                 }
                 Text(product.isAdHoc ? (product.name ?? "") : VasFormat.money(product.price))
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .lineLimit(2)
             }

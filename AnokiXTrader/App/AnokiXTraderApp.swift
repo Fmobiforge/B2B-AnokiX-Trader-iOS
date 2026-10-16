@@ -10,7 +10,26 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         GMSServices.provideAPIKey(GoogleMapsConfig.apiKey)
         PushManager.shared.configure()   // FirebaseApp.configure() + messaging/notification delegates
+        Self.applyPortalNavigationBar()
         return true
+    }
+
+    /// Trader Portal page header: white bar, #DCE1E8 hairline, navy (#1A237E) Inter title.
+    /// Covers every system navigation bar (module hosts, sheets, pushed detail screens).
+    private static func applyPortalNavigationBar() {
+        let navy = UIColor(red: 26 / 255, green: 35 / 255, blue: 126 / 255, alpha: 1)
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        appearance.shadowColor = UIColor(red: 220 / 255, green: 225 / 255, blue: 232 / 255, alpha: 1)
+        appearance.titleTextAttributes = [.foregroundColor: navy,
+                                          .font: AppFont.uiFont(17, .semibold)]
+        appearance.largeTitleTextAttributes = [.foregroundColor: navy,
+                                               .font: AppFont.uiFont(30, .bold)]
+        let bar = UINavigationBar.appearance()
+        bar.standardAppearance = appearance
+        bar.compactAppearance = appearance
+        bar.scrollEdgeAppearance = appearance
     }
 
     /// Forward the APNs device token to FCM so it can mint the registration token.
@@ -37,6 +56,8 @@ struct AnokiXTraderApp: App {
                 .environmentObject(session)
                 .environmentObject(MarketStore.shared)
                 .tint(Brand.purple)
+                // Default for any Text / TextField without its own font: Inter, body size.
+                .font(.app(17))
                 .onOpenURL { url in
                     // anokix://topup-return — PayCloud is finished with the wallet
                     // top-up checkout page. It carries no result we would trust: the

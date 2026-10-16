@@ -5,6 +5,16 @@ struct DrawerView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var session: Session
 
+    /// The drawer opens over the tab bar, so the screen behind it is always a tab.
+    private var activeKey: String? {
+        switch router.tab {
+        case .home:   return "home"
+        case .sell:   return "sell"
+        case .orders: return "orders"
+        case .more:   return nil
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
@@ -14,10 +24,11 @@ struct DrawerView: View {
                     .scaledToFit()
                     .frame(height: 30)
                 Text("Trader Portal")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.app(11, .semibold))
                     .foregroundColor(Brand.purpleTextLt)
-                    .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(Color.white.opacity(0.08))
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color(hex: "#161D4E"))
+                    .overlay(Capsule().stroke(Color(hex: "#3E3389"), lineWidth: 1))
                     .clipShape(Capsule())
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -28,28 +39,33 @@ struct DrawerView: View {
             ScrollView {
                 VStack(spacing: 2) {
                     ForEach(MockData.drawerMenu) { item in
+                        let active = item.key == activeKey
                         Button { router.route(item.key) } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: item.systemIcon)
                                     .font(.system(size: 17))
                                     .frame(width: 24)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(active ? .white : Brand.drawerMuted)
                                 VStack(alignment: .leading, spacing: 1) {
                                     Text(item.title)
-                                        .font(.system(size: 15, weight: .medium))
-                                        .foregroundColor(.white)
+                                        .font(.app(15, active ? .semibold : .medium))
+                                        .foregroundColor(active ? .white : Brand.drawerMuted)
                                     if let sub = item.subtitle {
-                                        Text(sub).font(.system(size: 11)).foregroundColor(Brand.purpleTextLt)
+                                        Text(sub).font(.app(11)).foregroundColor(Brand.purpleTextLt)
                                     }
                                 }
                                 Spacer()
                             }
-                            .padding(.horizontal, 16).padding(.vertical, 11)
+                            .padding(.horizontal, 14).padding(.vertical, 11)
+                            // Portal sidebar active item: indigo → violet, 10pt corners.
+                            .background(active ? AnyView(Brand.navActiveGradient) : AnyView(Color.clear))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
                 }
+                .padding(.horizontal, 10)
                 .padding(.vertical, 10)
             }
 
@@ -59,8 +75,8 @@ struct DrawerView: View {
             HStack(spacing: 12) {
                 InitialBadge(text: String(session.storeName.prefix(1)), color: Brand.purple, size: 40)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(session.storeName).font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
-                    Text(session.accountName).font(.system(size: 11)).foregroundColor(Brand.purpleTextLt)
+                    Text(session.storeName).font(.app(14, .semibold)).foregroundColor(.white)
+                    Text(session.accountName).font(.app(11)).foregroundColor(Brand.drawerMuted)
                 }
                 Spacer()
                 Button {

@@ -30,8 +30,8 @@ struct GenericRow: View {
                     InitialBadge(text: String(item.title.prefix(1)), color: Brand.purple, size: 42)
                 }
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(item.title).font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                    Text(item.subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(item.title).font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
+                    Text(item.subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 StatusBadge(text: item.badge, fg: tone.fg, bg: tone.bg)
@@ -77,8 +77,8 @@ struct StatTile: View {
                     .background(iconTint.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
             }
-            Text(value).font(.system(size: 18, weight: .bold)).foregroundColor(valueColor)
-            Text(label).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            Text(value).font(.app(18, .bold)).foregroundColor(valueColor)
+            Text(label).font(.app(12)).foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -93,7 +93,7 @@ struct Toast: View {
     let text: String
     var body: some View {
         Text(text)
-            .font(.system(size: 13, weight: .medium))
+            .font(.app(13, .medium))
             .foregroundColor(.white)
             .padding(.horizontal, 16).padding(.vertical, 10)
             .background(Color.black.opacity(0.85))

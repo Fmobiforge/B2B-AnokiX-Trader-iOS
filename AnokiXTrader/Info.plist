@@ -21,6 +21,14 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<!-- Inter — the Trader Portal / Android typeface (Resources/Fonts). See Font.app(_:_:). -->
+	<key>UIAppFonts</key>
+	<array>
+		<string>Inter-Regular.ttf</string>
+		<string>Inter-Medium.ttf</string>
+		<string>Inter-SemiBold.ttf</string>
+		<string>Inter-Bold.ttf</string>
+	</array>
 	<!--
 		Schemes the Support Centre probes with canOpenURL before launching them.
 		Without this list the checks silently return false and WhatsApp / the dialler /

@@ -14,8 +14,8 @@ struct MoreView: View {
                     HStack(spacing: 14) {
                         InitialBadge(text: String(session.storeName.prefix(1)), color: Brand.purple, size: 52)
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(session.storeName).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
-                            Text(session.accountName).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                            Text(session.storeName).font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
+                            Text(session.accountName).font(.app(13)).foregroundColor(Brand.textSecondary)
                         }
                         Spacer()
                         Image(systemName: "chevron.right").foregroundColor(Brand.textTertiary)
@@ -34,7 +34,7 @@ struct MoreView: View {
                                         .frame(width: 38, height: 38)
                                         .background(Brand.purpleLight)
                                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                    Text(item.title).font(.system(size: 15, weight: .medium)).foregroundColor(Brand.textPrimary)
+                                    Text(item.title).font(.app(15, .medium)).foregroundColor(Brand.textPrimary)
                                     Spacer()
                                     Image(systemName: "chevron.right").font(.system(size: 13)).foregroundColor(Brand.textTertiary)
                                 }
@@ -53,7 +53,7 @@ struct MoreView: View {
                         session.signOut()
                     } label: {
                         Text("Log Out")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.app(15, .semibold))
                             .foregroundColor(Brand.danger)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)

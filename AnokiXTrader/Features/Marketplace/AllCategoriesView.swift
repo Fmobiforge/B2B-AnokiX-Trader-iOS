@@ -43,13 +43,13 @@ struct AllCategoriesView: View {
             await store.refreshCart()
         }
         .environment(\.colorScheme, .light)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)   // white portal header → dark status-bar icons
     }
 
     private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass").foregroundColor(Brand.textSecondary)
-            TextField("Search categories…", text: $search).font(.system(size: 14))
+            TextField("Search categories…", text: $search).font(.app(14))
         }
         .padding(.horizontal, 12).padding(.vertical, 11)
         .background(Brand.surfaceVariant)
@@ -65,7 +65,7 @@ struct AllCategoriesView: View {
                 Image(systemName: "square.grid.2x2")
                     .font(.system(size: 34)).foregroundColor(Brand.textTertiary)
                 Text(store.categories.isEmpty ? "Loading categories…" : "No categories found")
-                    .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                    .font(.app(14)).foregroundColor(Brand.textSecondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -93,7 +93,7 @@ private struct CategoryTile: View {
                 .frame(width: 56, height: 56).background(Brand.purpleLight)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
             Text(category.title)
-                .font(.system(size: 11, weight: .medium)).foregroundColor(Brand.textPrimary)
+                .font(.app(11, .medium)).foregroundColor(Brand.textPrimary)
                 .multilineTextAlignment(.center).lineLimit(2)
                 .frame(height: 30, alignment: .top)
         }
@@ -105,7 +105,7 @@ private struct CategoryTile: View {
     }
 }
 
-// MARK: - Shared purple sub-header (back + title + cart), reused by CategoryProductsView
+// MARK: - Shared portal sub-header (back + title + cart), reused by CategoryProductsView
 
 struct MarketSubHeader: View {
     let title: String
@@ -117,23 +117,23 @@ struct MarketSubHeader: View {
         HStack(spacing: 4) {
             Button(action: onBack) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                    .font(.system(size: 17, weight: .semibold)).foregroundColor(Brand.textPrimary)
                     .frame(width: 42, height: 42)
             }
             .buttonStyle(.plain)
 
             Text(title)
-                .font(.system(size: 18, weight: .bold)).foregroundColor(.white)
+                .font(.app(18, .semibold)).foregroundColor(Brand.textPrimary)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Button(action: onCart) {
                 ZStack(alignment: .topTrailing) {
-                    Image(systemName: "cart").font(.system(size: 22)).foregroundColor(.white)
+                    Image(systemName: "cart").font(.system(size: 22)).foregroundColor(Brand.textPrimary)
                         .frame(width: 24, height: 24)
                     if cartBadge > 0 {
                         Text(cartBadge > 99 ? "99+" : "\(cartBadge)")
-                            .font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+                            .font(.app(10, .bold)).foregroundColor(.white)
                             .frame(minWidth: 18, minHeight: 18)
                             .background(Brand.danger).clipShape(Capsule())
                             .offset(x: 6, y: -6)
@@ -144,11 +144,9 @@ struct MarketSubHeader: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 8).padding(.bottom, 8).frame(minHeight: 44)
-        .background(
-            LinearGradient(colors: [Brand.purpleDark, Brand.purple],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea(edges: .top)
-        )
+        // Portal page header: white bar with a hairline bottom border.
+        .background(Brand.surface.ignoresSafeArea(edges: .top))
+        .overlay(alignment: .bottom) { Brand.border.frame(height: 1) }
     }
 }
 

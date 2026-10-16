@@ -121,27 +121,27 @@ struct DashboardView: View {
     private var todaySalesCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             Label("Today's Sales", systemImage: "chart.bar.fill")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.app(12, .semibold))
                 .foregroundColor(Brand.topTitle)
                 .labelStyle(.titleAndIcon)
 
             Text(store.money(store.todaySales?.amount))
-                .font(.system(size: 22, weight: .bold))
+                .font(.app(22, .bold))
                 .foregroundColor(Brand.textPrimary)
                 .padding(.top, 6)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
 
             Text("\(store.todaySales?.transactions ?? 0) sales today")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
             Text("\(store.todaySales?.items ?? 0) items sold")
-                .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                .font(.app(11)).foregroundColor(Brand.textTertiary)
 
             if let delta = store.todaySales?.delta_percent {
                 let up = store.todaySales?.isUp ?? true
                 Label(String(format: "%.1f%%", abs(delta)),
                       systemImage: up ? "arrow.up.right" : "arrow.down.right")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.app(10, .semibold))
                     .foregroundColor(up ? Brand.success : Brand.danger)
                     .padding(.horizontal, 8).padding(.vertical, 3)
                     .background(up ? Brand.successBg : Brand.dangerBg)
@@ -156,23 +156,23 @@ struct DashboardView: View {
     private var pendingOrdersCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             Label("Pending Orders", systemImage: "shippingbox.fill")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.app(12, .semibold))
                 .foregroundColor(Brand.topTitle)
 
             Text("\(store.pendingOrders?.count ?? 0)")
-                .font(.system(size: 22, weight: .bold))
+                .font(.app(22, .bold))
                 .foregroundColor(Brand.textPrimary)
                 .padding(.top, 6)
 
             Text("Total Value \(store.money(store.pendingOrders?.total_value))")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .minimumScaleFactor(0.8).lineLimit(1)
 
             Button("View Orders") { router.tab = .orders }
-                .font(.system(size: 12, weight: .semibold))
+                .font(.app(12, .semibold))
                 .foregroundColor(.white)
                 .padding(.horizontal, 14).padding(.vertical, 7)
-                .background(Brand.warning)
+                .background(Brand.warningStrong)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 .padding(.top, 10)
         }
@@ -187,9 +187,9 @@ struct DashboardView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("anokiX wallet")
-                        .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                        .font(.app(15, .bold)).foregroundColor(Brand.topTitle)
                     Text("Powered by IMB")
-                        .font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                        .font(.app(10)).foregroundColor(Brand.textTertiary)
                 }
                 Spacer()
                 if let status = store.wallet?.status, !status.isEmpty {
@@ -206,7 +206,7 @@ struct DashboardView: View {
                     } else {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Brand.purple)
+                            .foregroundColor(Brand.blue)
                             .frame(width: 20, height: 20)
                     }
                 }
@@ -216,43 +216,43 @@ struct DashboardView: View {
             }
 
             Text("Available Balance")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .padding(.top, 14)
             Text(store.money(store.wallet?.balance?.available))
-                .font(.system(size: 26, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(26, .bold)).foregroundColor(Brand.textPrimary)
                 .minimumScaleFactor(0.7).lineLimit(1)
             Text("Current \(store.money(store.wallet?.balance?.current)) · Pending \(store.money(store.wallet?.balance?.pending))")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .padding(.top, 3)
             if let asOf = timeOfDay(store.wallet?.balance?.as_of) {
                 Text("as of \(asOf)")
-                    .font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                    .font(.app(10)).foregroundColor(Brand.textTertiary)
                     .padding(.top, 3)
             }
 
             HStack(spacing: 10) {
                 Button { router.presented = .wallet } label: {
                     Text("Add Money")
-                        .font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                        .font(.app(12, .semibold)).foregroundColor(.white)
                         .frame(maxWidth: .infinity).padding(.vertical, 10)
-                        .background(Brand.purple)
+                        .background(Brand.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
                 Button { router.presented = .wallet } label: {
                     Text("Send Money")
-                        .font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                        .font(.app(12, .semibold)).foregroundColor(Brand.blue)
                         .frame(maxWidth: .infinity).padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .stroke(Brand.purple, lineWidth: 1))
+                                .stroke(Brand.blue, lineWidth: 1))
                 }
             }
             .buttonStyle(.plain)
             .padding(.top, 14)
 
             Button("View Transactions →") { router.presented = .wallet }
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Brand.purple)
+                .font(.app(12, .semibold))
+                .foregroundColor(Brand.blue)
                 .padding(.top, 12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -264,26 +264,26 @@ struct DashboardView: View {
     private var rewardsCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("anokiX rewards")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.topTitle)
+                .font(.app(15, .bold)).foregroundColor(Brand.topTitle)
             Text("Powered by Limes")
-                .font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                .font(.app(10)).foregroundColor(Brand.textTertiary)
 
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Rewards Points")
-                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                        .font(.app(11)).foregroundColor(Brand.textSecondary)
                     Text("\(store.rewards?.points ?? 0)")
-                        .font(.system(size: 26, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(26, .bold)).foregroundColor(Brand.textPrimary)
                     if let earned = store.rewards?.earned_this_month, earned > 0 {
                         Text("▲ \(earned) points this month")
-                            .font(.system(size: 11)).foregroundColor(Brand.success)
+                            .font(.app(11)).foregroundColor(Brand.success)
                     }
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Value").font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                    Text("Value").font(.app(10)).foregroundColor(Brand.textTertiary)
                     Text(store.money(store.rewards?.value))
-                        .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                 }
             }
             .padding(.top, 12)
@@ -291,14 +291,14 @@ struct DashboardView: View {
             HStack(spacing: 16) {
                 Button { router.presented = .rewards } label: {
                     Label("View Rewards", systemImage: "gift.fill")
-                        .font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                        .font(.app(12, .semibold)).foregroundColor(.white)
                         .padding(.horizontal, 16).padding(.vertical, 9)
-                        .background(Brand.success)
+                        .background(Brand.successStrong)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
                 Button("View History →") { router.presented = .rewards }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Brand.success)
+                    .font(.app(12, .semibold))
+                    .foregroundColor(Brand.successStrong)
                 Spacer()
             }
             .buttonStyle(.plain)
@@ -319,12 +319,12 @@ struct DashboardView: View {
                         VStack(spacing: 8) {
                             Image(systemName: qa.icon)
                                 .font(.system(size: 20))
-                                .foregroundColor(Brand.purple)
+                                .foregroundColor(Brand.blue)
                                 .frame(width: 48, height: 48)
-                                .background(Brand.purpleLight)
-                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .background(Brand.blueBg)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             Text(qa.title)
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.app(12, .medium))
                                 .foregroundColor(Brand.textPrimary)
                                 .multilineTextAlignment(.center)
                         }
@@ -377,22 +377,22 @@ struct DashboardView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             Text(promo.name ?? "")
-                .font(.system(size: 15, weight: .bold)).foregroundColor(.white)
+                .font(.app(15, .bold)).foregroundColor(.white)
                 .lineLimit(1)
                 .padding(.top, 12)
             if let description = promo.description, !description.isEmpty {
                 Text(description)
-                    .font(.system(size: 12)).foregroundColor(Color(hex: "#C7D2FE"))
+                    .font(.app(12)).foregroundColor(Color(hex: "#C7D2FE"))
                     .lineLimit(2)
                     .padding(.top, 4)
             }
             if let until = shortDate(promo.end_date) {
                 Text("Valid until \(until)")
-                    .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                    .font(.app(11)).foregroundColor(Brand.textTertiary)
                     .padding(.top, 6)
             }
             Button("Shop Now") { router.presented = .marketplace }
-                .font(.system(size: 12, weight: .semibold))
+                .font(.app(12, .semibold))
                 .foregroundColor(Brand.textPrimary)
                 .padding(.horizontal, 18).padding(.vertical, 8)
                 .background(Color.white)
@@ -421,19 +421,19 @@ struct DashboardView: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(o.order_number ?? "")
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.app(14, .semibold))
                                         .foregroundColor(Brand.textPrimary)
                                     if let name = o.distributor?.display_name, !name.isEmpty {
                                         Text(name)
-                                            .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                            .font(.app(12)).foregroundColor(Brand.textSecondary)
                                     }
                                     Text(createdAt(o.created_at))
-                                        .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                                        .font(.app(11)).foregroundColor(Brand.textTertiary)
                                 }
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 4) {
                                     Text(store.money(o.total_amount))
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.app(14, .bold))
                                         .foregroundColor(Brand.textPrimary)
                                     let color = statusColor(o.status_key)
                                     StatusBadge(text: o.status ?? "",
@@ -462,19 +462,19 @@ struct DashboardView: View {
                     ForEach(Array(store.topProducts.enumerated()), id: \.element.id) { idx, p in
                         HStack(spacing: 12) {
                             Text("\(idx + 1)")
-                                .font(.system(size: 13, weight: .bold)).foregroundColor(Brand.purple)
+                                .font(.app(13, .bold)).foregroundColor(Brand.purple)
                                 .frame(width: 28, height: 28)
                                 .background(Brand.purpleLight).clipShape(Circle())
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(p.name ?? "")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.app(14, .semibold))
                                     .foregroundColor(Brand.textPrimary)
                                 Text("\(Int(p.quantity ?? 0)) sold")
-                                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                    .font(.app(12)).foregroundColor(Brand.textSecondary)
                             }
                             Spacer()
                             Text(store.money(p.revenue))
-                                .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.success)
+                                .font(.app(14, .bold)).foregroundColor(Brand.success)
                         }
                         .padding(.vertical, 9)
                         if idx < store.topProducts.count - 1 { Divider() }
@@ -492,9 +492,9 @@ struct DashboardView: View {
                 .frame(width: 48, height: 48).background(Color.white.opacity(0.2)).clipShape(Circle())
             VStack(alignment: .leading, spacing: 6) {
                 Text("Unlock bigger rewards!")
-                    .font(.system(size: 15, weight: .bold)).foregroundColor(.white)
+                    .font(.app(15, .bold)).foregroundColor(.white)
                 Text("You're 2 orders away from higher rewards.")
-                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.85))
+                    .font(.app(12)).foregroundColor(.white.opacity(0.85))
                 ProgressView(value: 0.8).tint(.white).background(Color.white.opacity(0.25))
             }
             Spacer()
@@ -510,7 +510,7 @@ struct DashboardView: View {
 
     private func emptyState(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+            .font(.app(12)).foregroundColor(Brand.textTertiary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
     }

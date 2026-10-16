@@ -213,7 +213,7 @@ struct LogoCropSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Text("Crop Company Logo")
-                    .font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button { dismiss() } label: {
                     Image(systemName: "xmark").foregroundColor(Brand.textSecondary)
@@ -225,15 +225,15 @@ struct LogoCropSheet: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Text("Drag to reposition")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .center)
 
-            Text("Scale").font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+            Text("Scale").font(.app(14)).foregroundColor(Brand.textPrimary)
             Slider(value: $scale, in: 0...200) { _ in }
                 .tint(Brand.purple)
                 .onChange(of: scale) { v in controller.setScale(0.5 + CGFloat(v) / 100) }
 
-            Text("Rotation").font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+            Text("Rotation").font(.app(14)).foregroundColor(Brand.textPrimary)
             Slider(value: $rotation, in: 0...360) { _ in }
                 .tint(Brand.purple)
                 .onChange(of: rotation) { v in controller.setRotation(CGFloat(v)) }
@@ -243,7 +243,7 @@ struct LogoCropSheet: View {
                 DispatchQueue.main.async { onUploadNew() }
             } label: {
                 Text("Upload new image")
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.purple)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.purple)
                     .frame(maxWidth: .infinity).frame(height: 48)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
             }
@@ -251,7 +251,7 @@ struct LogoCropSheet: View {
             HStack(spacing: 12) {
                 Spacer()
                 Button("Cancel") { dismiss() }
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
                     .padding(.horizontal, 20).frame(height: 44)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
                 Button {
@@ -260,7 +260,7 @@ struct LogoCropSheet: View {
                         DispatchQueue.main.async { onConfirm(cropped) }
                     }
                 } label: {
-                    Text("OK").font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                    Text("OK").font(.app(15, .semibold)).foregroundColor(.white)
                         .padding(.horizontal, 28).frame(height: 44)
                         .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 12))
                 }

@@ -100,7 +100,7 @@ struct VasDynamicSection: View {
                      placeholder: "082 123 4567", keyboard: .phonePad, autocapitalize: false)
 
             Text("Bundle lines")
-                .font(.system(size: 14, weight: .bold))
+                .font(.app(14, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             ForEach($lines) { $line in
@@ -113,7 +113,7 @@ struct VasDynamicSection: View {
 
             Button { lines.append(Line()) } label: {
                 Label("Add service", systemImage: "plus")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
             }
             .buttonStyle(.plain)
@@ -122,11 +122,11 @@ struct VasDynamicSection: View {
 
             HStack {
                 Text("Bundle total")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.app(15, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Text(VasFormat.money(lines.reduce(0) { $0 + $1.priceValue }))
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.purple)
             }
 
@@ -214,12 +214,12 @@ private struct LineCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(line.service.label)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.app(13, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 if canRemove {
                     Button("Remove", action: onRemove)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.app(12, .semibold))
                         .foregroundColor(Brand.danger)
                 }
             }
@@ -233,7 +233,7 @@ private struct LineCard: View {
                          placeholder: "0", keyboard: .decimalPad, autocapitalize: false)
                 if line.service.inGigabytes && line.bytesValue > 0 {
                     Text("= \(VasFormat.bytes(line.bytesValue)) bytes")
-                        .font(.system(size: 11))
+                        .font(.app(11))
                         .foregroundColor(Brand.textTertiary)
                 }
             }
@@ -243,12 +243,12 @@ private struct LineCard: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Expires")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.app(12, .medium))
                     .foregroundColor(Brand.textSecondary)
                 Button { showExpiry = true } label: {
                     HStack {
                         Text(expiryLabel)
-                            .font(.system(size: 14))
+                            .font(.app(14))
                             .foregroundColor(line.expiry == nil ? Brand.textTertiary : Brand.textPrimary)
                         Spacer()
                         Image(systemName: "calendar")
@@ -297,7 +297,7 @@ private struct ExpiryPickerSheet: View {
         VStack(spacing: 0) {
             HStack {
                 Text("Expires")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button { dismiss() } label: {

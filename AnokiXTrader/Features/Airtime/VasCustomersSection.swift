@@ -24,7 +24,7 @@ struct VasCustomersSection: View {
 
             HStack(spacing: 10) {
                 TextField("Search name, ID, phone, email or account no.", text: $search)
-                    .font(.system(size: 14))
+                    .font(.app(14))
                     .foregroundColor(Brand.textPrimary)
                     .autocorrectionDisabled()
                     .submitLabel(.search)
@@ -32,7 +32,7 @@ struct VasCustomersSection: View {
                     .modifier(VasFieldBox())
 
                 Button("Search") { Task { await load() } }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 16).padding(.vertical, 12)
                     .background(Brand.purple)
@@ -42,11 +42,11 @@ struct VasCustomersSection: View {
 
             HStack {
                 Text(countLabel)
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                 Spacer()
                 Button("Refresh") { Task { await load() } }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
             }
 
@@ -104,23 +104,23 @@ private struct CustomerRow: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top) {
                 Text(customer.displayName)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.app(15, .semibold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer(minLength: 8)
                 StatusBadge(text: status.label, fg: status.fg, bg: status.bg)
             }
             Text(metaLine)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
             if let email = customer.email, !email.isEmpty {
                 Text(email)
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .lineLimit(1)
             }
             if let account = customer.limes_account_id, !account.isEmpty {
                 Text("Account no. \(account)")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.app(11, .semibold))
                     .foregroundColor(Brand.purple)
             }
         }

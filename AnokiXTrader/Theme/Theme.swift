@@ -1,4 +1,44 @@
 import SwiftUI
+import UIKit
+
+// MARK: - Typography (Inter — the Trader Portal / Android typeface)
+
+/// Inter faces bundled in Resources/Fonts and listed under UIAppFonts in Info.plist.
+enum AppFont {
+    /// False if the faces aren't bundled — every helper then falls back to the system font,
+    /// so a missing font can never break a screen.
+    static let available: Bool = UIFont(name: "Inter-Regular", size: 12) != nil
+
+    static func name(for weight: Font.Weight) -> String {
+        switch weight {
+        case .bold, .heavy, .black: return "Inter-Bold"
+        case .semibold:             return "Inter-SemiBold"
+        case .medium:               return "Inter-Medium"
+        default:                    return "Inter-Regular"
+        }
+    }
+
+    /// UIKit counterpart, for UINavigationBar / UISegmentedControl appearance.
+    static func uiFont(_ size: CGFloat, _ weight: UIFont.Weight = .regular) -> UIFont {
+        let name: String
+        switch weight {
+        case .bold, .heavy, .black: name = "Inter-Bold"
+        case .semibold:             name = "Inter-SemiBold"
+        case .medium:               name = "Inter-Medium"
+        default:                    name = "Inter-Regular"
+        }
+        return UIFont(name: name, size: size) ?? .systemFont(ofSize: size, weight: weight)
+    }
+}
+
+extension Font {
+    /// Inter at a fixed point size — drop-in for `.system(size:weight:)` (same fixed sizing,
+    /// no Dynamic Type scaling), so layouts keep their metrics.
+    static func app(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
+        guard AppFont.available else { return .system(size: size, weight: weight) }
+        return .custom(AppFont.name(for: weight), fixedSize: size)
+    }
+}
 
 // MARK: - Hex color support
 
@@ -32,23 +72,45 @@ extension Color {
 
 // MARK: - Brand palette (mirrors the Android colors.xml / Trader Portal)
 
+/// Aligned with the Trader Portal (trader.anokix.com): navy ink (#1A237E) for titles +
+/// body text, #5C6B7A secondary text, #F5F7FA canvas, #DCE1E8 card borders, violet for
+/// primary actions, portal blue (#0D47A1) for links / icon tiles, #00091F sidebar navy.
 enum Brand {
     static let purple       = Color(hex: "#7C3AED")
     static let purpleDark   = Color(hex: "#5B21B6")
     static let purpleLight  = Color(hex: "#EDE9FE")
     static let purpleTextLt = Color(hex: "#C4B5FD")
 
-    static let background    = Color(hex: "#F1F5F9")
+    static let background    = Color(hex: "#F5F7FA")
     static let surface       = Color(hex: "#FFFFFF")
     static let surfaceVariant = Color(hex: "#F8FAFC")
 
-    static let textPrimary   = Color(hex: "#0F172A")
-    static let textSecondary = Color(hex: "#64748B")
+    static let textPrimary   = Color(hex: "#1A237E")
+    static let textSecondary = Color(hex: "#5C6B7A")
     static let textTertiary  = Color(hex: "#94A3B8")
     static let topTitle      = Color(hex: "#1A237E")   // navy section headings (Android @color/top_title)
 
-    static let border        = Color(hex: "#E2E8F0")
-    static let divider       = Color(hex: "#E2E8F0")
+    static let border        = Color(hex: "#DCE1E8")
+    static let divider       = Color(hex: "#E8ECF1")
+
+    // Portal accents
+    static let blue          = Color(hex: "#0D47A1")
+    static let blueBg        = Color(hex: "#E3EAF5")
+    static let sky           = Color(hex: "#29B6F6")
+    static let indigo        = Color(hex: "#6366F1")
+    static let violet        = Color(hex: "#8B5CF6")
+    static let successStrong = Color(hex: "#2E7D32")
+    static let warningStrong = Color(hex: "#FF6F00")
+    static let drawerMuted   = Color.white.opacity(0.72)
+
+    /// Portal login / welcome button: sky → blue → violet.
+    static let ctaGradient = LinearGradient(
+        colors: [Color(hex: "#29B6F6"), Color(hex: "#4F8DF5"), Color(hex: "#8B5CF6")],
+        startPoint: .leading, endPoint: .trailing)
+    /// Portal sidebar active item: indigo → violet.
+    static let navActiveGradient = LinearGradient(
+        colors: [Color(hex: "#6366F1").opacity(0.9), Color(hex: "#8B5CF6").opacity(0.85)],
+        startPoint: .leading, endPoint: .trailing)
 
     static let success   = Color(hex: "#16A34A")
     static let successBg = Color(hex: "#DCFCE7")
@@ -59,8 +121,8 @@ enum Brand {
     static let info      = Color(hex: "#2563EB")
     static let infoBg    = Color(hex: "#DBEAFE")
 
-    static let loginBg   = Color(hex: "#000920")
-    static let drawerBg  = Color(hex: "#000920")
+    static let loginBg   = Color(hex: "#00091F")
+    static let drawerBg  = Color(hex: "#00091F")
 }
 
 // MARK: - Card container
@@ -75,12 +137,13 @@ struct Card<Content: View>: View {
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Brand.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(Brand.border, lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 2)
+            // Portal card shadow: 0 1px 3px rgba(13,71,161,.06).
+            .shadow(color: Brand.blue.opacity(0.06), radius: 3, x: 0, y: 1)
     }
 }
 
@@ -113,7 +176,7 @@ struct StatusBadge: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.app(11, .semibold))
             .foregroundColor(fg)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -132,12 +195,12 @@ struct SectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.system(size: 17, weight: .bold))
+                .font(.app(16, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Spacer()
             if let actionTitle, let action {
                 Button(actionTitle, action: action)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
             }
         }
@@ -149,12 +212,12 @@ struct SectionHeader: View {
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .semibold))
+            .font(.app(15, .semibold))
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(Brand.purple.opacity(configuration.isPressed ? 0.85 : 1))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 
@@ -167,7 +230,7 @@ struct FilterChip: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(selected ? .white : Brand.textSecondary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
@@ -189,7 +252,7 @@ struct InitialBadge: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: size * 0.36, weight: .bold))
+            .font(.app(size * 0.36, .bold))
             .foregroundColor(.white)
             .frame(width: size, height: size)
             .background(color)

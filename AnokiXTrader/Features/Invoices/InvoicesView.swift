@@ -58,10 +58,10 @@ struct InvoicesView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("No invoices yet")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("An invoice appears here once one of your orders is delivered.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -104,16 +104,16 @@ private struct InvoiceCard: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(invoice.invoice_number)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(Brand.purple)
                 Spacer()
                 StatusBadge(text: invoice.statusLabel, fg: invoice.statusTone.fg, bg: invoice.statusTone.bg)
             }
             Text("Order \(invoice.order_number ?? "—") · \(invoice.lineCount) item(s)")
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textPrimary)
             Text(InvoiceFmt.date(invoice.created_at))
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
 
             Divider().padding(.top, 6)
@@ -121,16 +121,16 @@ private struct InvoiceCard: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Amount")
-                        .font(.system(size: 10))
+                        .font(.app(10))
                         .foregroundColor(Brand.textSecondary)
                     Text(Money.rand(invoice.total_amount))
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.app(15, .bold))
                         .foregroundColor(Brand.textPrimary)
                 }
                 Spacer()
                 Button(action: onPdf) {
                     Label("PDF", systemImage: "doc.text")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.app(13, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .padding(.horizontal, 16).padding(.vertical, 9)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))

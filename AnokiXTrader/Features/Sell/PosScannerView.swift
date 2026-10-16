@@ -392,7 +392,7 @@ struct PosScanView: View {
     private var headerBar: some View {
         HStack {
             Text(mode.title)
-                .font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
             Spacer()
             Button { dismiss() } label: {
                 Image(systemName: "xmark")
@@ -430,7 +430,7 @@ struct PosScanView: View {
                     Text(controller.isHolding
                          ? "Scanned — move the item away for the next one"
                          : mode.aimHint)
-                        .font(.system(size: 11)).foregroundColor(.white)
+                        .font(.app(11)).foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 12).padding(.vertical, 5)
                         .background(Color.black.opacity(0.4)).clipShape(Capsule())
@@ -439,11 +439,11 @@ struct PosScanView: View {
             } else {
                 VStack(spacing: 12) {
                     Text(controller.status.message ?? "Allow camera access to scan straight off the label.")
-                        .font(.system(size: 13)).foregroundColor(Color(hex: "#E2E8F0"))
+                        .font(.app(13)).foregroundColor(Color(hex: "#E2E8F0"))
                         .multilineTextAlignment(.center)
                     if controller.status == .denied {
                         Button("Open settings") { openSettings() }
-                            .font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
+                            .font(.app(13, .semibold)).foregroundColor(.white)
                             .padding(.horizontal, 18).frame(height: 42)
                             .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
                     }
@@ -460,12 +460,12 @@ struct PosScanView: View {
     private var manualEntry: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Handheld scanner or type it in")
-                .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                 .padding(.top, 18)
 
             HStack(spacing: 8) {
                 TextField(mode.fieldHint, text: $typed)
-                    .font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14)).foregroundColor(Brand.textPrimary)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .submitLabel(.done)
@@ -477,14 +477,14 @@ struct PosScanView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
 
                 Button("Add") { submitTyped() }
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
+                    .font(.app(14, .semibold)).foregroundColor(.white)
                     .padding(.horizontal, 20).frame(height: 48)
                     .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .padding(.top, 8)
 
             Text("Point the camera at the label, or type the code and tap Add. A Bluetooth scanner types it in and presses Enter — that works here too.")
-                .font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+                .font(.app(12)).foregroundColor(Brand.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 8)
         }
@@ -494,7 +494,7 @@ struct PosScanView: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: f.icon).font(.system(size: 16)).foregroundColor(f.tint)
             Text(f.message)
-                .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                .font(.app(13)).foregroundColor(Brand.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
@@ -509,10 +509,10 @@ struct PosScanView: View {
             Text(cart.itemCount == 0
                  ? "Nothing on this sale yet"
                  : "\(cart.itemCount) \(cart.itemCount == 1 ? "item" : "items") · \(Money.rand(cart.subtotal))")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
             Spacer()
             Button("Done") { dismiss() }
-                .font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
+                .font(.app(14, .semibold)).foregroundColor(.white)
                 .padding(.horizontal, 28).frame(height: 46)
                 .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
         }

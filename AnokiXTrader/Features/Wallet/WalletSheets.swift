@@ -128,7 +128,7 @@ struct TopUpSheet: View {
     private var formBody: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Add money to your anokiX wallet with a card. You will be taken to our secure PayCloud checkout to complete the payment.")
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -149,24 +149,24 @@ struct TopUpSheet: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Amount (ZAR)")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 TextField("R 0.00", text: $amount)
                     .keyboardType(.decimalPad)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.app(18, .semibold))
                     .foregroundColor(Brand.textPrimary)
                     .padding(14)
                     .background(Brand.surface)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 Text("Between R\(WalletFmt.decimal(Self.minAmount)) and R\(WalletFmt.decimal(Self.maxAmount)).")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
             }
 
             if let formError {
                 Label(formError, systemImage: "exclamationmark.circle")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.danger)
             }
 
@@ -207,10 +207,10 @@ struct TopUpSheet: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(waitTitle)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.app(15, .semibold))
                         .foregroundColor(Brand.textPrimary)
                     Text(waitMessage)
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(Brand.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -219,12 +219,12 @@ struct TopUpSheet: View {
 
             if let merchantOrderNo {
                 Text("Order \(merchantOrderNo)")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
             }
 
             if let statusError {
-                Text(statusError).font(.system(size: 12)).foregroundColor(Brand.danger)
+                Text(statusError).font(.app(12)).foregroundColor(Brand.danger)
             }
 
             switch phase {
@@ -237,7 +237,7 @@ struct TopUpSheet: View {
                     Button("Open the payment page again") {
                         checkout = CheckoutLink(url: checkoutURL)
                     }
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.app(14, .semibold))
                     .foregroundColor(Brand.textPrimary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 13)
@@ -419,7 +419,7 @@ struct DebitOrderSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text(intro)
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(Brand.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
 
@@ -431,13 +431,13 @@ struct DebitOrderSheet: View {
                     Text(onceOff
                          ? "One debit will be raised against your wallet."
                          : "IMB debits your wallet monthly, from the first date up to and including the last.")
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let error {
                         Label(error, systemImage: "exclamationmark.circle")
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.danger)
                     }
 
@@ -472,7 +472,7 @@ struct DebitOrderSheet: View {
     private var schedulepicker: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("How often")
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack(spacing: 3) {
                 segment("Once-off", selected: onceOff) { onceOff = true }
@@ -487,7 +487,7 @@ struct DebitOrderSheet: View {
     private func segment(_ label: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(selected ? .white : Brand.textSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
@@ -506,15 +506,15 @@ struct DebitOrderSheet: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Reference")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 Spacer()
                 Text("\(reference.count) / \(limits.maxReference)")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textTertiary)
             }
             TextField("e.g. Stock float", text: $reference)
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(Brand.textPrimary)
                 .padding(14)
                 .background(Brand.surface)
@@ -546,7 +546,7 @@ struct DebitOrderSheet: View {
     private func datePicker(_ title: String, selection: Binding<Date>, floor: Date) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             DatePicker("", selection: selection, in: floor..., displayedComponents: .date)
                 .labelsHidden()

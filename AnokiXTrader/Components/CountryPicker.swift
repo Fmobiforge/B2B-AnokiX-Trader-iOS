@@ -24,13 +24,13 @@ struct CountryPickerSheet: View {
                     dismiss()
                 } label: {
                     HStack(spacing: 12) {
-                        Text(country.flag).font(.system(size: 22))
+                        Text(country.flag).font(.app(22))
                         Text(country.name)
-                            .font(.system(size: 15))
+                            .font(.app(15))
                             .foregroundColor(Brand.textPrimary)
                         Spacer()
                         Text(country.dialCode)
-                            .font(.system(size: 14))
+                            .font(.app(14))
                             .foregroundColor(Brand.textSecondary)
                         if country == selection {
                             Image(systemName: "checkmark").foregroundColor(Brand.purple)

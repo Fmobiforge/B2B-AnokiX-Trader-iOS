@@ -66,11 +66,11 @@ struct StaffView: View {
                 .foregroundColor(Brand.info)
             VStack(alignment: .leading, spacing: 4) {
                 Text("What staff can do")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.app(14, .semibold))
                     .foregroundColor(Brand.textPrimary)
                 Text("Staff can ring up sales, scan products and print receipts. They cannot "
                      + "manage the wallet, order stock or see what the shop earns.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -86,17 +86,17 @@ struct StaffView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Your staff")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Text(countLine)
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 10)
             Button { showAdd = true } label: {
                 Label("Add staff", systemImage: "person.badge.plus")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 14).padding(.vertical, 10)
                     .background(Brand.purple)
@@ -137,10 +137,10 @@ struct StaffView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("No staff yet")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("Add the people who work your till so they can sign in and ring up sales.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -192,11 +192,11 @@ private struct StaffCard: View {
                 InitialBadge(text: member.initials, color: Brand.purple, size: 42)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(member.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.app(15, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .lineLimit(1)
                     Text(member.email ?? "")
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                         .lineLimit(1)
                 }
@@ -206,7 +206,7 @@ private struct StaffCard: View {
             }
 
             Text(member.metaLine)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .lineLimit(1)
 
@@ -215,7 +215,7 @@ private struct StaffCard: View {
             HStack {
                 Button(action: onPassword) {
                     Label("Password", systemImage: "key")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.app(13, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .padding(.horizontal, 14).padding(.vertical, 9)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -225,7 +225,7 @@ private struct StaffCard: View {
                 Spacer()
 
                 Button(member.isActive ? "Disable" : "Enable", action: onToggle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(member.isActive ? Brand.danger : Brand.success)
                     .padding(.horizontal, 10).padding(.vertical, 9)
                     .buttonStyle(.plain)
@@ -272,7 +272,7 @@ private struct AddStaffSheet: View {
                                         placeholder: "thabo@yourshop.co.za",
                                         keyboard: .emailAddress, autocapitalize: false)
                         Text("They sign in with this.")
-                            .font(.system(size: 11))
+                            .font(.app(11))
                             .foregroundColor(Brand.textTertiary)
                     }
 
@@ -286,7 +286,7 @@ private struct AddStaffSheet: View {
 
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.danger)
                     }
 
@@ -365,13 +365,13 @@ private struct SetPasswordSheet: View {
                         PasswordField(title: "Password", text: $password,
                                       placeholder: "At least \(minPasswordLength) characters")
                         Text("Tell them the new password — they are not emailed.")
-                            .font(.system(size: 11))
+                            .font(.app(11))
                             .foregroundColor(Brand.textTertiary)
                     }
 
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.danger)
                     }
 
@@ -432,7 +432,7 @@ struct PasswordField: View {
                         SecureField(placeholder, text: $text)
                     }
                 }
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(Brand.textPrimary)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

@@ -39,9 +39,9 @@ struct AnalyticsView: View {
                             ForEach(MockData.topCategories) { c in
                                 HStack(spacing: 8) {
                                     Circle().fill(Color(hex: c.colorHex)).frame(width: 10, height: 10)
-                                    Text(c.name).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                                    Text(c.name).font(.app(13)).foregroundColor(Brand.textPrimary)
                                     Spacer()
-                                    Text("\(Int(c.percentage))%").font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textSecondary)
+                                    Text("\(Int(c.percentage))%").font(.app(13, .semibold)).foregroundColor(Brand.textSecondary)
                                 }
                             }
                         }
@@ -52,8 +52,8 @@ struct AnalyticsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     SectionHeader(title: "Business Health Score")
                     HStack {
-                        Text("92").font(.system(size: 40, weight: .bold)).foregroundColor(Brand.success)
-                        Text("/ 100").font(.system(size: 16)).foregroundColor(Brand.textSecondary)
+                        Text("92").font(.app(40, .bold)).foregroundColor(Brand.success)
+                        Text("/ 100").font(.app(16)).foregroundColor(Brand.textSecondary)
                         Spacer()
                         StatusBadge(text: "Excellent", fg: Brand.success, bg: Brand.successBg)
                     }
@@ -64,11 +64,11 @@ struct AnalyticsView: View {
                     SectionHeader(title: "Top Selling Products")
                     ForEach(Array(topSellers.enumerated()), id: \.offset) { idx, s in
                         HStack {
-                            Text("\(idx+1)").font(.system(size: 13, weight: .bold)).foregroundColor(Brand.purple)
+                            Text("\(idx+1)").font(.app(13, .bold)).foregroundColor(Brand.purple)
                                 .frame(width: 26, height: 26).background(Brand.purpleLight).clipShape(Circle())
-                            Text(s.0).font(.system(size: 14, weight: .medium))
+                            Text(s.0).font(.app(14, .medium))
                             Spacer()
-                            Text(s.1).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.success)
+                            Text(s.1).font(.app(14, .bold)).foregroundColor(Brand.success)
                         }.padding(.vertical, 7)
                         if idx < topSellers.count - 1 { Divider() }
                     }
@@ -79,8 +79,8 @@ struct AnalyticsView: View {
                     LazyVGrid(columns: kpiCols, spacing: 12) {
                         ForEach(insights, id: \.0) { i in
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(i.1).font(.system(size: 22, weight: .bold)).foregroundColor(i.2)
-                                Text(i.0).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                Text(i.1).font(.app(22, .bold)).foregroundColor(i.2)
+                                Text(i.0).font(.app(12)).foregroundColor(Brand.textSecondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(12).background(i.2.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 12))
@@ -90,9 +90,9 @@ struct AnalyticsView: View {
 
                 // Smart insights
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("Smart Insights", systemImage: "sparkles").font(.system(size: 15, weight: .bold)).foregroundColor(.white)
+                    Label("Smart Insights", systemImage: "sparkles").font(.app(15, .bold)).foregroundColor(.white)
                     Text("Beverages sales are up 18% this week. Consider restocking Coca-Cola 2L and Fresh Milk before the weekend peak.")
-                        .font(.system(size: 13)).foregroundColor(.white.opacity(0.9))
+                        .font(.app(13)).foregroundColor(.white.opacity(0.9))
                 }
                 .padding(16).frame(maxWidth: .infinity, alignment: .leading)
                 .background(LinearGradient(colors: [Brand.purple, Brand.purpleDark], startPoint: .leading, endPoint: .trailing))

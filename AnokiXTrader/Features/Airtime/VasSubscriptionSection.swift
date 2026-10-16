@@ -31,7 +31,7 @@ struct VasSubscriptionSection: View {
 
             Toggle(isOn: $eSim) {
                 Text("eSIM")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.app(14, .medium))
                     .foregroundColor(Brand.textPrimary)
             }
             .tint(Brand.purple)
@@ -44,7 +44,7 @@ struct VasSubscriptionSection: View {
                              placeholder: "8927078220001234567",
                              keyboard: .numberPad, autocapitalize: false)
                     Text("The 19–20 digit serial printed on the SIM card — not a phone number.")
-                        .font(.system(size: 11))
+                        .font(.app(11))
                         .foregroundColor(Brand.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -58,12 +58,12 @@ struct VasSubscriptionSection: View {
             Divider().padding(.vertical, 2)
 
             Text("Activated SIMs")
-                .font(.system(size: 15, weight: .bold))
+                .font(.app(15, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             if subscriptions.isEmpty {
                 Text("No SIMs activated yet.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
@@ -74,10 +74,10 @@ struct VasSubscriptionSection: View {
                         HStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(sub.numberLabel)
-                                    .font(.system(size: 15, weight: .semibold))
+                                    .font(.app(15, .semibold))
                                     .foregroundColor(sub.hasNumber ? Brand.textPrimary : Brand.warning)
                                 Text(sub.metaLabel)
-                                    .font(.system(size: 12))
+                                    .font(.app(12))
                                     .foregroundColor(Brand.textSecondary)
                                     .lineLimit(1)
                             }

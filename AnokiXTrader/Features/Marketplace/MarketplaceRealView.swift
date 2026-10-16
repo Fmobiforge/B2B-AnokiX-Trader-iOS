@@ -118,10 +118,10 @@ struct MarketplaceRealView: View {
         .onChange(of: destination?.id) { newId in
             print("🟣 [Marketplace] destination changed → \(newId ?? "nil")")
         }
-        // White status-bar icons over the purple header (same trick as Login / Register).
-        // Keep scroll content in light mode; closing the screen restores the tab bar default.
+        // White portal header → dark status-bar icons. Keep scroll content in light mode;
+        // closing the screen restores the tab bar default.
         .environment(\.colorScheme, .light)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Header (Android activity_marketplace.xml)
@@ -131,14 +131,14 @@ struct MarketplaceRealView: View {
             Button { router.presented = nil } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Brand.textPrimary)
                     .frame(width: 42, height: 42)
             }
             .buttonStyle(.plain)
 
             Text("Marketplace")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.white)
+                .font(.app(18, .semibold))
+                .foregroundColor(Brand.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             marketplaceCartButton
@@ -146,11 +146,9 @@ struct MarketplaceRealView: View {
         .padding(.horizontal, 8)
         .padding(.bottom, 8)
         .frame(minHeight: 44)
-        .background(
-            LinearGradient(colors: [Brand.purpleDark, Brand.purple],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea(edges: .top)
-        )
+        // Portal page header: white bar with a hairline bottom border.
+        .background(Brand.surface.ignoresSafeArea(edges: .top))
+        .overlay(alignment: .bottom) { Brand.border.frame(height: 1) }
     }
 
     private var marketplaceCartButton: some View {
@@ -158,11 +156,11 @@ struct MarketplaceRealView: View {
             ZStack(alignment: .topTrailing) {
                 Image(systemName: "cart")
                     .font(.system(size: 22))
-                    .foregroundColor(.white)
+                    .foregroundColor(Brand.textPrimary)
                     .frame(width: 24, height: 24)
                 if store.cartBadgeCount > 0 {
                     Text(store.cartBadgeCount > 99 ? "99+" : "\(store.cartBadgeCount)")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.app(10, .bold))
                         .foregroundColor(.white)
                         .frame(minWidth: 18, minHeight: 18)
                         .background(Brand.danger)
@@ -185,11 +183,11 @@ struct MarketplaceRealView: View {
                                   initial: String((store.data?.selected_distributor?.displayName ?? "D").prefix(1)),
                                   size: 44)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Preferred Distributor").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text("Preferred Distributor").font(.app(11)).foregroundColor(Brand.textSecondary)
                     Text(store.data?.selected_distributor?.displayName ?? "—")
-                        .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                        .font(.app(14, .bold)).foregroundColor(Brand.textPrimary).lineLimit(1)
                     Button("Change Distributor") { activeSheet = .distributors }
-                        .font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                        .font(.app(12, .semibold)).foregroundColor(Brand.purple)
                 }
                 Spacer()
             }
@@ -205,8 +203,8 @@ struct MarketplaceRealView: View {
 
     private func miniStat(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 10)).foregroundColor(Brand.textSecondary)
-            Text(value).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(label).font(.app(10)).foregroundColor(Brand.textSecondary)
+            Text(value).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                 .lineLimit(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -222,12 +220,12 @@ struct MarketplaceRealView: View {
                                 DistributorAvatar(logoUrl: d.logo_url,
                                                   initial: String(d.displayName.prefix(1)), size: 40)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(d.displayName).font(.system(size: 14, weight: .bold))
+                                    Text(d.displayName).font(.app(14, .bold))
                                         .foregroundColor(Brand.textPrimary)
-                                    Text(d.address ?? "").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                    Text(d.address ?? "").font(.app(12)).foregroundColor(Brand.textSecondary)
                                         .lineLimit(2).multilineTextAlignment(.leading)
                                     if String(d.id) == store.selectedDistributorId {
-                                        Text("Current distributor").font(.system(size: 11, weight: .semibold))
+                                        Text("Current distributor").font(.app(11, .semibold))
                                             .foregroundColor(Brand.purple)
                                     }
                                 }
@@ -300,15 +298,15 @@ struct MarketplaceRealView: View {
     private var insightsSection: some View {
         if let cards = store.data?.business_insights?.summary_cards, !cards.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Business Insights").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Business Insights").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                 LazyVGrid(columns: summaryGrid, spacing: 10) {
                     ForEach(cards) { card in
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(card.label ?? "").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-                            Text(card.formatted_value ?? "").font(.system(size: 18, weight: .bold))
+                            Text(card.label ?? "").font(.app(11)).foregroundColor(Brand.textSecondary)
+                            Text(card.formatted_value ?? "").font(.app(18, .bold))
                                 .foregroundColor(Brand.textPrimary)
                             if let sub = card.subtitle {
-                                Text(sub).font(.system(size: 10))
+                                Text(sub).font(.app(10))
                                     .foregroundColor(card.trendUp ? Brand.success : Brand.textSecondary)
                             }
                         }
@@ -327,7 +325,7 @@ struct MarketplaceRealView: View {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass").foregroundColor(Brand.textSecondary)
                 TextField("Search products, brands, categories…", text: $search)
-                    .font(.system(size: 14))
+                    .font(.app(14))
             }
             .padding(.horizontal, 12).padding(.vertical, 11)
             .background(Brand.surfaceVariant)
@@ -336,7 +334,7 @@ struct MarketplaceRealView: View {
 
             Button { toastMsg = "Barcode scanner coming soon." } label: {
                 HStack(spacing: 6) {
-                    Image(systemName: "barcode.viewfinder"); Text("Scan").font(.system(size: 13, weight: .semibold))
+                    Image(systemName: "barcode.viewfinder"); Text("Scan").font(.app(13, .semibold))
                 }
                 .foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 11)
                 .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 12))
@@ -363,12 +361,12 @@ struct MarketplaceRealView: View {
                                     .frame(width: 48, height: 48).background(Brand.purpleLight)
                                     .clipShape(RoundedRectangle(cornerRadius: 14))
                                 if idx == 4 {
-                                    Text("NEW").font(.system(size: 7, weight: .bold)).foregroundColor(.white)
+                                    Text("NEW").font(.app(7, .bold)).foregroundColor(.white)
                                         .padding(.horizontal, 4).padding(.vertical, 1)
                                         .background(Brand.danger).clipShape(Capsule()).offset(x: 6, y: -4)
                                 }
                             }
-                            Text(item.label).font(.system(size: 10)).foregroundColor(Brand.textPrimary)
+                            Text(item.label).font(.app(10)).foregroundColor(Brand.textPrimary)
                                 .multilineTextAlignment(.center).frame(width: 64)
                         }
                     }
@@ -400,10 +398,10 @@ struct MarketplaceRealView: View {
         if !store.parentCategories.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("Categories").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text("Categories").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                     Spacer()
                     Button("View All") { destination = .allCategories }
-                        .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                        .font(.app(13, .semibold)).foregroundColor(Brand.purple)
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {
@@ -413,7 +411,7 @@ struct MarketplaceRealView: View {
                                     Image(systemName: CategoryIcon.symbol(for: c)).font(.system(size: 18)).foregroundColor(Brand.purple)
                                         .frame(width: 48, height: 48).background(Brand.purpleLight)
                                         .clipShape(RoundedRectangle(cornerRadius: 14))
-                                    Text(c.title).font(.system(size: 10)).foregroundColor(Brand.textPrimary)
+                                    Text(c.title).font(.app(10)).foregroundColor(Brand.textPrimary)
                                         .multilineTextAlignment(.center)
                                         .lineLimit(2)
                                         .frame(width: 64, alignment: .top)
@@ -432,11 +430,11 @@ struct MarketplaceRealView: View {
 
     private var opportunitiesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Business Opportunities").font(.system(size: 16, weight: .bold)).foregroundColor(.white)
+            Text("Business Opportunities").font(.app(16, .bold)).foregroundColor(.white)
             Text("Increase your order volume and earn additional profit on every basket.")
-                .font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
+                .font(.app(12)).foregroundColor(.white.opacity(0.9))
             Button { toastMsg = "Coming soon" } label: {
-                Text("View Opportunity").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                Text("View Opportunity").font(.app(12, .semibold)).foregroundColor(Brand.purple)
                     .padding(.horizontal, 16).padding(.vertical, 9)
                     .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
             }
@@ -456,13 +454,13 @@ struct MarketplaceRealView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(title).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
-                        if let subtitle { Text(subtitle).font(.system(size: 11)).foregroundColor(Brand.textSecondary) }
+                        Text(title).font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
+                        if let subtitle { Text(subtitle).font(.app(11)).foregroundColor(Brand.textSecondary) }
                     }
                     Spacer()
                     if let collectionType {
                         Button("View All") { destination = .collection(type: collectionType, title: title) }
-                            .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                            .font(.app(13, .semibold)).foregroundColor(Brand.purple)
                     }
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -485,13 +483,13 @@ struct MarketplaceRealView: View {
                 // Inline header/Button (same pattern as the working Recommended/Best
                 // Sellers "View All") rather than SectionHeader.
                 HStack(alignment: .firstTextBaseline) {
-                    Text("Current Promotions").font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text("Current Promotions").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                     Spacer()
                     Button("View All") {
                         print("🟣 [Marketplace] Current Promotions 'View All' tapped → destination = .promotions")
                         destination = .promotions
                     }
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                    .font(.app(13, .semibold)).foregroundColor(Brand.purple)
                     .contentShape(Rectangle())
                 }
                 ForEach(promos) { promo in
@@ -515,8 +513,8 @@ struct MarketplaceRealView: View {
                 HStack(spacing: 8) {
                     Image(systemName: f.0).foregroundColor(Brand.purple)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(f.1).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                        Text(f.2).font(.system(size: 10)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                        Text(f.1).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
+                        Text(f.2).font(.app(10)).foregroundColor(Brand.textSecondary).lineLimit(1)
                     }
                     Spacer()
                 }
@@ -580,21 +578,21 @@ struct BannerCard: View {
 
     private var caption: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(banner.name ?? "").font(.system(size: 19, weight: .bold)).foregroundColor(.white)
+            Text(banner.name ?? "").font(.app(19, .bold)).foregroundColor(.white)
                 .lineLimit(2)
                 .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
-            Text(banner.description ?? "").font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
+            Text(banner.description ?? "").font(.app(12)).foregroundColor(.white.opacity(0.95))
                 .lineLimit(2)
                 .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
             HStack(spacing: 8) {
                 Button(action: onShop) {
-                    Text("Shop Products").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                    Text("Shop Products").font(.app(12, .semibold)).foregroundColor(Brand.purple)
                         .padding(.horizontal, 14).padding(.vertical, 7)
                         .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
                 Button(action: onPromotions) {
-                    Text("View Promotions").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                    Text("View Promotions").font(.app(12, .semibold)).foregroundColor(.white)
                         .padding(.horizontal, 14).padding(.vertical, 7)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white, lineWidth: 1))
                 }
@@ -635,20 +633,20 @@ struct PromotionCard: View {
             // Dark text shadow ("stroke" effect) keeps the title/description legible
             // over any background image.
             Text(promo.name ?? "")
-                .font(.system(size: 19, weight: .bold)).foregroundColor(.white)
+                .font(.app(19, .bold)).foregroundColor(.white)
                 .lineLimit(2)
                 .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
             Text(promo.description ?? "")
-                .font(.system(size: 12)).foregroundColor(.white.opacity(0.95))
+                .font(.app(12)).foregroundColor(.white.opacity(0.95))
                 .lineLimit(2)
                 .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
             if let end = promo.end_date, !end.isEmpty {
-                Text(end).font(.system(size: 12)).foregroundColor(.white.opacity(0.9))
+                Text(end).font(.app(12)).foregroundColor(.white.opacity(0.9))
                     .shadow(color: .black.opacity(0.75), radius: 4, x: 0, y: 1)
                     .padding(.top, 2)
             }
             Button(action: onShop) {
-                Text("Shop Now").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                Text("Shop Now").font(.app(12, .semibold)).foregroundColor(Brand.purple)
                     .padding(.horizontal, 16).padding(.vertical, 8)
                     .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
             }
@@ -692,12 +690,12 @@ struct MarketCard: View {
                 RemoteImage(url: product.imageURL)
                     .frame(width: 150, height: 120).clipped()
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(product.name ?? "").font(.system(size: 12, weight: .semibold))
+                    Text(product.name ?? "").font(.app(12, .semibold))
                         .foregroundColor(Brand.textPrimary).lineLimit(2)
                         .frame(height: 32, alignment: .top)
                     HStack {
                         Text(CurrencyFmt.format(product.priceValue, symbol: currency))
-                            .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.purple)
+                            .font(.app(15, .bold)).foregroundColor(Brand.purple)
                         Spacer()
                         Image(systemName: "plus").font(.system(size: 13, weight: .bold)).foregroundColor(.white)
                             .frame(width: 30, height: 30).background(Brand.purple).clipShape(Circle())

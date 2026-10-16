@@ -81,7 +81,7 @@ struct CategoryProductsView: View {
             await market.refreshCart()
         }
         .environment(\.colorScheme, .light)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)   // white portal header → dark status-bar icons
     }
 
     // MARK: - Title bar (count + Filters + Sort)
@@ -89,16 +89,16 @@ struct CategoryProductsView: View {
     private var titleBar: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("\(store.totalCount) products found")
-                .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                .font(.app(13)).foregroundColor(Brand.textSecondary)
             HStack(spacing: 10) {
                 Button { activeSheet = .filters } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "line.3.horizontal.decrease")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Filters").font(.system(size: 13, weight: .semibold))
+                        Text("Filters").font(.app(13, .semibold))
                         if store.activeFilterCount > 0 {
                             Text("\(store.activeFilterCount)")
-                                .font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+                                .font(.app(10, .bold)).foregroundColor(.white)
                                 .frame(minWidth: 18, minHeight: 18)
                                 .background(Brand.purple).clipShape(Capsule())
                         }
@@ -113,7 +113,7 @@ struct CategoryProductsView: View {
 
                 Spacer()
 
-                Text("Sort by:").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                Text("Sort by:").font(.app(13)).foregroundColor(Brand.textSecondary)
                 Menu {
                     ForEach(store.sortOptions) { opt in
                         Button(opt.label ?? opt.value) {
@@ -124,7 +124,7 @@ struct CategoryProductsView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Text(store.sortLabel)
-                            .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                            .font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
                         Image(systemName: "chevron.down")
                             .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
                     }
@@ -159,8 +159,8 @@ struct CategoryProductsView: View {
             VStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 30)).foregroundColor(Brand.textTertiary)
-                Text("No products found").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
-                Text("Try adjusting your filters.").font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+                Text("No products found").font(.app(14)).foregroundColor(Brand.textSecondary)
+                Text("Try adjusting your filters.").font(.app(12)).foregroundColor(Brand.textTertiary)
             }
             .frame(maxWidth: .infinity).padding(.vertical, 40)
         } else {
@@ -209,10 +209,10 @@ struct CategoryProductsView: View {
     private var recentlyPurchasedSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Recently Purchased")
-                .font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
             if store.recentlyPurchased.isEmpty {
                 Text("Products you order will appear here.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -247,11 +247,11 @@ struct CategoryProductCard: View {
                     .clipped()
                 VStack(alignment: .leading, spacing: 6) {
                     Text(product.name ?? "")
-                        .font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                         .lineLimit(2).frame(height: 32, alignment: .top)
                     HStack {
                         Text(CurrencyFmt.format(product.priceValue, symbol: currency))
-                            .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.purple)
+                            .font(.app(15, .bold)).foregroundColor(Brand.purple)
                         Spacer()
                         Image(systemName: "plus").font(.system(size: 13, weight: .bold)).foregroundColor(.white)
                             .frame(width: 30, height: 30).background(Brand.purple).clipShape(Circle())
@@ -273,10 +273,10 @@ struct CategoryProductCard: View {
             HStack(spacing: 5) {
                 Circle().fill(Brand.success).frame(width: 6, height: 6)
                 Text("In Stock • \(product.stockCount) in stock")
-                    .font(.system(size: 10)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                    .font(.app(10)).foregroundColor(Brand.textSecondary).lineLimit(1)
             }
         } else {
-            Text("Out of Stock").font(.system(size: 10)).foregroundColor(Brand.danger)
+            Text("Out of Stock").font(.app(10)).foregroundColor(Brand.danger)
         }
     }
 }

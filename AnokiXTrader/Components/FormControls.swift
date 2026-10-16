@@ -14,13 +14,13 @@ struct LabeledField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             TextField(placeholder, text: $text)
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(autocap)
                 .autocorrectionDisabled(disableAutocorrect)
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(Brand.textPrimary)
                 .padding(14)
                 .background(Brand.surface)
@@ -41,14 +41,14 @@ struct LabeledSecureField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack {
                 Group {
                     if visible { TextField(placeholder, text: $text) }
                     else { SecureField(placeholder, text: $text) }
                 }
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(Brand.textPrimary)
                 Button { visible.toggle() } label: {
                     Image(systemName: visible ? "eye.slash" : "eye")
@@ -76,12 +76,12 @@ struct DropdownField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             Button(action: action) {
                 HStack(spacing: 8) {
                     Text(value.isEmpty ? placeholder : value)
-                        .font(.system(size: 15))
+                        .font(.app(15))
                         .foregroundColor(value.isEmpty ? Brand.textTertiary : Brand.textPrimary)
                         .lineLimit(1)
                     Spacer(minLength: 8)
@@ -145,7 +145,7 @@ struct SelectOptionsSheet: View {
         VStack(spacing: 0) {
             HStack {
                 Text(title)
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button { dismiss() } label: {
@@ -168,8 +168,7 @@ struct SelectOptionsSheet: View {
                         } label: {
                             HStack(spacing: 12) {
                                 Text(opt.1)
-                                    .font(.system(size: 16,
-                                                  weight: selection == opt.0 ? .semibold : .regular))
+                                    .font(.app(16, selection == opt.0 ? .semibold : .regular))
                                     .foregroundColor(selection == opt.0 ? Brand.purple : Brand.textPrimary)
                                 Spacer(minLength: 8)
                                 if selection == opt.0 {
@@ -215,7 +214,7 @@ struct SelectChip: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(selected ? .white : Brand.textPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
@@ -241,7 +240,7 @@ struct StepBar: View {
                         .fill(i <= current ? Brand.purple : Brand.purpleLight)
                         .frame(width: 26, height: 26)
                     Text("\(i + 1)")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.app(12, .bold))
                         .foregroundColor(i <= current ? .white : Brand.purple)
                 }
                 if i < count - 1 {
@@ -314,12 +313,12 @@ struct WizardStepper: View {
                         .foregroundColor(.white)
                 } else {
                     Text("\(i + 1)")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.app(12, .bold))
                         .foregroundColor(state == .upcoming ? Brand.textSecondary : .white)
                 }
             }
             Text(titles[i])
-                .font(.system(size: 13, weight: state == .current ? .bold : .regular))
+                .font(.app(13, state == .current ? .bold : .regular))
                 .foregroundColor(labelColor(state))
                 .fixedSize()
         }
@@ -354,10 +353,10 @@ struct StepIntro: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 20, weight: .bold))
+                .font(.app(20, .bold))
                 .foregroundColor(Brand.topTitle)
             Text(subtitle)
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -373,10 +372,10 @@ struct InfoBox: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 13, weight: .bold))
+                .font(.app(13, .bold))
                 .foregroundColor(Brand.purple)
             Text(text)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -402,13 +401,13 @@ struct PhoneEntryField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack(spacing: 8) {
                 Button { showPicker = true } label: {
                     HStack(spacing: 4) {
-                        Text(country.flag).font(.system(size: 15))
-                        Text(country.dialCode).font(.system(size: 15, weight: .semibold))
+                        Text(country.flag).font(.app(15))
+                        Text(country.dialCode).font(.app(15, .semibold))
                             .foregroundColor(Brand.textPrimary)
                         Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
                             .foregroundColor(Brand.textSecondary)
@@ -418,7 +417,7 @@ struct PhoneEntryField: View {
                 Rectangle().fill(Brand.border).frame(width: 1, height: 24)
                 TextField(placeholder, text: $text)
                     .keyboardType(.phonePad)
-                    .font(.system(size: 15))
+                    .font(.app(15))
                     .foregroundColor(Brand.textPrimary)
             }
             .padding(14)
@@ -587,7 +586,7 @@ struct DeliveryHoursGrid: View {
                 Text("OPEN").frame(maxWidth: .infinity)
                 Text("CLOSE").frame(maxWidth: .infinity)
             }
-            .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+            .font(.app(11)).foregroundColor(Brand.textSecondary)
 
             ForEach($rows) { $row in
                 HStack(spacing: 6) {
@@ -596,7 +595,7 @@ struct DeliveryHoursGrid: View {
                             Image(systemName: row.checked ? "checkmark.square.fill" : "square")
                                 .font(.system(size: 16))
                                 .foregroundColor(row.checked ? Brand.purple : Brand.textTertiary)
-                            Text(row.abbr).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                            Text(row.abbr).font(.app(13)).foregroundColor(Brand.textPrimary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
@@ -620,7 +619,7 @@ struct DeliveryHoursGrid: View {
         TextField("—", text: value)
             .keyboardType(.numberPad)
             .multilineTextAlignment(.center)
-            .font(.system(size: 13))
+            .font(.app(13))
             .foregroundColor(Brand.textPrimary)
             .frame(maxWidth: .infinity)
             .frame(height: 36)
@@ -638,7 +637,7 @@ struct RemovableChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Text(label)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(13, .medium))
                 .foregroundColor(Brand.purple)
                 .lineLimit(1)
             Button(action: onRemove) {

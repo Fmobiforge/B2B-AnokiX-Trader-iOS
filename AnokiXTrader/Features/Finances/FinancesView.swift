@@ -102,14 +102,14 @@ struct FinancesView: View {
                     .frame(width: 38, height: 38)
                     .background(tint.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                Text(label).font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                Text(label).font(.app(12)).foregroundColor(Brand.textPrimary)
                     .lineLimit(2, reservesSpace: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Text(value).font(.system(size: 22, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text(value).font(.app(22, .bold)).foregroundColor(Brand.textPrimary)
                 .lineLimit(1).minimumScaleFactor(0.7)
                 .padding(.top, 14)
-            Text(sub).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+            Text(sub).font(.app(11)).foregroundColor(Brand.textSecondary)
                 .lineLimit(1)
                 .padding(.top, 4)
         }
@@ -127,7 +127,7 @@ struct FinancesView: View {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
                 TextField("Search reference, order, distributor…", text: $store.search)
-                    .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                    .font(.app(13)).foregroundColor(Brand.textPrimary)
             }
             .padding(.horizontal, 12).frame(height: 44)
             .background(Brand.surfaceVariant)
@@ -156,7 +156,7 @@ struct FinancesView: View {
         return Button { activeFilterSheet = sheet } label: {
             HStack(spacing: 6) {
                 Text(isActive ? currentLabel : placeholder)
-                    .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+                    .font(.app(12, isActive ? .semibold : .regular))
                     .foregroundColor(isActive ? Brand.purple : Brand.textPrimary)
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
@@ -176,14 +176,14 @@ struct FinancesView: View {
             Button { showDatePicker = true } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "calendar").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
-                    Text(dateLabel).font(.system(size: 13))
+                    Text(dateLabel).font(.app(13))
                         .foregroundColor(store.hasDateRange ? Brand.textPrimary : Brand.textSecondary)
                     Spacer()
                 }
             }
             if store.hasDateRange {
                 Button { store.clearDateRange() } label: {
-                    Text("Clear").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                    Text("Clear").font(.app(12, .semibold)).foregroundColor(Brand.purple)
                 }
             }
         }
@@ -212,7 +212,7 @@ struct FinancesView: View {
             LazyVStack(spacing: 10) {
                 HStack {
                     Text("Showing \(store.filtered.count) \(store.filtered.count == 1 ? "transaction" : "transactions")")
-                        .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                        .font(.app(11)).foregroundColor(Brand.textSecondary)
                     Spacer()
                 }
                 ForEach(store.filtered) { txn in
@@ -230,9 +230,9 @@ struct FinancesView: View {
             Image(systemName: "banknote")
                 .font(.system(size: 44)).foregroundColor(Brand.textTertiary)
             Text("No transactions found")
-                .font(.system(size: 15, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                .font(.app(15, .semibold)).foregroundColor(Brand.textPrimary)
             Text("Your wallet payments will appear here. Try adjusting the filters or date range.")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -261,36 +261,36 @@ private struct FinanceCard: View {
                 InitialBadge(text: initial(txn.counterparty), color: Brand.purple, size: 38)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(txn.counterparty ?? "—")
-                        .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                        .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                         .lineLimit(1)
                     if let phone = txn.counterparty_phone, !phone.isEmpty {
-                        Text(phone).font(.system(size: 11)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                        Text(phone).font(.app(11)).foregroundColor(Brand.textSecondary).lineLimit(1)
                     }
                 }
                 Spacer()
                 Text(FinanceMoney.signed(txn.amount))
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(txn.isOutflow ? Brand.danger : Brand.success)
             }
             .padding(.top, 12)
 
             Text(txn.description ?? "—")
-                .font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                .font(.app(12)).foregroundColor(Brand.textPrimary)
                 .lineLimit(2)
                 .padding(.top, 10)
 
             Text("\(txn.shortReference) · \(FinanceFmt.date(txn.created_at))")
-                .font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                .font(.app(10)).foregroundColor(Brand.textTertiary)
                 .padding(.top, 4)
 
             Divider().padding(.top, 12)
 
             HStack(spacing: 8) {
                 Image(systemName: "wallet.pass").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                Text(txn.methodDisplay).font(.system(size: 11)).foregroundColor(Brand.textSecondary).lineLimit(1)
+                Text(txn.methodDisplay).font(.app(11)).foregroundColor(Brand.textSecondary).lineLimit(1)
                 Spacer()
                 Button(action: onView) {
-                    Text("View").font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.purple)
+                    Text("View").font(.app(12, .semibold)).foregroundColor(Brand.purple)
                         .padding(.horizontal, 16).padding(.vertical, 8)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.purple, lineWidth: 1))
                 }
@@ -341,11 +341,11 @@ private struct FinanceDetailSheet: View {
                     }
 
                     Text(FinanceMoney.signed(txn.amount))
-                        .font(.system(size: 26, weight: .bold))
+                        .font(.app(26, .bold))
                         .foregroundColor(txn.isOutflow ? Brand.danger : Brand.success)
                         .padding(.top, 14)
                     Text(txn.description ?? "—")
-                        .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        .font(.app(13)).foregroundColor(Brand.textSecondary)
                         .padding(.top, 4)
 
                     Divider().padding(.vertical, 12)
@@ -359,7 +359,7 @@ private struct FinanceDetailSheet: View {
 
                     Button(action: { dismiss(); onDownload() }) {
                         Label("Download PDF", systemImage: "doc.text")
-                            .font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.purple)
+                            .font(.app(13, .semibold)).foregroundColor(Brand.purple)
                             .frame(maxWidth: .infinity).frame(height: 46)
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.purple, lineWidth: 1))
                     }
@@ -379,9 +379,9 @@ private struct FinanceDetailSheet: View {
 
     private func row(_ label: String, _ value: String) -> some View {
         HStack(alignment: .top) {
-            Text(label).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(12)).foregroundColor(Brand.textSecondary)
             Spacer()
-            Text(value).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(value).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                 .multilineTextAlignment(.trailing)
         }
         .padding(.vertical, 8)

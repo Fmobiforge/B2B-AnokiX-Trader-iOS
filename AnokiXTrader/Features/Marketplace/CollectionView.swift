@@ -33,7 +33,7 @@ struct CollectionView: View {
             MarketSubHeader(title: store.title, cartBadge: market.cartBadgeCount,
                             onBack: { dismiss() }, onCart: { activeSheet = .cart })
             Text("\(store.total) products")
-                .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                .font(.app(13)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16).padding(.top, 12).padding(.bottom, 4)
             content
@@ -55,7 +55,7 @@ struct CollectionView: View {
             await market.refreshCart()
         }
         .environment(\.colorScheme, .light)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)   // white portal header → dark status-bar icons
     }
 
     @ViewBuilder
@@ -65,7 +65,7 @@ struct CollectionView: View {
         } else if store.products.isEmpty {
             VStack(spacing: 8) {
                 Image(systemName: "bag").font(.system(size: 30)).foregroundColor(Brand.textTertiary)
-                Text("No products found").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("No products found").font(.app(14)).foregroundColor(Brand.textSecondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {

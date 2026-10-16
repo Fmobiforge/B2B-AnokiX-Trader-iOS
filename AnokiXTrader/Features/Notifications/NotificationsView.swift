@@ -61,7 +61,7 @@ struct NotificationsView: View {
             tab(store.unreadCount > 0 ? "Unread (\(store.unreadCount))" : "Unread", "unread")
             Spacer()
             Button("Mark all as read") { Task { await store.markAll() } }
-                .font(.system(size: 13, weight: .semibold))
+                .font(.app(13, .semibold))
                 .foregroundColor(Brand.purple)
         }
     }
@@ -70,7 +70,7 @@ struct NotificationsView: View {
         Button { Task { await store.setFilter(key) } } label: {
             VStack(spacing: 4) {
                 Text(label)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.app(14, .bold))
                     .foregroundColor(store.filter == key ? Brand.purple : Brand.textSecondary)
                 Rectangle()
                     .fill(store.filter == key ? Brand.purple : Color.clear)
@@ -99,13 +99,13 @@ struct NotificationsView: View {
         Group {
             if store.total > 0 {
                 HStack {
-                    Text(showingText).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(showingText).font(.app(12)).foregroundColor(Brand.textSecondary)
                     Spacer()
                     Button { Task { await store.load(page: store.page - 1) } } label: {
                         Image(systemName: "chevron.left").font(.system(size: 14, weight: .semibold))
                     }
                     .disabled(store.page <= 1).opacity(store.page <= 1 ? 0.3 : 1)
-                    Text("\(store.page)/\(store.totalPages)").font(.system(size: 12, weight: .semibold))
+                    Text("\(store.page)/\(store.totalPages)").font(.app(12, .semibold))
                         .foregroundColor(Brand.textPrimary).padding(.horizontal, 4)
                     Button { Task { await store.load(page: store.page + 1) } } label: {
                         Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold))
@@ -124,10 +124,10 @@ struct NotificationsView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("You're all caught up")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("New alerts about your orders, deliveries and stock appear here.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -179,10 +179,10 @@ struct NotificationRow: View {
                 .frame(width: 40, height: 40).background(n.tint.opacity(0.12)).clipShape(Circle())
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text(n.title).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text(n.title).font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                     if n.isImportant {
                         Text("Important")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.app(10, .bold))
                             .foregroundColor(Brand.danger)
                             .padding(.horizontal, 6).padding(.vertical, 2)
                             .background(Brand.danger.opacity(0.12))
@@ -191,10 +191,10 @@ struct NotificationRow: View {
                     if !n.is_read { Circle().fill(Brand.purple).frame(width: 7, height: 7) }
                 }
                 if let body = n.body, !body.isEmpty {
-                    Text(body).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(body).font(.app(12)).foregroundColor(Brand.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Text(NotifFmt.relative(n.created_at)).font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                Text(NotifFmt.relative(n.created_at)).font(.app(11)).foregroundColor(Brand.textTertiary)
             }
             Spacer(minLength: 0)
         }

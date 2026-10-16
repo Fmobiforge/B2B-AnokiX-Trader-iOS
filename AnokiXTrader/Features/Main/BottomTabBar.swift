@@ -46,7 +46,7 @@ struct BottomTabBar: View {
                 Image(systemName: item.icon)
                     .font(.system(size: 20, weight: selected ? .semibold : .regular))
                 Text(item.title)
-                    .font(.system(size: 10, weight: selected ? .semibold : .medium))
+                    .font(.app(10, selected ? .semibold : .medium))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }

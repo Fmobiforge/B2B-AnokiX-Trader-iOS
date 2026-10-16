@@ -50,16 +50,16 @@ struct CheckoutView: View {
                     SectionHeader(title: "Current Sale")
                     if cart.isEmpty {
                         Text("Your cart is empty. Add products to start a sale.")
-                            .font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                            .font(.app(14)).foregroundColor(Brand.textSecondary)
                             .frame(maxWidth: .infinity).padding(.vertical, 24)
                     } else {
                         VStack(spacing: 0) {
                             ForEach(cart.lines) { line in
                                 HStack(spacing: 12) {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(line.name).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                                        Text("\(Money.rand(line.unitPrice)) each").font(.system(size: 12)).foregroundColor(Brand.textSecondary)
-                                        Text(Money.rand(line.lineTotal)).font(.system(size: 13, weight: .bold)).foregroundColor(Brand.purple)
+                                        Text(line.name).font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
+                                        Text("\(Money.rand(line.unitPrice)) each").font(.app(12)).foregroundColor(Brand.textSecondary)
+                                        Text(Money.rand(line.lineTotal)).font(.app(13, .bold)).foregroundColor(Brand.purple)
                                     }
                                     Spacer()
                                     VStack(alignment: .trailing, spacing: 6) {
@@ -82,12 +82,12 @@ struct CheckoutView: View {
                 // Discount + totals
                 VStack(spacing: 10) {
                     HStack {
-                        Text("Discount").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                        Text("Discount").font(.app(14)).foregroundColor(Brand.textSecondary)
                         Spacer()
                         TextField("0", text: $discountText)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.app(14, .semibold))
                             .frame(width: 90, height: 36)
                             .padding(.horizontal, 10)
                             .background(Brand.surfaceVariant)
@@ -99,9 +99,9 @@ struct CheckoutView: View {
                     totalRow("VAT (15%)", Money.rand(vat))
                     Divider()
                     HStack {
-                        Text("Total").font(.system(size: 16, weight: .bold))
+                        Text("Total").font(.app(16, .bold))
                         Spacer()
-                        Text(Money.rand(total)).font(.system(size: 18, weight: .bold)).foregroundColor(Brand.purple)
+                        Text(Money.rand(total)).font(.app(18, .bold)).foregroundColor(Brand.purple)
                     }
                 }
                 .card()
@@ -115,7 +115,7 @@ struct CheckoutView: View {
                     SectionHeader(title: "Payment Method")
                     Button { showPaymentPicker = true } label: {
                         HStack {
-                            Text(payment.label).font(.system(size: 14)).foregroundColor(Brand.textPrimary)
+                            Text(payment.label).font(.app(14)).foregroundColor(Brand.textPrimary)
                             Spacer()
                             Image(systemName: "chevron.down").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
                         }
@@ -242,9 +242,9 @@ struct CheckoutView: View {
 
     private func totalRow(_ l: String, _ r: String) -> some View {
         HStack {
-            Text(l).font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+            Text(l).font(.app(14)).foregroundColor(Brand.textSecondary)
             Spacer()
-            Text(r).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(r).font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
         }
     }
 }
@@ -256,7 +256,7 @@ private struct QtyStepper: View {
     var body: some View {
         HStack(spacing: 14) {
             Button(action: dec) { Image(systemName: "minus.circle.fill").foregroundColor(Brand.textTertiary) }
-            Text("\(qty)").font(.system(size: 15, weight: .bold)).frame(minWidth: 20)
+            Text("\(qty)").font(.app(15, .bold)).frame(minWidth: 20)
             Button(action: inc) { Image(systemName: "plus.circle.fill").foregroundColor(Brand.purple) }
         }
     }
@@ -318,7 +318,7 @@ struct CardMachineSheet: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Card machine payment")
-                    .font(.system(size: 19, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(19, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button { dismiss() } label: {
                     Image(systemName: "xmark")
@@ -329,9 +329,9 @@ struct CardMachineSheet: View {
 
             // Amount being pushed to the machine
             HStack {
-                Text("Amount").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                Text("Amount").font(.app(14)).foregroundColor(Brand.textSecondary)
                 Spacer()
-                Text(amountText).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(amountText).font(.app(20, .bold)).foregroundColor(Brand.textPrimary)
             }
             .padding(16)
             .background(Brand.surfaceVariant)
@@ -339,7 +339,7 @@ struct CardMachineSheet: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             Text("Card machine")
-                .font(.system(size: 13, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(13, .bold)).foregroundColor(Brand.textPrimary)
                 .padding(.top, 16).padding(.bottom, 8)
 
             // A `SelectOptionsSheet` rather than a native `Menu`, for the same reason
@@ -348,7 +348,7 @@ struct CardMachineSheet: View {
             Button { showMachinePicker = true } label: {
                 HStack {
                     Text(selected?.displayName ?? "")
-                        .font(.system(size: 14)).foregroundColor(Brand.textPrimary).lineLimit(1)
+                        .font(.app(14)).foregroundColor(Brand.textPrimary).lineLimit(1)
                     Spacer()
                     Image(systemName: "chevron.down")
                         .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
@@ -367,7 +367,7 @@ struct CardMachineSheet: View {
                         .font(.system(size: 15))
                         .foregroundColor(status.ok ? Brand.success : Brand.danger)
                     Text(status.text)
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(status.ok ? Brand.success : Brand.danger)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
@@ -395,7 +395,7 @@ struct CardMachineSheet: View {
                         Text(sent ? "Done" : (sending ? "Sending…" : "Send \(amountText)"))
                             .lineLimit(1).minimumScaleFactor(0.8)
                     }
-                    .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                    .font(.app(15, .semibold)).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 14)
                     .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 10))
                 }
@@ -405,7 +405,7 @@ struct CardMachineSheet: View {
                 if !sent {
                     Button { dismiss() } label: {
                         Text("Close")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.app(15, .semibold))
                             .foregroundColor(Brand.textSecondary)
                             .frame(maxWidth: .infinity).padding(.vertical, 13)
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))

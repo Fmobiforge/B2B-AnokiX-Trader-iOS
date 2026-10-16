@@ -70,7 +70,7 @@ struct AirtimeView: View {
     private var howItWorks: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("How this page works")
-                .font(.system(size: 13, weight: .bold))
+                .font(.app(13, .bold))
                 .foregroundColor(Brand.textPrimary)
             Text("**Onboard customer** → activate their SIM under **Subscription** (you hand in "
                  + "the SIM's ICCID; Limes hands back the phone number) → then sell airtime, "
@@ -78,7 +78,7 @@ struct AirtimeView: View {
                  + "services**, and track it all under **Recent transactions**. Airtime & data "
                  + "top-ups go straight to any active number — onboarding is only needed when "
                  + "signing a customer up to a SIM subscription.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -101,7 +101,7 @@ struct AirtimeView: View {
                             withAnimation { proxy.scrollTo(tab.id, anchor: .leading) }
                         } label: {
                             Text(tab.rawValue)
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.app(13, .semibold))
                                 .foregroundColor(tab == store.tab ? Brand.success : Brand.textSecondary)
                                 .padding(.horizontal, 16).padding(.vertical, 9)
                                 .background(tab == store.tab ? Brand.successBg : Brand.surface)
@@ -141,22 +141,22 @@ struct AirtimeView: View {
     private var gateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Select a customer above to continue", systemImage: "lock.fill")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("Limes authenticates as the customer, so every call on this tab runs on "
                  + "their token.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
             if store.customersLoaded && store.activeCustomers.isEmpty {
                 Divider().padding(.vertical, 2)
                 Text("No customers yet. Limes issues its token per customer, so onboard "
                      + "someone before selling to them.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Button("Onboard a customer") { store.tab = .onboard }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
             }
         }
@@ -178,7 +178,7 @@ private struct ActingAsBar: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 Text("Acting as")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.textSecondary)
                 if !store.actingSubject.isEmpty {
                     StatusBadge(text: store.actingSubject, fg: Brand.success, bg: Brand.successBg)
@@ -201,7 +201,7 @@ private struct ActingAsBar: View {
             Button { showPicker = true } label: {
                 HStack(spacing: 8) {
                     Text(store.actingCustomer?.pickerLabel ?? "Select a customer")
-                        .font(.system(size: 15))
+                        .font(.app(15))
                         .foregroundColor(store.actingCustomer == nil
                                          ? Brand.textTertiary : Brand.textPrimary)
                         .lineLimit(1)
@@ -226,7 +226,7 @@ private struct ActingAsBar: View {
                 Text(store.actingBusy
                      ? "Authenticating with Limes…"
                      : "Pick a customer — their Limes token is what these calls use.")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -260,7 +260,7 @@ struct VasTransactionsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Recent VAS transactions")
-                .font(.system(size: 17, weight: .bold))
+                .font(.app(17, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             if store.transactions.isEmpty {
@@ -272,17 +272,17 @@ struct VasTransactionsSection: View {
                         HStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(txn.name ?? "—")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.app(14, .semibold))
                                     .foregroundColor(Brand.textPrimary)
                                     .lineLimit(1)
                                 Text("\(VasFormat.msisdn(txn.msisdn)) · \(VasFormat.time(txn.created_at))")
-                                    .font(.system(size: 12))
+                                    .font(.app(12))
                                     .foregroundColor(Brand.textSecondary)
                             }
                             Spacer(minLength: 8)
                             VStack(alignment: .trailing, spacing: 4) {
                                 Text(VasFormat.money(txn.amount))
-                                    .font(.system(size: 14, weight: .bold))
+                                    .font(.app(14, .bold))
                                     .foregroundColor(Brand.textPrimary)
                                 StatusBadge(text: style.label, fg: style.fg, bg: style.bg)
                             }
@@ -303,7 +303,7 @@ struct VasEmptyCard: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 12))
+            .font(.app(12))
             .foregroundColor(Brand.textSecondary)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
@@ -320,10 +320,10 @@ struct VasSectionHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 17, weight: .bold))
+                .font(.app(17, .bold))
                 .foregroundColor(Brand.textPrimary)
             Text(body_)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -335,7 +335,7 @@ struct VasSectionHeader: View {
 struct VasFieldBox: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .font(.system(size: 14))
+            .font(.app(14))
             .padding(.horizontal, 14).padding(.vertical, 12)
             .background(Brand.surfaceVariant)
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
@@ -354,7 +354,7 @@ struct VasField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .font(.app(12, .medium))
                 .foregroundColor(Brand.textSecondary)
             TextField(placeholder, text: $text)
                 .keyboardType(keyboard)
@@ -377,12 +377,12 @@ struct VasPicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .font(.app(12, .medium))
                 .foregroundColor(Brand.textSecondary)
             Button { show = true } label: {
                 HStack(spacing: 8) {
                     Text(currentLabel.isEmpty ? placeholder : currentLabel)
-                        .font(.system(size: 14))
+                        .font(.app(14))
                         .foregroundColor(currentLabel.isEmpty ? Brand.textTertiary : Brand.textPrimary)
                         .lineLimit(1)
                     Spacer(minLength: 8)

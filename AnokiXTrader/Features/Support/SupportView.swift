@@ -63,7 +63,7 @@ struct SupportView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Brand.textSecondary)
                 TextField("Search for help articles, topics or keywords…", text: $store.search)
-                    .font(.system(size: 14))
+                    .font(.app(14))
                     .foregroundColor(Brand.textPrimary)
                     .autocorrectionDisabled()
                     .submitLabel(.search)
@@ -87,7 +87,7 @@ struct SupportView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Button("Search") { Task { await store.runSearch() } }
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(.white)
                 .padding(.horizontal, 18)
                 .frame(height: 46)
@@ -141,14 +141,14 @@ struct SupportView: View {
 
             if let hours = store.channels?.hours, !hours.trimmingCharacters(in: .whitespaces).isEmpty {
                 Text(hours)
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textSecondary)
             }
         } else if store.loading {
             ProgressView().frame(maxWidth: .infinity).padding(.vertical, 20)
         } else {
             Text("Support channels are being set up. Please check back soon.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -162,13 +162,13 @@ struct SupportView: View {
     private var articlesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(store.activeQuery == nil ? "Popular Topics" : "Search")
-                .font(.system(size: 17, weight: .bold))
+                .font(.app(17, .bold))
                 .foregroundColor(Brand.textPrimary)
 
             if store.articles.isEmpty {
                 Text(store.activeQuery.map { "No help articles matched “\($0)”." }
                      ?? "Help articles are on their way.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
@@ -184,11 +184,11 @@ struct SupportView: View {
                                 .padding(.top, 1)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(article.title ?? "—")
-                                    .font(.system(size: 13))
+                                    .font(.app(13))
                                     .foregroundColor(Brand.textPrimary)
                                 if let blurb = article.blurb {
                                     Text(blurb)
-                                        .font(.system(size: 11))
+                                        .font(.app(11))
                                         .foregroundColor(Brand.textSecondary)
                                         .lineLimit(2)
                                 }
@@ -208,17 +208,17 @@ struct SupportView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("My Support Tickets")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button("New ticket") { request = .ticket }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.purple)
             }
 
             if store.tickets.isEmpty {
                 Text("You have not opened any tickets yet.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 26)
@@ -323,10 +323,10 @@ private struct ChannelCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.app(14, .semibold))
                         .foregroundColor(Brand.textPrimary)
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                         .lineLimit(1)
                 }
@@ -349,22 +349,22 @@ private struct TicketRow: View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 8) {
                 Text(ticket.ticket_number ?? "—")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textSecondary)
                 StatusBadge(text: ticket.statusLabel,
                             fg: ticket.statusTone.fg, bg: ticket.statusTone.bg)
                 Spacer(minLength: 8)
                 Text(SupportFmt.shortDateTime(ticket.created_at))
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textTertiary)
             }
             Text(ticket.subject ?? "—")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(Brand.textPrimary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
             Text(ticket.waitingLabel)
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -427,7 +427,7 @@ private struct SupportRequestSheet: View {
 
                     if let errorMsg {
                         Text(errorMsg)
-                            .font(.system(size: 12))
+                            .font(.app(12))
                             .foregroundColor(Brand.danger)
                     }
 
@@ -483,7 +483,7 @@ private struct SupportRequestSheet: View {
                           placeholder: "anokiX Support") { showAudiencePicker = true }
             Text("Ask your distributor about their stock, prices and deliveries. "
                  + "Ask anokiX about the app, your wallet or payments.")
-                .font(.system(size: 11))
+                .font(.app(11))
                 .foregroundColor(Brand.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -584,9 +584,9 @@ struct FieldLabel: View {
     var body: some View {
         HStack(spacing: 3) {
             if required {
-                Text("*").font(.system(size: 13, weight: .medium)).foregroundColor(Brand.danger)
+                Text("*").font(.app(13, .medium)).foregroundColor(Brand.danger)
             }
-            Text(text).font(.system(size: 13, weight: .medium)).foregroundColor(Brand.textSecondary)
+            Text(text).font(.app(13, .medium)).foregroundColor(Brand.textSecondary)
         }
     }
 }
@@ -608,7 +608,7 @@ struct SingleLineField: View {
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(autocapitalize ? .sentences : .never)
                 .autocorrectionDisabled(!autocapitalize)
-                .font(.system(size: 15))
+                .font(.app(15))
                 .foregroundColor(Brand.textPrimary)
                 .padding(14)
                 .background(Brand.surface)
@@ -635,13 +635,13 @@ struct MultilineField: View {
             ZStack(alignment: .topLeading) {
                 if text.isEmpty && !placeholder.isEmpty {
                     Text(placeholder)
-                        .font(.system(size: 15))
+                        .font(.app(15))
                         .foregroundColor(Brand.textTertiary)
                         .padding(.horizontal, 18)
                         .padding(.top, 22)
                 }
                 TextEditor(text: $text)
-                    .font(.system(size: 15))
+                    .font(.app(15))
                     .foregroundColor(Brand.textPrimary)
                     .scrollContentBackground(.hidden)
                     .padding(.horizontal, 10)

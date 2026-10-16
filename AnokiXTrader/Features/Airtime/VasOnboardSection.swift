@@ -57,7 +57,7 @@ struct VasOnboardSection: View {
                  + "**Subscription** tab. For airtime, data or bundle top-ups you don't need "
                  + "this: use **Catalog & orders** or **Dynamic services**, which provision "
                  + "straight to a phone number.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,7 +115,7 @@ struct VasOnboardSection: View {
     private var addressFields: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Billing address")
-                .font(.system(size: 14, weight: .bold))
+                .font(.app(14, .bold))
                 .foregroundColor(Brand.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 12) {
@@ -142,7 +142,7 @@ struct VasOnboardSection: View {
                 .opacity(submitting ? 0.6 : 1)
 
             Button(previewing ? "Building…" : "View request body") { preview() }
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(Brand.textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 13)

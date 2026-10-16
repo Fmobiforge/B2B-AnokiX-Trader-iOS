@@ -50,7 +50,7 @@ struct OrdersView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
                     TextField("Search by order ID, distributor or product…", text: $searchText)
-                        .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                        .font(.app(13)).foregroundColor(Brand.textPrimary)
                         .onChange(of: searchText) { _ in debounceSearch() }
                 }
                 .padding(.horizontal, 12).frame(height: 44)
@@ -74,7 +74,7 @@ struct OrdersView: View {
         } label: {
             HStack(spacing: 6) {
                 Text(store.distributorName ?? "All Distributors")
-                    .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                    .font(.app(13)).foregroundColor(Brand.textPrimary)
                     .lineLimit(1)
                 Image(systemName: "chevron.down").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
             }
@@ -90,7 +90,7 @@ struct OrdersView: View {
             HStack(spacing: 10) {
                 Image(systemName: "calendar").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
                 Text("\(OrderFmt.display(store.dateFrom))  →  \(OrderFmt.display(store.dateTo))")
-                    .font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                    .font(.app(13)).foregroundColor(Brand.textPrimary)
                 Spacer()
             }
             .padding(.horizontal, 12).frame(height: 44)
@@ -137,7 +137,7 @@ struct OrdersView: View {
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "shippingbox").font(.system(size: 50)).foregroundColor(Brand.textTertiary)
-            Text("No orders found.").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+            Text("No orders found.").font(.app(14)).foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 60)
@@ -148,7 +148,7 @@ struct OrdersView: View {
     private var paginationBar: some View {
         if let p = store.pagination, p.total > 0 {
             HStack {
-                Text(paginationLabel(p)).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                Text(paginationLabel(p)).font(.app(12)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 if p.total_pages > 1 {
                     Button { store.prevPage() } label: {
@@ -220,20 +220,20 @@ struct OrderRow: View {
                 InitialBadge(text: OrderLogo.initials(order.distributorName),
                              color: OrderLogo.color(order.distributor_id), size: 46)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(order.distributorName).font(.system(size: 15, weight: .bold)).foregroundColor(Brand.purple)
-                    Text(order.order_number).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                    Text(OrderFmt.createdAt(order.created_at)).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text(order.distributorName).font(.app(15, .bold)).foregroundColor(Brand.purple)
+                    Text(order.order_number).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
+                    Text(OrderFmt.createdAt(order.created_at)).font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 6) {
-                    Text(OrderFmt.money(order.amount)).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text(OrderFmt.money(order.amount)).font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
                     StatusBadge(text: statusLabel(order.statusKey),
                                 fg: statusColor(order.statusKey), bg: statusColor(order.statusKey).opacity(0.14))
                 }
             }
 
             Text("PRODUCTS \(order.products?.count ?? 0)")
-                .font(.system(size: 10, weight: .bold)).tracking(0.5).foregroundColor(Brand.textSecondary)
+                .font(.app(10, .bold)).tracking(0.5).foregroundColor(Brand.textSecondary)
                 .padding(.top, 12)
 
             WrappingTextChips(items: order.products ?? []).padding(.top, 6)
@@ -241,11 +241,11 @@ struct OrderRow: View {
             Divider().padding(.top, 12)
 
             HStack {
-                Text(deliveryInfo).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                Text(deliveryInfo).font(.app(11)).foregroundColor(Brand.textSecondary)
                 Spacer()
                 HStack(spacing: 4) {
                     Image(systemName: "eye").font(.system(size: 12))
-                    Text("View Detail").font(.system(size: 12, weight: .semibold))
+                    Text("View Detail").font(.app(12, .semibold))
                 }
                 .foregroundColor(Brand.purple)
                 .padding(.horizontal, 12).padding(.vertical, 7)

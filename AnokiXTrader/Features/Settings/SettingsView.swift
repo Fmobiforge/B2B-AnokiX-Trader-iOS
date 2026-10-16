@@ -14,7 +14,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Manage your account, business and portal preferences.")
-                    .font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
 
                 profileHeader
 
@@ -54,9 +54,9 @@ struct SettingsView: View {
         HStack(spacing: 14) {
             AvatarCircle(initials: store.initials, size: 52)
             VStack(alignment: .leading, spacing: 2) {
-                Text(store.fullName).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(store.fullName).font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                 if !store.companyName.isEmpty {
-                    Text(store.companyName).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(store.companyName).font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
             }
             Spacer(minLength: 0)
@@ -74,8 +74,8 @@ struct SettingsView: View {
                     .font(.system(size: 17)).foregroundColor(Brand.purple)
                     .frame(width: 42, height: 42).background(Brand.purpleLight).clipShape(Circle())
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(title).font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
+                    Text(subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
@@ -100,9 +100,9 @@ struct ProfileSettingsView: View {
             HStack(spacing: 14) {
                 AvatarCircle(initials: store.initials, size: 56)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(store.fullName).font(.system(size: 17, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    Text(store.fullName).font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
                     if !store.companyName.isEmpty {
-                        Text(store.companyName).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        Text(store.companyName).font(.app(12)).foregroundColor(Brand.textSecondary)
                     }
                 }
                 Spacer(minLength: 0)
@@ -135,8 +135,8 @@ struct NotificationSettingsView: View {
             ForEach(SettingsOptions.toggles) { item in
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(item.title).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
-                        Text(item.desc).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        Text(item.title).font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
+                        Text(item.desc).font(.app(12)).foregroundColor(Brand.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer(minLength: 8)
@@ -201,7 +201,7 @@ struct PreferencesSettingsView: View {
                            options: SettingsOptions.vasPaymentModes,
                            selection: $store.vasPaymentMode)
                 Text("How Airtime & VAS purchases are paid for.")
-                    .font(.system(size: 12))
+                    .font(.app(12))
                     .foregroundColor(Brand.textTertiary)
             }
             SaveFooter(loading: store.savingPrefs,
@@ -279,7 +279,7 @@ struct BusinessProfileEditorView: View {
         HStack(spacing: 12) {
             Button { if step == 0 { dismiss() } else { step -= 1 } } label: {
                 Text(step == 0 ? "Cancel" : "Back")
-                    .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                     .padding(.horizontal, 22).frame(height: 46)
                     .overlay(RoundedRectangle(cornerRadius: 23).stroke(Brand.border, lineWidth: 1))
             }
@@ -289,7 +289,7 @@ struct BusinessProfileEditorView: View {
                     HStack(spacing: 8) {
                         if store.saving { ProgressView().tint(.white) }
                         Text(store.saving ? "Saving…" : "Save Changes")
-                            .font(.system(size: 14, weight: .bold)).foregroundColor(.white)
+                            .font(.app(14, .bold)).foregroundColor(.white)
                     }
                     .padding(.horizontal, 24).frame(height: 46)
                     .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 23))
@@ -312,7 +312,7 @@ private struct BizOwnerStep: View {
             LabeledField(title: "ID Number", text: $store.idNumber, placeholder: "Enter ID number")
             LabeledField(title: "Passport Number", text: $store.passportNumber, placeholder: "Enter passport number")
             Text("Provide either an ID number or a passport number.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
         }
     }
 }
@@ -339,7 +339,7 @@ private struct BizBusinessStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Company Logo").font(.system(size: 13, weight: .medium))
+                Text("Company Logo").font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 Button { logoStage = .sourcePicker } label: {
                     ZStack {
@@ -349,8 +349,8 @@ private struct BizBusinessStep: View {
                             RemoteImage(url: MediaUrls.resolve(url))
                         } else {
                             VStack(spacing: 2) {
-                                Text("+").font(.system(size: 32, weight: .light)).foregroundColor(Brand.textSecondary)
-                                Text("Upload logo").font(.system(size: 12)).foregroundColor(Brand.purple)
+                                Text("+").font(.app(32, .light)).foregroundColor(Brand.textSecondary)
+                                Text("Upload logo").font(.app(12)).foregroundColor(Brand.purple)
                             }
                         }
                     }
@@ -443,11 +443,11 @@ private struct BizLocationStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Address of your business").font(.system(size: 13, weight: .medium))
+            Text("Address of your business").font(.app(13, .medium))
                 .foregroundColor(Brand.textSecondary)
             HStack {
                 TextField("Search for your business address", text: $query)
-                    .font(.system(size: 15)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15)).foregroundColor(Brand.textPrimary)
                     .onChange(of: query) { _ in search() }
                 if searching { ProgressView() }
             }
@@ -461,7 +461,7 @@ private struct BizLocationStep: View {
                         Button { resolve(s) } label: {
                             HStack {
                                 Image(systemName: "mappin.circle").foregroundColor(Brand.purple)
-                                Text(s.description).font(.system(size: 13)).foregroundColor(Brand.textPrimary)
+                                Text(s.description).font(.app(13)).foregroundColor(Brand.textPrimary)
                                     .multilineTextAlignment(.leading)
                                 Spacer()
                             }
@@ -476,7 +476,7 @@ private struct BizLocationStep: View {
             }
 
             if !store.address.isEmpty {
-                Text(store.address).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                Text(store.address).font(.app(13)).foregroundColor(Brand.textSecondary)
             }
 
             GoogleMapView(latitude: $store.latitude, longitude: $store.longitude,
@@ -485,7 +485,7 @@ private struct BizLocationStep: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
 
             Text("Tap the map to drop a pin, or drag the pin to set the location.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
         }
         .onAppear { if query.isEmpty { query = store.address } }
     }
@@ -547,9 +547,9 @@ private struct BizVerifyStep: View {
                         .frame(width: 22)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.label + " *")
-                            .font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                            .font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
                         Text(rowSubtitle(row.field))
-                            .font(.system(size: 11))
+                            .font(.app(11))
                             .foregroundColor(rowDone(row.field) ? Brand.success : Brand.textSecondary)
                             .lineLimit(1)
                     }
@@ -559,7 +559,7 @@ private struct BizVerifyStep: View {
                         docSheet = .sourcePicker
                     } label: {
                         Text(rowDone(row.field) ? "Replace" : "Upload")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(Brand.purple)
+                            .font(.app(12, .bold)).foregroundColor(Brand.purple)
                             .padding(.horizontal, 16).padding(.vertical, 9)
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
                     }
@@ -568,7 +568,7 @@ private struct BizVerifyStep: View {
                 .padding(12).card(padding: 12)
             }
             Text("Accepted formats: JPG, PNG, PDF (Max 5MB). Only changed documents are uploaded.")
-                .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                .font(.app(11)).foregroundColor(Brand.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .sheet(item: $docSheet) { sheet in
@@ -643,11 +643,11 @@ private struct BizDistributorStep: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Preferred Delivery Days").font(.system(size: 13, weight: .medium))
+                Text("Preferred Delivery Days").font(.app(13, .medium))
                     .foregroundColor(Brand.textSecondary)
                 DeliveryHoursGrid(rows: $store.deliveryRows)
                 Text("24-hour times (e.g. 8 = 08:00); leave a row blank to default to 8–18. The second pair is an optional split window.")
-                    .font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    .font(.app(11)).foregroundColor(Brand.textSecondary)
             }
 
             SelectField(title: "Preferred Payment Method", placeholder: "Select payment method",
@@ -709,9 +709,9 @@ private struct BizWalletStep: View {
                 .font(.system(size: 20)).foregroundColor(Brand.purple)
             VStack(alignment: .leading, spacing: 3) {
                 Text("anokiX Wallet")
-                    .font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                    .font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 Text("Your IMB business account — balances, payments and rewards in one place.")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
@@ -734,7 +734,7 @@ private struct BizWalletStep: View {
             } else {
                 Button { Task { await store.load() } } label: {
                     Label("Refresh", systemImage: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.app(13, .medium))
                         .foregroundColor(Brand.textSecondary)
                 }
                 .buttonStyle(.plain)
@@ -744,7 +744,7 @@ private struct BizWalletStep: View {
 
     private func errorBox(_ message: String) -> some View {
         Text(message)
-            .font(.system(size: 12)).foregroundColor(Brand.danger)
+            .font(.app(12)).foregroundColor(Brand.danger)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
             .background(Brand.dangerBg)
@@ -754,13 +754,13 @@ private struct BizWalletStep: View {
     private var accountCard: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text("IMB Account Number")
-                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                .font(.app(12)).foregroundColor(Brand.textSecondary)
             Text(store.wallet?.account_number ?? "—")
                 .font(.system(size: 18, weight: .bold, design: .monospaced))
                 .foregroundColor(Brand.textPrimary)
             if let since = store.wallet?.activated_at, !since.isEmpty {
                 Text("Activated \(since)")
-                    .font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                    .font(.app(11)).foregroundColor(Brand.textTertiary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -781,9 +781,9 @@ private struct BizWalletStep: View {
     private func balanceTile(_ value: String, _ label: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(value)
-                .font(.system(size: 14, weight: .bold)).foregroundColor(color)
+                .font(.app(14, .bold)).foregroundColor(color)
                 .minimumScaleFactor(0.7).lineLimit(1)
-            Text(label).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+            Text(label).font(.app(11)).foregroundColor(Brand.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
@@ -795,14 +795,14 @@ private struct BizWalletStep: View {
     private var transactionsCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Recent Transactions")
-                .font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+                .font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
                 .padding(.bottom, 8)
 
             VStack(spacing: 0) {
                 HStack {
-                    Text("Date").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text("Date").font(.app(11)).foregroundColor(Brand.textSecondary)
                     Spacer()
-                    Text("Amount").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                    Text("Amount").font(.app(11)).foregroundColor(Brand.textSecondary)
                 }
                 .padding(.vertical, 8)
                 Divider()
@@ -810,19 +810,19 @@ private struct BizWalletStep: View {
                 let txns = balance?.transactions ?? []
                 if txns.isEmpty {
                     Text(store.loaded ? "No transactions yet." : "Loading…")
-                        .font(.system(size: 12)).foregroundColor(Brand.textTertiary)
+                        .font(.app(12)).foregroundColor(Brand.textTertiary)
                         .frame(maxWidth: .infinity).padding(.vertical, 20)
                 } else {
                     ForEach(Array(txns.enumerated()), id: \.element.id) { idx, t in
                         let value = Double(t.amount ?? "") ?? 0
                         HStack {
                             Text(Self.txnDate(t.date))
-                                .font(.system(size: 12)).foregroundColor(Brand.textPrimary)
+                                .font(.app(12)).foregroundColor(Brand.textPrimary)
                                 .lineLimit(1)
                             Spacer(minLength: 10)
                             // The API sends the amount as a string ("-60.00"); keep the sign.
                             Text((value < 0 ? "-" : "") + Money.rand(abs(value)))
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.app(12, .semibold))
                                 .foregroundColor(value < 0 ? Brand.textPrimary : Brand.success)
                         }
                         .padding(.vertical, 11)
@@ -863,8 +863,8 @@ struct SettingsScreen<Content: View>: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 18, weight: .bold)).foregroundColor(Brand.textPrimary)
-                    Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(title).font(.app(18, .bold)).foregroundColor(Brand.textPrimary)
+                    Text(subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
                 .padding(.bottom, 4)
                 content
@@ -888,7 +888,7 @@ struct SaveFooter: View {
         HStack(spacing: 10) {
             Spacer()
             Button("Cancel", action: cancel)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(Brand.textPrimary)
                 .padding(.horizontal, 18).frame(height: 44)
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -898,7 +898,7 @@ struct SaveFooter: View {
                 HStack(spacing: 8) {
                     if loading { ProgressView().tint(.white) }
                     Text(loading ? "Saving…" : "Save Changes")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.app(14, .semibold))
                 }
                 .foregroundColor(.white)
                 .padding(.horizontal, 18).frame(height: 44)
@@ -917,7 +917,7 @@ struct AvatarCircle: View {
 
     var body: some View {
         Text(initials)
-            .font(.system(size: size * 0.38, weight: .bold))
+            .font(.app(size * 0.38, .bold))
             .foregroundColor(Brand.purple)
             .frame(width: size, height: size)
             .background(Brand.purpleLight)

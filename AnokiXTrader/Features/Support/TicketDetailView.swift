@@ -60,7 +60,7 @@ struct TicketDetailView: View {
         if let ticket {
             VStack(alignment: .leading, spacing: 8) {
                 Text(ticket.subject ?? "—")
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(Brand.textPrimary)
                 HStack(spacing: 6) {
                     StatusBadge(text: ticket.statusLabel,
@@ -69,7 +69,7 @@ struct TicketDetailView: View {
                         StatusBadge(text: badge.label, fg: badge.fg, bg: badge.bg)
                     }
                     Text(openedLine(ticket))
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                         .lineLimit(1)
                     Spacer(minLength: 0)
@@ -125,14 +125,14 @@ struct TicketDetailView: View {
                            placeholder: "Type your reply…", height: 84)
             HStack {
                 Button("Close ticket") { showCloseConfirm = true }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(Brand.textPrimary)
                     .padding(.horizontal, 16).padding(.vertical, 11)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
                     .buttonStyle(.plain)
                 Spacer()
                 Button(submitting ? "Sending…" : "Send reply") { sendReply() }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.app(13, .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 20).padding(.vertical, 11)
                     .background(Brand.purple)
@@ -148,7 +148,7 @@ struct TicketDetailView: View {
 
     private var closedBanner: some View {
         Text("This ticket is closed. Open a new one if you still need help.")
-            .font(.system(size: 12))
+            .font(.app(12))
             .foregroundColor(Brand.info)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
@@ -211,7 +211,7 @@ private struct MessageBubble: View {
     var body: some View {
         if message.isSystem {
             Text(message.body ?? "")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .padding(.horizontal, 14).padding(.vertical, 7)
                 .background(Brand.surface)
@@ -222,16 +222,16 @@ private struct MessageBubble: View {
             VStack(alignment: message.isMine ? .trailing : .leading, spacing: 3) {
                 if !message.isMine, let author = message.author_name, !author.isEmpty {
                     Text(author)
-                        .font(.system(size: 10))
+                        .font(.app(10))
                         .foregroundColor(Brand.textTertiary)
                         .padding(.horizontal, 4)
                 }
                 VStack(alignment: .leading, spacing: 3) {
                     Text(message.body ?? "")
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(Brand.textPrimary)
                     Text(SupportFmt.time(message.created_at))
-                        .font(.system(size: 10))
+                        .font(.app(10))
                         .foregroundColor(Brand.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }

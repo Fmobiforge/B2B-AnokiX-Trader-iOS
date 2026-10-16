@@ -178,9 +178,9 @@ struct ScreenHeader: View {
             }
             .accessibilityLabel("Open menu")
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 20, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(title).font(.app(20, .bold)).foregroundColor(Brand.textPrimary)
                 if let subtitle {
-                    Text(subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
             }
             Spacer()
@@ -192,7 +192,7 @@ struct ScreenHeader: View {
                         .overlay(alignment: .topTrailing) {
                             if market.cartBadgeCount > 0 {
                                 Text(market.cartBadgeCount > 99 ? "99+" : "\(market.cartBadgeCount)")
-                                    .font(.system(size: 9, weight: .bold))
+                                    .font(.app(9, .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 4).padding(.vertical, 1)
                                     .background(Brand.danger)
@@ -211,7 +211,7 @@ struct ScreenHeader: View {
                     .overlay(alignment: .topTrailing) {
                         if badge.count > 0 {
                             Text(badge.count > 9 ? "9+" : "\(badge.count)")
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.app(9, .bold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 4).padding(.vertical, 1)
                                 .background(Brand.danger)

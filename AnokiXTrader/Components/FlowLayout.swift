@@ -68,7 +68,7 @@ struct WrappingTextChips: View {
     var body: some View {
         FlexibleWrap(items: items) { name in
             Text(name)
-                .font(.system(size: 11)).foregroundColor(Brand.textPrimary)
+                .font(.app(11)).foregroundColor(Brand.textPrimary)
                 .padding(.horizontal, 10).padding(.vertical, 5)
                 .background(Brand.surfaceVariant)
                 .overlay(Capsule().stroke(Brand.border, lineWidth: 1))

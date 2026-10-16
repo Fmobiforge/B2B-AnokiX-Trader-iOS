@@ -18,9 +18,9 @@ struct MarketplaceView: View {
             VStack(alignment: .leading, spacing: 18) {
                 // hero
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Mega Deals").font(.system(size: 12, weight: .bold)).foregroundColor(.white.opacity(0.9))
-                    Text("Stock up & Save Big!").font(.system(size: 22, weight: .bold)).foregroundColor(.white)
-                    Text("UP TO 15% OFF").font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
+                    Text("Mega Deals").font(.app(12, .bold)).foregroundColor(.white.opacity(0.9))
+                    Text("Stock up & Save Big!").font(.app(22, .bold)).foregroundColor(.white)
+                    Text("UP TO 15% OFF").font(.app(13, .semibold)).foregroundColor(.white)
                 }
                 .padding(18).frame(maxWidth: .infinity, alignment: .leading)
                 .background(LinearGradient(colors: [Brand.purple, Brand.warning], startPoint: .leading, endPoint: .trailing))
@@ -36,18 +36,18 @@ struct MarketplaceView: View {
                 }
 
                 // top distributors
-                Text("Top Distributors").font(.system(size: 17, weight: .bold))
+                Text("Top Distributors").font(.app(17, .bold))
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(MockData.distributors) { d in
                             VStack(spacing: 8) {
                                 InitialBadge(text: String(d.name.prefix(2)).uppercased(), color: Color(hex: d.colorHex), size: 54)
-                                Text(d.name).font(.system(size: 12, weight: .semibold)).foregroundColor(Brand.textPrimary)
+                                Text(d.name).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                                 HStack(spacing: 3) {
                                     Image(systemName: "star.fill").font(.system(size: 9)).foregroundColor(.orange)
-                                    Text(d.rating).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                                    Text(d.rating).font(.app(11)).foregroundColor(Brand.textSecondary)
                                 }
-                                Text("\(d.products) products").font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+                                Text("\(d.products) products").font(.app(10)).foregroundColor(Brand.textTertiary)
                             }
                             .frame(width: 110).padding(.vertical, 12).card(padding: 6)
                         }
@@ -55,13 +55,13 @@ struct MarketplaceView: View {
                 }
 
                 // promotions
-                Text("Exclusive Promotions").font(.system(size: 17, weight: .bold))
+                Text("Exclusive Promotions").font(.app(17, .bold))
                 VStack(spacing: 12) {
                     ForEach(MockData.marketPromos) { p in MarketPromoCard(promo: p) }
                 }
 
                 // bestsellers
-                Text("Bestsellers").font(.system(size: 17, weight: .bold))
+                Text("Bestsellers").font(.app(17, .bold))
                 LazyVGrid(columns: grid, spacing: 12) {
                     ForEach(products) { p in
                         MarketProductCard(product: p) {
@@ -78,9 +78,9 @@ struct MarketplaceView: View {
             if !orderCart.isEmpty {
                 Button { showOrder = true } label: {
                     HStack {
-                        Text("\(orderCart.itemCount) items").foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                        Text("\(orderCart.itemCount) items").foregroundColor(.white).font(.app(14, .semibold))
                         Spacer()
-                        Text("Review Order · \(Money.rand(orderCart.subtotal))").foregroundColor(.white).font(.system(size: 14, weight: .bold))
+                        Text("Review Order · \(Money.rand(orderCart.subtotal))").foregroundColor(.white).font(.app(14, .bold))
                     }
                     .padding(16).background(Brand.purple)
                 }
@@ -104,9 +104,9 @@ struct MarketPromoCard: View {
             Image(systemName: "tag.fill").foregroundColor(tint)
                 .frame(width: 44, height: 44).background(tint.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 3) {
-                Text(promo.offer).font(.system(size: 14, weight: .bold)).foregroundColor(tint)
-                Text(promo.detail).font(.system(size: 12)).foregroundColor(Brand.textPrimary)
-                Text(promo.expires).font(.system(size: 11)).foregroundColor(Brand.textTertiary)
+                Text(promo.offer).font(.app(14, .bold)).foregroundColor(tint)
+                Text(promo.detail).font(.app(12)).foregroundColor(Brand.textPrimary)
+                Text(promo.expires).font(.app(11)).foregroundColor(Brand.textTertiary)
             }
             Spacer()
         }
@@ -122,19 +122,19 @@ struct MarketProductCard: View {
             ZStack(alignment: .topTrailing) {
                 ZStack {
                     Color(hex: product.colorHex).opacity(0.18)
-                    Text(String(product.name.prefix(1))).font(.system(size: 24, weight: .bold)).foregroundColor(Color(hex: product.colorHex))
+                    Text(String(product.name.prefix(1))).font(.app(24, .bold)).foregroundColor(Color(hex: product.colorHex))
                 }
                 .frame(height: 72).clipShape(RoundedRectangle(cornerRadius: 12))
                 if let b = product.badge {
-                    Text(b).font(.system(size: 9, weight: .bold)).foregroundColor(.white)
+                    Text(b).font(.app(9, .bold)).foregroundColor(.white)
                         .padding(.horizontal, 6).padding(.vertical, 3).background(Brand.purple).clipShape(Capsule()).padding(6)
                 }
             }
-            Text(product.name).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
-            Text(product.pack).font(.system(size: 11)).foregroundColor(Brand.textSecondary)
-            Text(product.stockStatus).font(.system(size: 10)).foregroundColor(Brand.textTertiary)
+            Text(product.name).font(.app(14, .semibold)).foregroundColor(Brand.textPrimary).lineLimit(1)
+            Text(product.pack).font(.app(11)).foregroundColor(Brand.textSecondary)
+            Text(product.stockStatus).font(.app(10)).foregroundColor(Brand.textTertiary)
             HStack {
-                Text(product.price).font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text(product.price).font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button(action: onAdd) {
                     Image(systemName: "plus").font(.system(size: 13, weight: .bold)).foregroundColor(.white)

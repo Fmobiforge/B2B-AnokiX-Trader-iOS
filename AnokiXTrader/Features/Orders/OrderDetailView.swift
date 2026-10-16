@@ -59,24 +59,24 @@ struct OrderDetailView: View {
                              color: OrderLogo.color(o.distributor_id), size: 50)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Text(o.order_number).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        Text(o.order_number).font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
                         StatusBadge(text: statusLabel(o.statusKey),
                                     fg: statusColor(o.statusKey), bg: statusColor(o.statusKey).opacity(0.14))
                     }
-                    Text(o.distributorName).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                    Text(o.distributorName).font(.app(13)).foregroundColor(Brand.textSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 3) {
-                    Text(OrderFmt.money(o.amount)).font(.system(size: 16, weight: .bold)).foregroundColor(Brand.purple)
+                    Text(OrderFmt.money(o.amount)).font(.app(16, .bold)).foregroundColor(Brand.purple)
                     Text("\(itemUnitCount) items")
-                        .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                        .font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
             }
             HStack {
                 Spacer()
                 Button { openPdf() } label: {
                     Label("Purchase Order PDF", systemImage: "doc.text")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.app(13, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .padding(.horizontal, 14).padding(.vertical, 9)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -113,13 +113,13 @@ struct OrderDetailView: View {
     private var trackingCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Text("Order Tracking").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Order Tracking").font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
                 Circle().fill(Brand.success).frame(width: 6, height: 6)
-                Text("Live updates").font(.system(size: 12)).foregroundColor(Brand.success)
+                Text("Live updates").font(.app(12)).foregroundColor(Brand.success)
                 Spacer()
             }
             if cancelled {
-                Text("This order was cancelled.").font(.system(size: 13)).foregroundColor(Brand.danger)
+                Text("This order was cancelled.").font(.app(13)).foregroundColor(Brand.danger)
             }
             ForEach(Array(stageLabels.enumerated()), id: \.offset) { idx, label in
                 timelineRow(idx: idx, label: label)
@@ -144,10 +144,10 @@ struct OrderDetailView: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.system(size: 14, weight: current ? .bold : .medium))
+                    .font(.app(14, current ? .bold : .medium))
                     .foregroundColor(reached ? Brand.textPrimary : Brand.textTertiary)
                 if let sub = stageSubtitle(idx) {
-                    Text(sub).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    Text(sub).font(.app(12)).foregroundColor(Brand.textSecondary)
                 }
             }
             .padding(.top, 1)
@@ -190,14 +190,14 @@ struct OrderDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "mappin.and.ellipse").font(.system(size: 15)).foregroundColor(Brand.purple)
-                Text("Delivery Address").font(.system(size: 15, weight: .bold)).foregroundColor(Brand.textPrimary)
+                Text("Delivery Address").font(.app(15, .bold)).foregroundColor(Brand.textPrimary)
             }
             if let business = o.delivery_address?.business, !business.isEmpty {
-                Text(business).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.purple)
+                Text(business).font(.app(14, .semibold)).foregroundColor(Brand.purple)
             }
-            Text(o.delivery_address?.address ?? "—").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+            Text(o.delivery_address?.address ?? "—").font(.app(13)).foregroundColor(Brand.textSecondary)
             if let notes = o.notes, !notes.isEmpty {
-                Text("Note: \(notes)").font(.system(size: 12)).foregroundColor(Brand.textSecondary).padding(.top, 2)
+                Text("Note: \(notes)").font(.app(12)).foregroundColor(Brand.textSecondary).padding(.top, 2)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -208,7 +208,7 @@ struct OrderDetailView: View {
 
     private var itemsCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Items (\(o.items?.count ?? 0))").font(.system(size: 16, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text("Items (\(o.items?.count ?? 0))").font(.app(16, .bold)).foregroundColor(Brand.textPrimary)
             if loading && o.items == nil {
                 ProgressView().frame(maxWidth: .infinity).padding(.vertical, 8)
             } else {
@@ -237,7 +237,7 @@ struct OrderDetailLoader: View {
             } else if failed {
                 VStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle").font(.system(size: 34)).foregroundColor(Brand.textTertiary)
-                    Text("Couldn't load this order.").font(.system(size: 14)).foregroundColor(Brand.textSecondary)
+                    Text("Couldn't load this order.").font(.app(14)).foregroundColor(Brand.textSecondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Brand.background)
@@ -267,19 +267,19 @@ private struct OrderItemRow: View {
                 .frame(width: 60, height: 60).clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(alignment: .topTrailing) {
                     Text("x\(item.quantity)")
-                        .font(.system(size: 11, weight: .bold)).foregroundColor(.white)
+                        .font(.app(11, .bold)).foregroundColor(.white)
                         .padding(.horizontal, 6).padding(.vertical, 1)
                         .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 8))
                         .padding(4)
                 }
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.product?.name ?? "").font(.system(size: 14, weight: .semibold))
+                Text(item.product?.name ?? "").font(.app(14, .semibold))
                     .foregroundColor(Brand.textPrimary).lineLimit(2)
                 Text("\(item.quantity) × \(OrderFmt.money(item.unit_price ?? 0))")
-                    .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                    .font(.app(12)).foregroundColor(Brand.textSecondary)
             }
             Spacer()
-            Text(OrderFmt.money(item.line_total ?? 0)).font(.system(size: 14, weight: .bold)).foregroundColor(Brand.textPrimary)
+            Text(OrderFmt.money(item.line_total ?? 0)).font(.app(14, .bold)).foregroundColor(Brand.textPrimary)
         }
         .padding(.vertical, 8)
     }
@@ -308,7 +308,7 @@ struct DateRangeSheet: View {
         VStack(spacing: 0) {
             HStack {
                 Text("Date range")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.app(17, .bold))
                     .foregroundColor(Brand.textPrimary)
                 Spacer()
                 Button { dismiss() } label: {
@@ -354,7 +354,7 @@ struct DateRangeSheet: View {
     private func dateRow(_ label: String, selection: Binding<Date>, range: PartialRangeFrom<Date>?) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 15, weight: .medium))
+                .font(.app(15, .medium))
                 .foregroundColor(Brand.textPrimary)
             Spacer()
             if let range {

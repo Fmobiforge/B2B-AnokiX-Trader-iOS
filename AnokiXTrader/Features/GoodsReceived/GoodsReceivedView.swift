@@ -68,10 +68,10 @@ struct GoodsReceivedView: View {
                 .font(.system(size: 40))
                 .foregroundColor(Brand.textTertiary)
             Text("No goods received vouchers yet")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.app(15, .semibold))
                 .foregroundColor(Brand.textPrimary)
             Text("A GRV appears here once an order is delivered, ready for you to confirm.")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -115,16 +115,16 @@ private struct GrvCard: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(grv.grv_number)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(Brand.purple)
                 Spacer()
                 StatusBadge(text: grv.statusLabel, fg: grv.statusTone.fg, bg: grv.statusTone.bg)
             }
             Text("Order \(grv.order_number ?? "—")")
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Brand.textPrimary)
             Text("\(grv.lineCount) line(s) · Delivery \(GrvFmt.deliveryDate(grv.delivery_date))")
-                .font(.system(size: 12))
+                .font(.app(12))
                 .foregroundColor(Brand.textSecondary)
 
             Divider().padding(.top, 6)
@@ -133,7 +133,7 @@ private struct GrvCard: View {
                 Spacer()
                 Button(action: onPdf) {
                     Label("PDF", systemImage: "doc.text")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.app(13, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .padding(.horizontal, 16).padding(.vertical, 9)
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
@@ -143,7 +143,7 @@ private struct GrvCard: View {
                 if grv.isPending {
                     Button(action: onConfirm) {
                         Text("Confirm Receipt")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.app(13, .semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16).padding(.vertical, 9)
                             .background(Brand.purple)
@@ -200,7 +200,7 @@ private struct GrvConfirmSheet: View {
                     }
 
                     Text("Accepted items will be added to your inventory.")
-                        .font(.system(size: 12))
+                        .font(.app(12))
                         .foregroundColor(Brand.textSecondary)
                 }
                 .padding(16)
@@ -214,7 +214,7 @@ private struct GrvConfirmSheet: View {
     private var header: some View {
         HStack {
             Text("Confirm Receipt · \(grv.grv_number)")
-                .font(.system(size: 17, weight: .bold))
+                .font(.app(17, .bold))
                 .foregroundColor(Brand.textPrimary)
             Spacer()
             Button { onDone(nil) } label: {
@@ -246,10 +246,10 @@ private struct GrvConfirmSheet: View {
     private func infoCell(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(label)
-                .font(.system(size: 9, weight: .semibold))
+                .font(.app(9, .semibold))
                 .foregroundColor(Brand.textTertiary)
             Text(value)
-                .font(.system(size: 14, weight: .bold))
+                .font(.app(14, .bold))
                 .foregroundColor(Brand.purple)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -264,10 +264,10 @@ private struct GrvConfirmSheet: View {
         return VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.name ?? "—")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.app(14, .semibold))
                     .foregroundColor(Brand.textPrimary)
                 Text("SKU: \(item.sku ?? "—")")
-                    .font(.system(size: 11))
+                    .font(.app(11))
                     .foregroundColor(Brand.textSecondary)
             }
             HStack(alignment: .top, spacing: 6) {
@@ -287,7 +287,7 @@ private struct GrvConfirmSheet: View {
     private func numCell<V: View>(_ label: String, @ViewBuilder _ value: () -> V) -> some View {
         VStack(spacing: 4) {
             Text(label)
-                .font(.system(size: 9, weight: .semibold))
+                .font(.app(9, .semibold))
                 .foregroundColor(Brand.textTertiary)
             value()
         }
@@ -305,7 +305,7 @@ private struct GrvConfirmSheet: View {
                 ))
                 .keyboardType(.numberPad)
                 .multilineTextAlignment(.center)
-                .font(.system(size: 15, weight: .bold))
+                .font(.app(15, .bold))
                 .frame(height: 36)
                 .background(Brand.surface)
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.border, lineWidth: 1))
@@ -317,14 +317,14 @@ private struct GrvConfirmSheet: View {
         VStack(spacing: 8) {
             if let errorMsg {
                 Text(errorMsg)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.app(12, .medium))
                     .foregroundColor(Brand.danger)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             HStack(spacing: 10) {
                 Button { onDone(nil) } label: {
                     Text("Cancel")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.app(15, .semibold))
                         .foregroundColor(Brand.textPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
@@ -337,7 +337,7 @@ private struct GrvConfirmSheet: View {
                         if submitting { ProgressView().tint(.white) }
                         Text(submitting ? "Saving…" : "Confirm & Add to Inventory")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.app(15, .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
@@ -396,7 +396,7 @@ private struct GrvConfirmSheet: View {
 private extension Text {
     /// Shared styling for the static numeric cells (ordered / missing / accepted).
     func cellValue(color: Color = Brand.textPrimary) -> some View {
-        self.font(.system(size: 15, weight: .bold))
+        self.font(.app(15, .bold))
             .foregroundColor(color)
             .frame(height: 36)
     }

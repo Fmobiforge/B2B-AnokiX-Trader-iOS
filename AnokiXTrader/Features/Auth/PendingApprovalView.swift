@@ -35,7 +35,7 @@ struct PendingApprovalView: View {
                     Button(action: backToLogin) {
                         HStack(spacing: 6) {
                             Image(systemName: "arrow.left").font(.system(size: 14, weight: .semibold))
-                            Text("Back to login").font(.system(size: 14))
+                            Text("Back to login").font(.app(14))
                         }
                         .foregroundColor(tagline)
                     }
@@ -55,12 +55,12 @@ struct PendingApprovalView: View {
                     .padding(.top, 16)
 
                     Text("Application Under Review")
-                        .font(.system(size: 26, weight: .bold))
+                        .font(.app(26, .bold))
                         .foregroundColor(.white)
                         .padding(.top, 18)
 
                     Text(subtitle)
-                        .font(.system(size: 14))
+                        .font(.app(14))
                         .foregroundColor(tagline)
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -73,7 +73,7 @@ struct PendingApprovalView: View {
                     }
 
                     Text("What happens next")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.app(16, .bold))
                         .foregroundColor(.white)
                         .padding(.top, 26)
 
@@ -125,7 +125,7 @@ struct PendingApprovalView: View {
         HStack(spacing: 0) {
             Rectangle().fill(Color(hex: "#6366F1")).frame(width: 3)
             Text(walletMessage)
-                .font(.system(size: 13))
+                .font(.app(13))
                 .foregroundColor(Color(hex: "#A9B4CC"))
                 .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
@@ -142,12 +142,12 @@ struct PendingApprovalView: View {
             ForEach(Array(steps.enumerated()), id: \.offset) { idx, text in
                 HStack(alignment: .top, spacing: 14) {
                     Text("\(idx + 1)")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.app(12, .bold))
                         .foregroundColor(.white)
                         .frame(width: 24, height: 24)
                         .background(Circle().fill(Brand.purple))
                     Text(text)
-                        .font(.system(size: 13))
+                        .font(.app(13))
                         .foregroundColor(bodyText)
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -165,7 +165,7 @@ struct PendingApprovalView: View {
                 Text("Need help?").foregroundColor(tagline)
                 Text("support@anokix.com").foregroundColor(link).fontWeight(.semibold)
             }
-            .font(.system(size: 13))
+            .font(.app(13))
             .foregroundColor(tagline)
         }
         .frame(maxWidth: .infinity)
@@ -175,7 +175,7 @@ struct PendingApprovalView: View {
 
     private func detailRow<V: View>(_ label: String, @ViewBuilder value: () -> V) -> some View {
         HStack(spacing: 12) {
-            Text(label).font(.system(size: 13)).foregroundColor(tagline)
+            Text(label).font(.app(13)).foregroundColor(tagline)
             value().frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.vertical, 14)
@@ -187,14 +187,14 @@ struct PendingApprovalView: View {
 
     private func valueText(_ value: String?) -> some View {
         Text(display(value))
-            .font(.system(size: 14, weight: .bold))
+            .font(.app(14, .bold))
             .foregroundColor(.white)
             .multilineTextAlignment(.trailing)
     }
 
     private var statusBadge: some View {
         Text(display(data?.registration_status, fallback: "Pending Approval"))
-            .font(.system(size: 12, weight: .bold))
+            .font(.app(12, .bold))
             .foregroundColor(Color(hex: "#C4B5FD"))
             .padding(.horizontal, 12).padding(.vertical, 5)
             .background(Capsule().fill(Color(hex: "#4C3A8C")))
@@ -202,7 +202,7 @@ struct PendingApprovalView: View {
 
     private var walletBadge: some View {
         Text(walletActivated ? "Activated" : "Not activated")
-            .font(.system(size: 12, weight: .bold))
+            .font(.app(12, .bold))
             .foregroundColor(walletActivated ? Color(hex: "#4ADE80") : Color(hex: "#B4C3D8"))
             .padding(.horizontal, 12).padding(.vertical, 5)
             .background(Capsule().fill(walletActivated ? Color(hex: "#16A34A").opacity(0.18)

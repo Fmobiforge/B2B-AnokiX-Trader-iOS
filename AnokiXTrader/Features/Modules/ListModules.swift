@@ -61,8 +61,8 @@ struct CustomersView: View {
         .sheet(item: $selected) { c in
             VStack(spacing: 16) {
                 InitialBadge(text: String(c.title.prefix(1)), color: Brand.purple, size: 64).padding(.top, 24)
-                Text(c.title).font(.system(size: 20, weight: .bold))
-                Text(c.subtitle).font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                Text(c.title).font(.app(20, .bold))
+                Text(c.subtitle).font(.app(13)).foregroundColor(Brand.textSecondary)
                 StatusBadge(text: c.badge, fg: badgeTone(c.badge).fg, bg: badgeTone(c.badge).bg)
                 Spacer()
                 HStack(spacing: 12) {
@@ -90,14 +90,14 @@ struct OffersView: View {
                                 Image(systemName: "tag.fill").foregroundColor(Brand.purple)
                                     .frame(width: 42, height: 42).background(Brand.purpleLight).clipShape(RoundedRectangle(cornerRadius: 11))
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(o.title).font(.system(size: 14, weight: .semibold)).foregroundColor(Brand.textPrimary)
-                                    Text(o.subtitle).font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                    Text(o.title).font(.app(14, .semibold)).foregroundColor(Brand.textPrimary)
+                                    Text(o.subtitle).font(.app(12)).foregroundColor(Brand.textSecondary)
                                 }
                                 Spacer()
                                 Button(o.badge == "Upcoming" ? "Soon" : "Claim") {
                                     toastMsg = o.badge == "Upcoming" ? "Offer not yet active." : "Offer claimed!"
                                 }
-                                .font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                                .font(.app(12, .semibold)).foregroundColor(.white)
                                 .padding(.horizontal, 14).padding(.vertical, 7)
                                 .background(o.badge == "Upcoming" ? Brand.textTertiary : Brand.purple).clipShape(Capsule())
                             }

@@ -3,19 +3,15 @@ import UIKit
 
 // MARK: - Shared welcome/login chrome (mirrors the Distributor iOS app)
 
-/// Blue → indigo → purple pill, matching the Distributor's `GradientButton`
-/// (bg_welcome_login_gradient).
+/// Portal login CTA: sky → blue → violet pill (bg_welcome_login_gradient on Android).
 struct WelcomeGradientButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .bold))
+            .font(.app(16, .semibold))
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(
-                LinearGradient(colors: [Color(hex: "#3B82F6"), Color(hex: "#6366F1"), Color(hex: "#A855F7")],
-                               startPoint: .leading, endPoint: .trailing)
-            )
+            .frame(height: 54)
+            .background(Brand.ctaGradient)
             .clipShape(Capsule())
             .opacity(configuration.isPressed ? 0.9 : 1)
     }
@@ -24,7 +20,7 @@ struct WelcomeGradientButtonStyle: ButtonStyle {
 private enum AuthPalette {
     static let tagline = Color(hex: "#8A93B2")
     static let createBorder = Color(hex: "#2B3B63")
-    static let link = Color(hex: "#5B8DEF")
+    static let link = Color(hex: "#6EC8FF")      // portal auth links
 }
 
 private let supportEmail = "support@anokix.com"
@@ -54,7 +50,7 @@ private struct LaunchScreenContent: View {
                         .scaledToFit()
                         .frame(width: geo.size.width * 0.6)
                     Text("Trader App")
-                        .font(.system(size: 18))
+                        .font(.app(18))
                         .foregroundColor(.white)
                 }
                 .frame(width: geo.size.width)
@@ -113,11 +109,11 @@ struct WelcomeView: View {
                     .scaledToFit()
                     .frame(height: 150)
                 Text("Welcome to anokiX")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.app(28, .bold))
                     .foregroundColor(.white)
                     .padding(.top, 22)
                 Text("Africa's Commerce, Payments & Merchant Growth Ecosystem")
-                    .font(.system(size: 15))
+                    .font(.app(15))
                     .foregroundColor(AuthPalette.tagline)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
@@ -130,7 +126,7 @@ struct WelcomeView: View {
 
                     Button { session.stage = .register } label: {
                         Text("Create Account")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.app(16, .bold))
                             .foregroundColor(Brand.success)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
@@ -143,7 +139,7 @@ struct WelcomeView: View {
                             Text("Need Help? ").foregroundColor(AuthPalette.tagline)
                                 + Text("Support Centre").foregroundColor(AuthPalette.link).bold()
                         }
-                        .font(.system(size: 14))
+                        .font(.app(14))
                     }
                     .padding(.top, 6)
                 }
@@ -177,11 +173,11 @@ struct LoginView: View {
                         .frame(width: 190, height: 60)
                         .padding(.top, 56)
                     Text("Welcome back")
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.app(24, .bold))
                         .foregroundColor(.white)
                         .padding(.top, 22)
                     Text("Sign in to your trader account")
-                        .font(.system(size: 14))
+                        .font(.app(14))
                         .foregroundColor(AuthPalette.tagline)
                         .padding(.top, 6)
 
@@ -192,7 +188,7 @@ struct LoginView: View {
                               keyboard: .emailAddress)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Password").font(.system(size: 13, weight: .medium))
+                            Text("Password").font(.app(13, .medium))
                                 .foregroundColor(AuthPalette.tagline)
                             HStack {
                                 Group {
@@ -228,16 +224,16 @@ struct LoginView: View {
 
                         Button { showReset = true } label: {
                             Text("Forgot password?")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(AuthPalette.tagline)
+                                .font(.app(13, .semibold))
+                                .foregroundColor(AuthPalette.link)
                         }
 
                         Button { session.stage = .register } label: {
                             HStack(spacing: 4) {
                                 Text("New to anokiX?").foregroundColor(AuthPalette.tagline)
-                                Text("Create Account").foregroundColor(.white).fontWeight(.semibold)
+                                Text("Create Account").foregroundColor(AuthPalette.link).fontWeight(.semibold)
                             }
-                            .font(.system(size: 13))
+                            .font(.app(13))
                         }
                         .padding(.top, 2)
                     }
@@ -272,7 +268,7 @@ struct LoginView: View {
     private func tabButton(_ title: String, active: Bool, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.app(14, .semibold))
                 .foregroundColor(active ? .white : AuthPalette.tagline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
@@ -284,7 +280,7 @@ struct LoginView: View {
     private func field(title: String, text: Binding<String>, placeholder: String,
                        keyboard: UIKeyboardType) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.system(size: 13, weight: .medium)).foregroundColor(AuthPalette.tagline)
+            Text(title).font(.app(13, .medium)).foregroundColor(AuthPalette.tagline)
             TextField(placeholder, text: text)
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(.never)
@@ -345,12 +341,12 @@ struct ForgotPasswordView: View {
     private var formCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Reset your password")
-                .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                .font(.app(22, .bold)).foregroundColor(.white)
             Text("Enter your account email and we'll send you a link to reset your password.")
-                .font(.system(size: 14)).foregroundColor(AuthPalette.tagline)
+                .font(.app(14)).foregroundColor(AuthPalette.tagline)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Email").font(.system(size: 13, weight: .medium)).foregroundColor(AuthPalette.tagline)
+                Text("Email").font(.app(13, .medium)).foregroundColor(AuthPalette.tagline)
                 TextField("you@business.co.za", text: $email)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -371,8 +367,8 @@ struct ForgotPasswordView: View {
 
             Button { dismiss() } label: {
                 Text("Back to login")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color(hex: "#5B8DEF"))
+                    .font(.app(14, .medium))
+                    .foregroundColor(AuthPalette.link)
                     .frame(maxWidth: .infinity)
             }
             .padding(.top, 2)
@@ -391,10 +387,10 @@ struct ForgotPasswordView: View {
                 .clipShape(Circle())
 
             Text("Check your email")
-                .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                .font(.app(22, .bold)).foregroundColor(.white)
 
             Text("If \(maskedEmail) is registered, we've sent a password reset link to it. Follow the link in the email to set a new password.")
-                .font(.system(size: 14)).foregroundColor(AuthPalette.tagline)
+                .font(.app(14)).foregroundColor(AuthPalette.tagline)
                 .multilineTextAlignment(.center)
 
             Button { dismiss() } label: { Text("Back to login") }
@@ -403,7 +399,7 @@ struct ForgotPasswordView: View {
 
             Button { submit(firstSend: false) } label: {
                 Text(sending ? "Sending…" : "Resend link")
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.app(16, .bold))
                     .foregroundColor(Brand.success)
                     .frame(maxWidth: .infinity).frame(height: 56)
                     .overlay(Capsule().stroke(Color(hex: "#2B3B63"), lineWidth: 1.5))

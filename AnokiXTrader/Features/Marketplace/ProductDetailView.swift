@@ -34,20 +34,20 @@ struct ProductDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Group {
                         image
-                        Text(product.name ?? "").font(.system(size: 22, weight: .bold)).foregroundColor(Brand.textPrimary)
+                        Text(product.name ?? "").font(.app(22, .bold)).foregroundColor(Brand.textPrimary)
                         if let brand = product.brand_name, !brand.isEmpty {
-                            Text("By \(brand)").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                            Text("By \(brand)").font(.app(13)).foregroundColor(Brand.textSecondary)
                         }
                         Text(CurrencyFmt.format(product.priceValue, symbol: currency))
-                            .font(.system(size: 24, weight: .bold)).foregroundColor(Brand.purple)
-                        Text("Incl. VAT").font(.system(size: 11)).foregroundColor(Brand.textSecondary)
+                            .font(.app(24, .bold)).foregroundColor(Brand.purple)
+                        Text("Incl. VAT").font(.app(11)).foregroundColor(Brand.textSecondary)
                         HStack(spacing: 14) {
                             Label(product.inStock ? "In Stock" : "Out of Stock",
                                   systemImage: "checkmark.circle.fill")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.app(12, .semibold))
                                 .foregroundColor(product.inStock ? Brand.success : Brand.danger)
                             Label("Next Day Delivery", systemImage: "shippingbox")
-                                .font(.system(size: 12)).foregroundColor(Brand.textSecondary)
+                                .font(.app(12)).foregroundColor(Brand.textSecondary)
                         }
                     }
                     Group {
@@ -59,7 +59,7 @@ struct ProductDetailView: View {
                         Divider()
                         HStack(spacing: 12) {
                             stepper
-                            Text("(\(product.stockCount) in stock)").font(.system(size: 13))
+                            Text("(\(product.stockCount) in stock)").font(.app(13))
                                 .foregroundColor(Brand.textSecondary)
                             Spacer()
                         }
@@ -67,9 +67,9 @@ struct ProductDetailView: View {
                             Label("Add to Cart", systemImage: "cart")
                         }
                         .buttonStyle(PrimaryButtonStyle())
-                        Text("Product Description").font(.system(size: 17, weight: .bold))
+                        Text("Product Description").font(.app(17, .bold))
                             .foregroundColor(Brand.textPrimary).padding(.top, 8)
-                        Text(product.description ?? "").font(.system(size: 13)).foregroundColor(Brand.textSecondary)
+                        Text(product.description ?? "").font(.app(13)).foregroundColor(Brand.textSecondary)
                     }
                 }
                 .padding(16)
@@ -121,7 +121,7 @@ struct ProductDetailView: View {
             Button { if quantity > 1 { quantity -= 1 } } label: {
                 Image(systemName: "minus").frame(width: 40, height: 40)
             }
-            Text("\(quantity)").font(.system(size: 16, weight: .bold)).frame(width: 44)
+            Text("\(quantity)").font(.app(16, .bold)).frame(width: 44)
             Button { if quantity < maxQty { quantity += 1 } } label: {
                 Image(systemName: "plus").frame(width: 40, height: 40)
             }
@@ -132,8 +132,8 @@ struct ProductDetailView: View {
 
     private func infoRow(_ label: String, _ value: String) -> some View {
         HStack {
-            Text(label).font(.system(size: 13)).foregroundColor(Brand.textSecondary).frame(width: 110, alignment: .leading)
-            Text(value).font(.system(size: 13, weight: .semibold)).foregroundColor(Brand.textPrimary)
+            Text(label).font(.app(13)).foregroundColor(Brand.textSecondary).frame(width: 110, alignment: .leading)
+            Text(value).font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
             Spacer()
         }
     }
