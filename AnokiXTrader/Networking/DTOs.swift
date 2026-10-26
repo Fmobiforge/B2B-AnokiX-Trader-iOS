@@ -144,6 +144,11 @@ struct MarketplaceData: Decodable {
     let promotions: [PromotionDTO]?
     let business_insights: BusinessInsightsDTO?
     let my_distributors: [DistributorDTO]?
+    /// Best / Exclusive Deals rows — same product shape as `recommended`. Everything else
+    /// the portal shows (campaigns, stories, suppliers, sellers, recent orders) is read
+    /// leniently into `MarketplaceExtras`.
+    let best_deal_products: [ProductDTO]?
+    let exclusive_deal_products: [ProductDTO]?
 
     var currencySymbol: String {
         if let s = meta?.currency?.symbol, !s.isEmpty { return s }
@@ -241,6 +246,216 @@ struct SummaryCardDTO: Decodable, Identifiable, Hashable {
 struct TrendDTO: Decodable, Hashable {
     let direction: String?
     let label: String?
+}
+
+// MARK: - Marketplace portal sections (SwiftyJSON)
+//
+// Campaign payloads mix numeric and string ids ("product_id": "49", "available_stock": 1000),
+// so these are read with SwiftyJSON's coercing accessors rather than strict Codable — a
+// surprising type in one campaign must never blank the whole marketplace.
+
+/// A product a campaign puts on offer (single product, combo member, or a buy / free item
+/// of a buy-one-get-one deal).
+struct CampaignProductDTO: Identifiable, Hashable {
+    enum Role: Hashable { case single, combo, buy, free }
+
+    let id: String
+    let productId: String
+    let name: String
+    let sku: String?
+    let barcode: String?
+    let imageURL: String?
+    let availableStock: Int
+    let originalPrice: Double
+    let campaignPrice: Double
+    let brandName: String?
+    let categoryTitle: String?
+    let role: Role
+
+    var price: Double { campaignPrice > 0 ? campaignPrice : originalPrice }
+
+    init(json: JSON, role: Role, index: Int) {
+        productId = json["product_id"].stringValue
+        id = "\(productId)-\(role)-\(index)"
+        name = json["name"].stringValue
+        sku = json["sku"].string
+        barcode = json["barcode"].string
+        let image = json["image_url"].string ?? json["primary_product_image_url"].string
+        imageURL = MediaUrls.resolve(image)
+        availableStock = json["available_stock"].intValue
+        originalPrice = json["original_price"].doubleValue
+        campaignPrice = json["campaign_selling_price"].doubleValue
+        brandName = json["brand"]["name"].string
+        categoryTitle = json["category"]["title"].string
+        self.role = role
+    }
+
+    /// Stand-in so `ProductDetailView` can open straight away (it refreshes itself by id).
+    var asProduct: ProductDTO {
+        ProductDTO(id: productId, name: name, sku: sku, barcode: barcode, description: nil,
+                   brand_name: brandName, category_title: categoryTitle,
+                   parent_category_title: nil, selling_price: String(price),
+                   promotion_price: nil, stock: availableStock, stock_quantity: nil,
+                   primary_product_image_url: imageURL, image_url: imageURL,
+                   additional_images: nil)
+    }
+}
+
+/// A marketplace campaign — banner slide, promotion, news post, story or exclusive deal.
+struct CampaignDTO: Identifiable, Hashable {
+    /// The campaign id (what analytics and the API key on).
+    let id: Int
+    /// The row's own `id` — for a banner slide this is the banner id `BannerDTO` carries.
+    let sourceId: Int
+    let type: String
+    let name: String
+    let description: String?
+    let startDate: String?
+    let endDate: String?
+    let bannerURL: String?
+    let videoURL: String?
+    let distributorName: String?
+    let products: [CampaignProductDTO]
+
+    init(json: JSON) {
+        let campaignId = json["campaign_id"].intValue
+        sourceId = json["id"].intValue
+        id = campaignId > 0 ? campaignId : sourceId
+        type = json["campaign_type"].stringValue.lowercased()
+        name = json["name"].stringValue
+        description = json["description"].string.flatMap { $0.isEmpty ? nil : $0 }
+        startDate = json["start_date"].string
+        endDate = json["end_date"].string
+        bannerURL = MediaUrls.resolve(json["banner_file"]["file_url"].string)
+        videoURL = MediaUrls.resolve(json["video_file"]["file_url"].string)
+        let d = json["distributor"]
+        distributorName = [d["company_legal_name"].string, d["display_name"].string, d["trading_name"].string]
+            .compactMap { $0 }.first { !$0.isEmpty }
+
+        let selected = json["selected_products"]
+        var items: [CampaignProductDTO] = []
+        for (i, p) in (selected["single_products"].array ?? []).enumerated() {
+            items.append(CampaignProductDTO(json: p, role: .single, index: i))
+        }
+        for (c, combo) in (selected["combo_deals"].array ?? []).enumerated() {
+            for (i, p) in (combo["products"].array ?? []).enumerated() {
+                items.append(CampaignProductDTO(json: p, role: .combo, index: c * 100 + i))
+            }
+        }
+        for (d, deal) in (selected["buy1_get1_deals"].array ?? []).enumerated() {
+            for (i, p) in (deal["buy_products"].array ?? []).enumerated() {
+                items.append(CampaignProductDTO(json: p, role: .buy, index: d * 100 + i))
+            }
+            for (i, p) in (deal["free_products"].array ?? []).enumerated() {
+                items.append(CampaignProductDTO(json: p, role: .free, index: d * 100 + i))
+            }
+        }
+        products = items
+    }
+
+    /// Artwork for cards and the sheet (the still image; video-only campaigns have none).
+    var imageURL: String? { bannerURL }
+
+    /// Announcements, news posts and stories promote nothing to buy → "View Details".
+    var isAnnouncement: Bool { type == "post" || type == "story" || type.contains("announcement") }
+
+    /// Badge text, e.g. "cant_miss_deal" → "CAN'T MISS DEAL".
+    var typeLabel: String {
+        switch type {
+        case "post":           return "ANNOUNCEMENT"
+        case "story":          return "STORY"
+        case "cant_miss_deal": return "CAN'T MISS DEAL"
+        case "exclusive_deal": return "EXCLUSIVE DEAL"
+        case "best_deal":      return "BEST DEAL"
+        case "promotion":      return "PROMOTION"
+        case "featured_store": return "FEATURED STORE"
+        default:               return type.replacingOccurrences(of: "_", with: " ").uppercased()
+        }
+    }
+}
+
+struct MarketSupplierDTO: Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let productCount: Int
+}
+
+struct MarketSellerDTO: Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let logoURL: String?
+    let productsAvailable: Int
+    let isMine: Bool
+}
+
+struct MarketRecentOrderDTO: Identifiable, Hashable {
+    let id: Int
+    let number: String
+    let status: String
+    let statusKey: String
+    let createdAt: String
+}
+
+/// The Trader Portal marketplace sections not covered by the strict `MarketplaceData`.
+struct MarketplaceExtras {
+    var banners: [CampaignDTO] = []
+    var promotions: [CampaignDTO] = []
+    var posts: [CampaignDTO] = []
+    var stories: [CampaignDTO] = []
+    var exclusiveDeals: [CampaignDTO] = []
+    /// Deal product id → the campaign it is offered under (for analytics attribution).
+    var dealCampaignIds: [String: Int] = [:]
+    var topSuppliers: [MarketSupplierDTO] = []
+    var topSellers: [MarketSellerDTO] = []
+    var recentOrders: [MarketRecentOrderDTO] = []
+    /// Full distributor rows (contacts, products available…) for the details screen.
+    var selectedDistributor: TraderDistributorDTO?
+    var myDistributors: [TraderDistributorDTO] = []
+
+    static let empty = MarketplaceExtras()
+
+    init() {}
+
+    init(json: JSON) {
+        banners = (json["banners"].array ?? []).map(CampaignDTO.init(json:))
+        promotions = (json["promotions"].array ?? []).map(CampaignDTO.init(json:))
+        posts = (json["posts"].array ?? []).map(CampaignDTO.init(json:))
+        stories = (json["stories"].array ?? []).map(CampaignDTO.init(json:))
+        exclusiveDeals = (json["exclusive_deals"].array ?? []).map(CampaignDTO.init(json:))
+        for p in (json["best_deal_products"].array ?? []) + (json["exclusive_deal_products"].array ?? []) {
+            let cid = p["campaign_id"].intValue
+            if cid > 0 { dealCampaignIds[p["id"].stringValue] = cid }
+        }
+        topSuppliers = (json["top_suppliers"].array ?? []).map {
+            MarketSupplierDTO(id: $0["id"].intValue, name: $0["name"].stringValue,
+                              productCount: $0["product_count"].intValue)
+        }
+        topSellers = (json["top_sellers"].array ?? []).map {
+            MarketSellerDTO(id: $0["id"].intValue, name: $0["name"].stringValue,
+                            logoURL: $0["logo_url"].string,
+                            productsAvailable: $0["products_available"].intValue,
+                            isMine: $0["is_mine"].boolValue)
+        }
+        recentOrders = (json["recent_orders"].array ?? []).map {
+            MarketRecentOrderDTO(id: $0["id"].intValue,
+                                 number: $0["order_number"].string ?? "\($0["id"].intValue)",
+                                 status: $0["status"].stringValue,
+                                 statusKey: $0["status_key"].stringValue.lowercased(),
+                                 createdAt: $0["created_at"].stringValue)
+        }
+        selectedDistributor = Self.distributor(json["selected_distributor"])
+        myDistributors = (json["my_distributors"].array ?? []).compactMap(Self.distributor)
+    }
+
+    private static func distributor(_ json: JSON) -> TraderDistributorDTO? {
+        guard json.type == .dictionary, let data = try? json.rawData() else { return nil }
+        return try? JSONDecoder().decode(TraderDistributorDTO.self, from: data)
+    }
+
+    /// Any campaign on the page with this id (used to open a promotion from "View All").
+    func campaign(id: Int) -> CampaignDTO? {
+        (banners + promotions + posts + stories + exclusiveDeals).first { $0.id == id }
+    }
 }
 
 // MARK: - Product

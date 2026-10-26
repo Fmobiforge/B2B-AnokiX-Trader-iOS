@@ -109,7 +109,8 @@ private struct DistributorCard: View {
 
 // MARK: - Detail
 
-private struct DistributorDetailView: View {
+/// Also opened from the Marketplace (distributor card / "View Distributor").
+struct DistributorDetailView: View {
     let distributor: TraderDistributorDTO
     @ObservedObject var store: DistributorsStore
     let toast: (String) -> Void

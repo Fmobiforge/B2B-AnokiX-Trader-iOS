@@ -40,6 +40,8 @@ final class MarketStore: ObservableObject {
     private init() {}
 
     @Published var data: MarketplaceData?
+    /// Portal sections read leniently from the same marketplace response.
+    @Published var extras = MarketplaceExtras.empty
     @Published var categories: [ProductCategoryDTO] = []
     @Published var loading = false
     @Published var error: String?
@@ -73,8 +75,9 @@ final class MarketStore: ObservableObject {
         loading = true
         error = nil
         do {
-            let result = try await APIClient.shared.getMarketplace(distributorId: distributorId)
+            let (result, sections) = try await APIClient.shared.getMarketplaceFull(distributorId: distributorId)
             data = result
+            extras = sections
             if let sel = result.selected_distributor { selectedDistributorId = String(sel.id) }
             loading = false
         } catch {
@@ -94,7 +97,73 @@ final class MarketStore: ObservableObject {
         let idStr = String(id)
         guard idStr != selectedDistributorId else { return }
         selectedDistributorId = idStr
-        Task { await load(distributorId: idStr) }
+        Task {
+            await load(distributorId: idStr)
+            if !activeSearch.isEmpty { _ = await search(activeSearch) }
+        }
+    }
+
+    // MARK: - Campaign analytics (portal parity)
+
+    /// The campaign the trader last opened. Like the portal, later product views on the
+    /// marketplace are attributed to it.
+    private(set) var lastCampaignId: Int?
+
+    func trackCampaignOpen(_ campaignId: Int) {
+        guard campaignId > 0 else { return }
+        lastCampaignId = campaignId
+        Task { await APIClient.shared.recordCampaignClick(campaignId) }
+    }
+
+    /// Records a product view against `campaignId`, or failing that the last campaign opened.
+    func trackProductView(_ productId: String, campaignId: Int? = nil) {
+        guard let cid = campaignId ?? lastCampaignId, cid > 0 else { return }
+        Task { await APIClient.shared.recordCampaignProductView(campaignId: cid, productId: productId) }
+    }
+
+    // MARK: - Search (api/trader/marketplace/search)
+
+    /// The query whose results are on screen ("" when not searching).
+    @Published private(set) var activeSearch = ""
+    @Published private(set) var searchResults: [ProductDTO] = []
+    @Published private(set) var searchTotal = 0
+    @Published private(set) var searching = false
+    @Published private(set) var searchError: String?
+
+    /// Runs a search and returns its products. A response for a query the user has since
+    /// replaced is dropped, so fast typing never shows stale results.
+    @discardableResult
+    func search(_ raw: String) async -> [ProductDTO] {
+        let query = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { clearSearch(); return [] }
+        activeSearch = query
+        searching = true
+        searchError = nil
+        do {
+            let result = try await APIClient.shared.searchMarketplace(query: query,
+                                                                     distributorId: selectedDistributorId)
+            guard query == activeSearch else { return [] }
+            let products = result.products ?? []
+            searchResults = products
+            searchTotal = max(result.pagination?.total ?? 0, products.count)
+            searching = false
+            return products
+        } catch {
+            guard query == activeSearch else { return [] }
+            searchResults = []
+            searchTotal = 0
+            searching = false
+            searchError = (error as? LocalizedError)?.errorDescription ?? "Failed to search products."
+            return []
+        }
+    }
+
+    func clearSearch() {
+        activeSearch = ""
+        searchResults = []
+        searchTotal = 0
+        searching = false
+        searchError = nil
     }
 
     // MARK: - Cart

@@ -1,85 +1,120 @@
 import SwiftUI
 
-/// Trader Marketplace wired to GET /api/trader/marketplace — the iOS counterpart
-/// of the Android `MarketplaceActivity`. Uses a custom purple header (same as
-/// `activity_marketplace.xml`) so the cart badge is not affected by nav-bar tinting.
+/// Trader Marketplace wired to GET /api/trader/marketplace — laid out after the Trader
+/// Portal's /marketplace page as one mobile column, and kept in step with the Android
+/// `MarketplaceActivity`:
+///
+/// distributor card (tap for details, "Change" to switch) → Airtime / Electricity / POS
+/// shortcuts → campaign banners → search + scan (results inline) → categories →
+/// recommended → best deals → exclusive deals → promotions → news → stories → top
+/// suppliers → best sellers → my distributors → recent orders → feature strip.
+///
+/// Campaign opens and campaign-driven product views are reported to the analytics
+/// endpoints exactly as the portal does (`MarketStore.trackCampaignOpen / trackProductView`).
 struct MarketplaceRealView: View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var store: MarketStore
+    @EnvironmentObject var session: Session
 
+    @StateObject private var distributorsStore = DistributorsStore()
     @State private var search = ""
+    /// A scanned code already being looked up — the debounced search skips it.
+    @State private var scannedCode: String?
     @State private var activeSheet: ActiveSheet?
     @State private var bannerIndex = 0
     @State private var toastMsg: String?
     @State private var destination: MarketDestination?
+    @FocusState private var searchFocused: Bool
 
-    /// Full-screen destinations opened over the marketplace (each in its own
-    /// NavigationStack): the "View All" category chooser, a tapped category, or a
-    /// "View All" product collection (Recommended / Best Sellers).
+    /// Full-screen destinations opened over the marketplace: the category chooser, a
+    /// category, a "View All" collection, all promotions, or the story viewer.
     private enum MarketDestination: Identifiable {
         case allCategories
         case category(ProductCategoryDTO)
         case collection(type: String, title: String)
         case promotions
+        case stories(start: Int)
         var id: String {
             switch self {
             case .allCategories: return "all-categories"
             case .category(let c): return "category-\(c.id)"
             case .collection(let type, _): return "collection-\(type)"
             case .promotions: return "promotions"
+            case .stories(let start): return "stories-\(start)"
             }
         }
     }
 
-    /// One sheet at a time — multiple `.sheet` modifiers on a single view are
-    /// unreliable, so all three presentations share this enum.
+    /// One sheet at a time — multiple `.sheet` modifiers on a single view are unreliable.
     private enum ActiveSheet: Identifiable {
         case product(ProductDTO)
         case cart
         case distributors
+        case campaign(CampaignDTO)
+        case distributorDetail(TraderDistributorDTO)
+        case order(Int)
+        case scan
         var id: String {
             switch self {
             case .product(let p): return "product-\(p.id)"
             case .cart: return "cart"
             case .distributors: return "distributors"
+            case .campaign(let c): return "campaign-\(c.id)"
+            case .distributorDetail(let d): return "distributor-\(d.id)"
+            case .order(let id): return "order-\(id)"
+            case .scan: return "scan"
             }
         }
     }
 
     private let bannerTimer = Timer.publish(every: 8.0, on: .main, in: .common).autoconnect()
-    private let summaryGrid = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    private let twoColumns = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    private let threeColumns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8),
+                                GridItem(.flexible(), spacing: 8)]
+
+    private var selectedName: String { store.data?.selected_distributor?.displayName ?? "" }
+    private var isSearching: Bool { !store.activeSearch.isEmpty || store.searching }
 
     var body: some View {
         VStack(spacing: 0) {
             marketplaceHeader
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        Group {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    Group {
+                        VStack(spacing: 10) {
                             distributorCard
-                            bannerSlider
-                            insightsSection
-                            searchRow
-                            menuSection(proxy)
+                            servicesRow
                         }
-                        Group {
-                            categoriesSection
-                            opportunitiesCard
-                            productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
-                                           products: store.data?.recommended, collectionType: "recommended")
-                            // Scroll anchor for the menu's "Promotions" button — kept OFF the
-                            // section itself, because .id() on the interactive section swallowed
-                            // its "View All" button tap.
-                            Color.clear.frame(height: 0).id("promotions")
-                            promotionsSection
-                            productSection(title: "Best Sellers", subtitle: nil,
-                                           products: store.data?.best_sellers, collectionType: "best_sellers")
-                            featureStrip
-                        }
+                        bannerSlider
+                        searchRow
+                        if isSearching { searchResults } else { categoriesSection }
                     }
-                    .padding(16)
+                    Group {
+                        productSection(title: "Recommended for You", subtitle: "Based on your previous orders",
+                                       products: store.data?.recommended, collectionType: "recommended")
+                        dealsSection(title: "Best Deals", products: store.data?.best_deal_products,
+                                     collectionType: "best_deals", onlyFrom: nil)
+                        dealsSection(title: "Exclusive Deals", products: store.data?.exclusive_deal_products,
+                                     collectionType: "exclusive_deals", onlyFrom: selectedName)
+                        promotionsSection
+                        newsSection
+                        storiesSection
+                    }
+                    Group {
+                        suppliersSection
+                        sellersSection
+                        myDistributorsSection
+                        recentOrdersSection
+                        featureStrip
+                    }
                 }
-                .scrollContentBackground(.hidden)
+                .padding(16)
+            }
+            .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+            .refreshable {
+                await store.load(distributorId: store.selectedDistributorId)
+                await store.refreshCart()
             }
         }
         .background(Brand.background)
@@ -91,40 +126,124 @@ struct MarketplaceRealView: View {
         .onAppear {
             Task { await store.refreshCart() }
         }
+        // Debounced live search; a scanned code is looked up directly instead.
+        .task(id: search) {
+            let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
+            if query.isEmpty { store.clearSearch(); return }
+            if query == scannedCode { return }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            guard !Task.isCancelled else { return }
+            await store.search(query)
+        }
         .sheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .product(let p):
-                ProductDetailView(productId: p.id, fallback: p,
-                                  distributorName: store.data?.selected_distributor?.displayName ?? "",
-                                  currency: store.currency, store: store)
-            case .cart:
-                CartView(store: store)
-            case .distributors:
-                distributorPicker
-            }
+            sheetContent(sheet)
         }
         .toast($toastMsg)
         .fullScreenCover(item: $destination) { dest in
-            NavigationStack {
-                switch dest {
-                case .allCategories: AllCategoriesView(store: store)
-                case .category(let c): CategoryProductsView(category: c, store: store)
-                case .collection(let type, let title): CollectionView(type: type, title: title, store: store)
-                case .promotions: PromotionsView(store: store)
+            switch dest {
+            case .stories(let start):
+                StoryViewerView(stories: store.extras.stories, start: start) { shown in
+                    store.trackCampaignOpen(shown.id)
+                }
+            default:
+                NavigationStack {
+                    switch dest {
+                    case .allCategories: AllCategoriesView(store: store)
+                    case .category(let c): CategoryProductsView(category: c, store: store)
+                    case .collection(let type, let title): CollectionView(type: type, title: title, store: store)
+                    case .promotions: PromotionsView(store: store)
+                    case .stories: EmptyView()
+                    }
                 }
             }
-            .onAppear { print("🟣 [Marketplace] fullScreenCover presenting destination id=\(dest.id)") }
         }
-        .onChange(of: destination?.id) { newId in
-            print("🟣 [Marketplace] destination changed → \(newId ?? "nil")")
-        }
+        .onDisappear { store.clearSearch() }
         // White portal header → dark status-bar icons. Keep scroll content in light mode;
         // closing the screen restores the tab bar default.
         .environment(\.colorScheme, .light)
         .preferredColorScheme(.light)
     }
 
-    // MARK: - Header (Android activity_marketplace.xml)
+    // MARK: - Sheets
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: ActiveSheet) -> some View {
+        switch sheet {
+        case .product(let p):
+            ProductDetailView(productId: p.id, fallback: p, distributorName: selectedName,
+                              currency: store.currency, store: store)
+        case .cart:
+            CartView(store: store)
+        case .distributors:
+            distributorPicker
+        case .campaign(let c):
+            CampaignSheetView(campaign: c, currency: store.currency) { product in
+                store.trackProductView(product.productId, campaignId: c.id)
+                activeSheet = .product(product.asProduct)
+            }
+        case .distributorDetail(let d):
+            NavigationStack {
+                DistributorDetailView(distributor: d, store: distributorsStore) { toastMsg = $0 }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") { activeSheet = nil }
+                        }
+                    }
+            }
+            .preferredColorScheme(.light)
+        case .order(let id):
+            NavigationStack {
+                OrderDetailLoader(orderId: id)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") { activeSheet = nil }
+                        }
+                    }
+            }
+            .environmentObject(router)
+            .environmentObject(session)
+            .preferredColorScheme(.light)
+        case .scan:
+            MarketScanView { code in lookUpScanned(code) }
+        }
+    }
+
+    // MARK: - Actions
+
+    private func openCampaign(_ campaign: CampaignDTO) {
+        store.trackCampaignOpen(campaign.id)
+        activeSheet = .campaign(campaign)
+    }
+
+    /// Opens a product page, attributing the view to `campaignId` (or the last campaign).
+    private func openProduct(_ p: ProductDTO, campaignId: Int? = nil) {
+        store.trackProductView(p.id, campaignId: campaignId)
+        activeSheet = .product(p)
+    }
+
+    private func openDistributorDetail(id: Int?) {
+        guard let id else { return }
+        let key = String(id)
+        let detail = store.extras.myDistributors.first { $0.id == key }
+            ?? (store.extras.selectedDistributor?.id == key ? store.extras.selectedDistributor : nil)
+        if let detail { activeSheet = .distributorDetail(detail) }
+    }
+
+    /// A scanned barcode / SKU goes through the marketplace search; a single hit opens.
+    private func lookUpScanned(_ code: String) {
+        scannedCode = code
+        search = code
+        Task {
+            let results = await store.search(code)
+            if results.count == 1, let only = results.first {
+                // Let the scan sheet finish dismissing before presenting the product.
+                try? await Task.sleep(nanoseconds: 450_000_000)
+                openProduct(only)
+            }
+        }
+    }
+
+    // MARK: - Header
 
     private var marketplaceHeader: some View {
         HStack(spacing: 4) {
@@ -174,46 +293,69 @@ struct MarketplaceRealView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Distributor card
+    // MARK: - Distributor card + services
 
     private var distributorCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                DistributorAvatar(logoUrl: store.data?.selected_distributor?.logo_url,
-                                  initial: String((store.data?.selected_distributor?.displayName ?? "D").prefix(1)),
-                                  size: 44)
+        let dist = store.data?.selected_distributor
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                DistributorAvatar(logoUrl: dist?.logo_url,
+                                  initial: String((dist?.displayName ?? "D").prefix(1)), size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Preferred Distributor").font(.app(11)).foregroundColor(Brand.textSecondary)
-                    Text(store.data?.selected_distributor?.displayName ?? "—")
-                        .font(.app(14, .bold)).foregroundColor(Brand.textPrimary).lineLimit(1)
-                    Button("Change Distributor") { activeSheet = .distributors }
-                        .font(.app(12, .semibold)).foregroundColor(Brand.purple)
+                    Text(dist?.displayName ?? "—")
+                        .font(.app(16, .bold)).foregroundColor(Brand.textPrimary).lineLimit(1)
                 }
-                Spacer()
+                Spacer(minLength: 8)
+                Button { activeSheet = .distributors } label: {
+                    Text("Change").font(.app(12, .semibold)).foregroundColor(Brand.blue)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Brand.blue, lineWidth: 1))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
             Divider()
-            HStack(spacing: 8) {
-                miniStat("Delivery Area", store.data?.selected_distributor?.address ?? "—")
-                miniStat("Wallet Balance", "R2,800.00")
-                miniStat("Available Credit", "R10,000.00")
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "mappin.and.ellipse").font(.system(size: 14)).foregroundColor(Brand.blue)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Delivery Area").font(.app(11)).foregroundColor(Brand.textSecondary)
+                    Text(dist?.address ?? "—").font(.app(13, .semibold)).foregroundColor(Brand.textPrimary)
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 0)
             }
         }
-        .card()
+        .card(padding: 14)
+        .contentShape(Rectangle())
+        .onTapGesture { openDistributorDetail(id: dist?.id) }
     }
 
-    private func miniStat(_ label: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.app(10)).foregroundColor(Brand.textSecondary)
-            Text(value).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
-                .lineLimit(2)
+    private var servicesRow: some View {
+        LazyVGrid(columns: threeColumns, spacing: 8) {
+            MarketServiceTile(icon: "iphone", tint: Brand.indigo,
+                              title: "Airtime & Data", subtitle: "Top up now") {
+                router.presented = .airtime
+            }
+            MarketServiceTile(icon: "bolt.fill", tint: Brand.warningStrong,
+                              title: "Electricity", subtitle: "Buy prepaid") {
+                router.presented = .airtime
+            }
+            MarketServiceTile(icon: "creditcard", tint: Brand.blue,
+                              title: "POS & Devices", subtitle: "Manage devices") {
+                router.presented = nil
+                router.tab = .sell
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var distributorPicker: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 12) {
+                    Text("Select a distributor to browse products and promotions from their catalogue.")
+                        .font(.app(13)).foregroundColor(Brand.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     ForEach(store.data?.my_distributors ?? []) { d in
                         Button { store.selectDistributor(d.id); activeSheet = nil } label: {
                             HStack(spacing: 12) {
@@ -226,18 +368,18 @@ struct MarketplaceRealView: View {
                                         .lineLimit(2).multilineTextAlignment(.leading)
                                     if String(d.id) == store.selectedDistributorId {
                                         Text("Current distributor").font(.app(11, .semibold))
-                                            .foregroundColor(Brand.purple)
+                                            .foregroundColor(Brand.indigo)
                                     }
                                 }
                                 Spacer()
                                 if String(d.id) == store.selectedDistributorId {
-                                    Image(systemName: "checkmark.circle.fill").foregroundColor(Brand.purple)
+                                    Image(systemName: "checkmark.circle.fill").foregroundColor(Brand.indigo)
                                 }
                             }
                             .padding(14)
-                            .background(String(d.id) == store.selectedDistributorId ? Brand.purpleLight : Brand.surface)
+                            .background(String(d.id) == store.selectedDistributorId ? Brand.indigo.opacity(0.06) : Brand.surface)
                             .overlay(RoundedRectangle(cornerRadius: 12)
-                                .stroke(String(d.id) == store.selectedDistributorId ? Brand.purple : Brand.border, lineWidth: 1))
+                                .stroke(String(d.id) == store.selectedDistributorId ? Brand.indigo : Brand.border, lineWidth: 1))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .buttonStyle(.plain)
@@ -249,37 +391,34 @@ struct MarketplaceRealView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { activeSheet = nil } } }
         }
-        // The marketplace forces .preferredColorScheme(.dark); this picker sheet inherits
-        // that dark style, so force it back to light.
         .preferredColorScheme(.light)
     }
 
     // MARK: - Banner slider
 
-    /// Custom carousel. A page-style `TabView` inside a vertical `ScrollView`
-    /// renders corrupted and overlaps neighbouring content, so we show one
-    /// fixed-height `BannerCard` at a time (Kingfisher cross-fades the image as the
-    /// URL changes), auto-advance on the timer, and put tappable page dots in their
-    /// own row *below* the banner (never overlapping).
+    /// Custom carousel (a page-style `TabView` inside a vertical `ScrollView` renders
+    /// corrupted): one fixed-height slide at a time, auto-advancing, with tappable dots
+    /// in their own row below.
     @ViewBuilder
     private var bannerSlider: some View {
         if let banners = store.data?.banners, !banners.isEmpty {
             let safeIndex = max(0, min(bannerIndex, banners.count - 1))
-            VStack(spacing: 12) {
-                BannerCard(banner: banners[safeIndex],
-                           onShop: { toastMsg = "Coming soon" },
-                           onPromotions: { destination = .promotions })
-                    .id(banners[safeIndex].id)
+            let banner = banners[safeIndex]
+            let campaign = store.extras.banners.first { $0.sourceId == banner.id }
+                ?? store.extras.campaign(id: banner.id)
+            VStack(spacing: 10) {
+                CampaignBannerCard(banner: banner, campaign: campaign) {
+                    if let campaign { openCampaign(campaign) }
+                }
+                .id(banner.id)
 
                 if banners.count > 1 {
                     HStack(spacing: 6) {
                         ForEach(0..<banners.count, id: \.self) { i in
                             Capsule()
-                                .fill(i == safeIndex ? Brand.purple : Brand.border)
+                                .fill(i == safeIndex ? Brand.indigo : Brand.border)
                                 .frame(width: i == safeIndex ? 20 : 7, height: 7)
-                                .onTapGesture {
-                                    withAnimation(.easeInOut) { bannerIndex = i }
-                                }
+                                .onTapGesture { withAnimation(.easeInOut) { bannerIndex = i } }
                         }
                     }
                     .animation(.easeInOut, value: safeIndex)
@@ -292,32 +431,6 @@ struct MarketplaceRealView: View {
         }
     }
 
-    // MARK: - Insights
-
-    @ViewBuilder
-    private var insightsSection: some View {
-        if let cards = store.data?.business_insights?.summary_cards, !cards.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Business Insights").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
-                LazyVGrid(columns: summaryGrid, spacing: 10) {
-                    ForEach(cards) { card in
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(card.label ?? "").font(.app(11)).foregroundColor(Brand.textSecondary)
-                            Text(card.formatted_value ?? "").font(.app(18, .bold))
-                                .foregroundColor(Brand.textPrimary)
-                            if let sub = card.subtitle {
-                                Text(sub).font(.app(10))
-                                    .foregroundColor(card.trendUp ? Brand.success : Brand.textSecondary)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .card(padding: 12)
-                    }
-                }
-            }
-        }
-    }
-
     // MARK: - Search
 
     private var searchRow: some View {
@@ -326,69 +439,70 @@ struct MarketplaceRealView: View {
                 Image(systemName: "magnifyingglass").foregroundColor(Brand.textSecondary)
                 TextField("Search products, brands, categories…", text: $search)
                     .font(.app(14))
-            }
-            .padding(.horizontal, 12).padding(.vertical, 11)
-            .background(Brand.surfaceVariant)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.border, lineWidth: 1))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            Button { toastMsg = "Barcode scanner coming soon." } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "barcode.viewfinder"); Text("Scan").font(.app(13, .semibold))
-                }
-                .foregroundColor(.white).padding(.horizontal, 14).padding(.vertical, 11)
-                .background(Brand.purple).clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-        }
-    }
-
-    // MARK: - Menu buttons
-
-    private let menuItems: [(icon: String, label: String)] = [
-        ("list.bullet.rectangle", "My Orders"), ("wallet.pass", "Wallet"), ("creditcard", "Credit"),
-        ("shippingbox", "Deliveries"), ("percent", "Promotions"), ("simcard", "VAS Services"),
-        ("chart.bar", "Analytics"), ("ellipsis", "More")
-    ]
-
-    private func menuSection(_ proxy: ScrollViewProxy) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 14) {
-                ForEach(Array(menuItems.enumerated()), id: \.offset) { idx, item in
-                    Button { onMenu(idx, proxy) } label: {
-                        VStack(spacing: 6) {
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: item.icon).font(.system(size: 20)).foregroundColor(Brand.purple)
-                                    .frame(width: 48, height: 48).background(Brand.purpleLight)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                                if idx == 4 {
-                                    Text("NEW").font(.app(7, .bold)).foregroundColor(.white)
-                                        .padding(.horizontal, 4).padding(.vertical, 1)
-                                        .background(Brand.danger).clipShape(Capsule()).offset(x: 6, y: -4)
-                                }
-                            }
-                            Text(item.label).font(.app(10)).foregroundColor(Brand.textPrimary)
-                                .multilineTextAlignment(.center).frame(width: 64)
-                        }
+                    .focused($searchFocused)
+                    .submitLabel(.search)
+                    .autocorrectionDisabled()
+                    .onSubmit {
+                        let q = search
+                        Task { await store.search(q) }
+                    }
+                if !search.isEmpty {
+                    Button { clearSearch() } label: {
+                        Image(systemName: "xmark.circle.fill").foregroundColor(Brand.textTertiary)
                     }
                     .buttonStyle(.plain)
                 }
             }
-            // Top room so the Promotions "NEW" badge (offset above the icon) isn't
-            // clipped by the horizontal ScrollView's content bounds.
-            .padding(.top, 8)
+            .padding(.horizontal, 12).frame(height: 46)
+            .background(Brand.surface)
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.border, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Button { activeSheet = .scan } label: {
+                Image(systemName: "barcode.viewfinder")
+                    .font(.system(size: 19, weight: .medium)).foregroundColor(Brand.indigo)
+                    .frame(width: 46, height: 46)
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.indigo, lineWidth: 1))
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Scan a product barcode")
         }
     }
 
-    private func onMenu(_ idx: Int, _ proxy: ScrollViewProxy) {
-        switch idx {
-        case 0, 3: router.presented = nil; router.tab = .orders
-        case 1: router.presented = .wallet
-        case 2: toastMsg = "Coming soon"
-        case 4: withAnimation { proxy.scrollTo("promotions", anchor: .top) }
-        case 5: router.presented = .airtime
-        case 6: router.presented = .analytics
-        default: toastMsg = "Coming soon"
+    private func clearSearch() {
+        scannedCode = nil
+        search = ""
+        store.clearSearch()
+        searchFocused = false
+    }
+
+    /// "N results for “q”" with a Clear action — takes the place of Categories (portal).
+    @ViewBuilder
+    private var searchResults: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            MarketSectionHeader(title: store.searching ? "Searching…" : resultsTitle,
+                                actionTitle: "Clear", onAction: { clearSearch() })
+            if store.searching && store.searchResults.isEmpty {
+                ProgressView().frame(maxWidth: .infinity).padding(.vertical, 12)
+            } else if let error = store.searchError {
+                Text(error).font(.app(13)).foregroundColor(Brand.textSecondary)
+            } else if store.searchResults.isEmpty {
+                Text("No products match “\(store.activeSearch)”.")
+                    .font(.app(13)).foregroundColor(Brand.textSecondary)
+            } else {
+                LazyVGrid(columns: twoColumns, spacing: 10) {
+                    ForEach(store.searchResults) { p in
+                        CategoryProductCard(product: p, currency: store.currency) { openProduct(p) }
+                    }
+                }
+            }
         }
+    }
+
+    private var resultsTitle: String {
+        let n = store.searchTotal
+        return "\(n) \(n == 1 ? "result" : "results") for “\(store.activeSearch)”"
     }
 
     // MARK: - Categories
@@ -396,104 +510,179 @@ struct MarketplaceRealView: View {
     @ViewBuilder
     private var categoriesSection: some View {
         if !store.parentCategories.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Categories").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
-                    Spacer()
-                    Button("View All") { destination = .allCategories }
-                        .font(.app(13, .semibold)).foregroundColor(Brand.purple)
-                }
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Categories") { destination = .allCategories }
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 14) {
+                    HStack(alignment: .top, spacing: 12) {
                         ForEach(store.parentCategories) { c in
                             Button { destination = .category(c) } label: {
                                 VStack(spacing: 6) {
-                                    Image(systemName: CategoryIcon.symbol(for: c)).font(.system(size: 18)).foregroundColor(Brand.purple)
-                                        .frame(width: 48, height: 48).background(Brand.purpleLight)
-                                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                                    Text(c.title).font(.app(10)).foregroundColor(Brand.textPrimary)
+                                    Image(systemName: CategoryIcon.symbol(for: c))
+                                        .font(.system(size: 18)).foregroundColor(Brand.textSecondary)
+                                        .frame(width: 52, height: 52)
+                                        .background(Circle().fill(Brand.surface))
+                                        .overlay(Circle().stroke(Brand.border, lineWidth: 1))
+                                    Text(c.title).font(.app(10)).foregroundColor(Brand.textSecondary)
                                         .multilineTextAlignment(.center)
                                         .lineLimit(2)
-                                        .frame(width: 64, alignment: .top)
+                                        .frame(width: 72, alignment: .top)
                                 }
-                                .frame(width: 64, alignment: .top)
+                                .frame(width: 72, alignment: .top)
                             }
                             .buttonStyle(.plain)
                         }
                     }
+                    .padding(.vertical, 1)
                 }
             }
         }
-    }
-
-    // MARK: - Opportunities
-
-    private var opportunitiesCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Business Opportunities").font(.app(16, .bold)).foregroundColor(.white)
-            Text("Increase your order volume and earn additional profit on every basket.")
-                .font(.app(12)).foregroundColor(.white.opacity(0.9))
-            Button { toastMsg = "Coming soon" } label: {
-                Text("View Opportunity").font(.app(12, .semibold)).foregroundColor(Brand.purple)
-                    .padding(.horizontal, 16).padding(.vertical, 9)
-                    .background(Color.white).clipShape(RoundedRectangle(cornerRadius: 10))
-            }
-            .padding(.top, 4)
-        }
-        .padding(16).frame(maxWidth: .infinity, alignment: .leading)
-        .background(LinearGradient(colors: [Brand.purple, Brand.purpleDark], startPoint: .topLeading, endPoint: .bottomTrailing))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Product rows
 
     @ViewBuilder
     private func productSection(title: String, subtitle: String?, products: [ProductDTO]?,
-                               collectionType: String? = nil) -> some View {
+                                collectionType: String) -> some View {
         if let products, !products.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(title).font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
-                        if let subtitle { Text(subtitle).font(.app(11)).foregroundColor(Brand.textSecondary) }
-                    }
-                    Spacer()
-                    if let collectionType {
-                        Button("View All") { destination = .collection(type: collectionType, title: title) }
-                            .font(.app(13, .semibold)).foregroundColor(Brand.purple)
-                    }
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: title, subtitle: subtitle) {
+                    destination = .collection(type: collectionType, title: title)
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         ForEach(products) { p in
-                            MarketCard(product: p, currency: store.currency) { activeSheet = .product(p) }
+                            MarketCard(product: p, currency: store.currency) { openProduct(p) }
                         }
+                    }
+                    .padding(.vertical, 1)
+                }
+            }
+        }
+    }
+
+    /// Best / Exclusive Deals. Each product sits on a campaign, so a tap records the
+    /// campaign open before the product view (portal behaviour).
+    @ViewBuilder
+    private func dealsSection(title: String, products: [ProductDTO]?, collectionType: String,
+                              onlyFrom: String?) -> some View {
+        if let products, !products.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: title) {
+                    destination = .collection(type: collectionType, title: title)
+                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(products) { p in
+                            DealCard(product: p, currency: store.currency, onlyFrom: onlyFrom) {
+                                let cid = store.extras.dealCampaignIds[p.id]
+                                if let cid { store.trackCampaignOpen(cid) }
+                                openProduct(p, campaignId: cid)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 1)
+                }
+            }
+        }
+    }
+
+    // MARK: - Promotions / news / stories
+
+    @ViewBuilder
+    private var promotionsSection: some View {
+        if let promos = store.data?.promotions, !promos.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Promotions") { destination = .promotions }
+                ForEach(promos) { promo in
+                    PromotionCard(promo: promo) {
+                        if let c = store.extras.campaign(id: promo.id) { openCampaign(c) }
                     }
                 }
             }
         }
     }
 
-    // MARK: - Promotions
+    @ViewBuilder
+    private var newsSection: some View {
+        if !store.extras.posts.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: selectedName.isEmpty ? "News" : "News from \(selectedName)")
+                MarketListCard(items: store.extras.posts) { post in
+                    NewsRow(post: post) { openCampaign(post) }
+                }
+            }
+        }
+    }
 
     @ViewBuilder
-    private var promotionsSection: some View {
-        if let promos = store.data?.promotions, !promos.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                // Inline header/Button (same pattern as the working Recommended/Best
-                // Sellers "View All") rather than SectionHeader.
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Current Promotions").font(.app(17, .bold)).foregroundColor(Brand.textPrimary)
-                    Spacer()
-                    Button("View All") {
-                        print("🟣 [Marketplace] Current Promotions 'View All' tapped → destination = .promotions")
-                        destination = .promotions
+    private var storiesSection: some View {
+        if !store.extras.stories.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Stories")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(Array(store.extras.stories.enumerated()), id: \.element.id) { i, story in
+                            StoryBubble(story: story) { destination = .stories(start: i) }
+                        }
                     }
-                    .font(.app(13, .semibold)).foregroundColor(Brand.purple)
-                    .contentShape(Rectangle())
+                    .padding(.vertical, 1)
                 }
-                ForEach(promos) { promo in
-                    PromotionCard(promo: promo) { toastMsg = "Coming soon" }
+            }
+        }
+    }
+
+    // MARK: - Suppliers / sellers / distributors / orders
+
+    @ViewBuilder
+    private var suppliersSection: some View {
+        if !store.extras.topSuppliers.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Top Suppliers")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(store.extras.topSuppliers) { SupplierChip(supplier: $0) }
+                    }
+                    .padding(.vertical, 1)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var sellersSection: some View {
+        if !store.extras.topSellers.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Best Sellers") { router.presented = .distributors }
+                MarketListCard(items: store.extras.topSellers) { SellerRow(seller: $0) }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var myDistributorsSection: some View {
+        if let mine = store.data?.my_distributors, !mine.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "My Distributors") { router.presented = .distributors }
+                ForEach(mine) { d in
+                    let detail = store.extras.myDistributors.first { $0.id == String(d.id) }
+                    MyDistributorCard(distributor: d, productsAvailable: detail?.products_available ?? 0) {
+                        openDistributorDetail(id: d.id)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var recentOrdersSection: some View {
+        if !store.extras.recentOrders.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                MarketSectionHeader(title: "Recent Orders") {
+                    router.presented = nil
+                    router.tab = .orders
+                }
+                MarketListCard(items: Array(store.extras.recentOrders.prefix(4))) { order in
+                    RecentOrderRow(order: order) { activeSheet = .order(order.id) }
                 }
             }
         }
@@ -503,24 +692,28 @@ struct MarketplaceRealView: View {
 
     private var featureStrip: some View {
         let features: [(String, String, String)] = [
-            ("tag", "Best Prices", "From trusted suppliers"),
+            ("dollarsign.circle", "Best Prices", "From trusted suppliers"),
             ("shippingbox", "Fast Delivery", "To your business"),
-            ("lock.shield", "Secure Payments", "Safe & trusted checkout"),
+            ("checkmark.shield", "Secure Payments", "100% safe & trusted"),
             ("gift", "Earn Rewards", "On every purchase")
         ]
-        return LazyVGrid(columns: summaryGrid, spacing: 10) {
+        return LazyVGrid(columns: twoColumns, spacing: 10) {
             ForEach(Array(features.enumerated()), id: \.offset) { _, f in
-                HStack(spacing: 8) {
-                    Image(systemName: f.0).foregroundColor(Brand.purple)
+                HStack(spacing: 10) {
+                    Image(systemName: f.0).font(.system(size: 15)).foregroundColor(Brand.indigo)
+                        .frame(width: 32, height: 32)
+                        .background(Brand.indigo.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(f.1).font(.app(12, .semibold)).foregroundColor(Brand.textPrimary)
                         Text(f.2).font(.app(10)).foregroundColor(Brand.textSecondary).lineLimit(1)
                     }
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
                 .card(padding: 12)
             }
         }
+        .padding(.top, 4)
     }
 }
 

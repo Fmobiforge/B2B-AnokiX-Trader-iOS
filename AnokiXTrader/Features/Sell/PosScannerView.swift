@@ -292,7 +292,8 @@ private final class PreviewContainerView: UIView {
     var previewLayer: AVCaptureVideoPreviewLayer { layer as! AVCaptureVideoPreviewLayer }
 }
 
-private struct CameraPreview: UIViewRepresentable {
+/// Shared with the Marketplace barcode lookup sheet.
+struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
 
     func makeUIView(context: Context) -> UIView {

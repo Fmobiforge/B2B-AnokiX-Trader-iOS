@@ -202,6 +202,45 @@ final class APIClient {
         return try decode(data)
     }
 
+    /// The marketplace page plus the Trader Portal sections read leniently from the same
+    /// response (campaigns, stories, suppliers, sellers, recent orders) — one request.
+    func getMarketplaceFull(distributorId: String?) async throws -> (MarketplaceData, MarketplaceExtras) {
+        var q: [String: String] = [:]
+        if let id = distributorId, !id.isEmpty { q["distributor_id"] = id }
+        let data = try await get("api/trader/marketplace", query: q)
+        let decoded: MarketplaceData = try decode(data)
+        return (decoded, MarketplaceExtras(json: data))
+    }
+
+    /// Marketplace product search (api/trader/marketplace/search) — matches name, brand,
+    /// category, SKU and barcode, so it also resolves a scanned code. Same
+    /// {meta, pagination, products} shape as a collection.
+    func searchMarketplace(query: String, distributorId: String?,
+                           page: Int = 1, perPage: Int = 24) async throws -> CollectionData {
+        var q: [String: String] = ["q": query, "page": String(page), "per_page": String(perPage)]
+        if let id = distributorId, !id.isEmpty { q["distributor_id"] = id }
+        let data = try await get("api/trader/marketplace/search", query: q)
+        return try decode(data)
+    }
+
+    /// Campaign analytics — a banner / promotion / news post / story was opened
+    /// (api/trader/marketplace/campaign-click). Best-effort: never surfaces an error.
+    func recordCampaignClick(_ campaignId: Int) async {
+        guard campaignId > 0 else { return }
+        _ = try? await postForm("api/trader/marketplace/campaign-click",
+                                form: ["campaign_id": String(campaignId)])
+    }
+
+    /// Campaign analytics — a product was viewed because of a campaign
+    /// (api/trader/marketplace/campaign-event, event_type=product_view). Best-effort.
+    func recordCampaignProductView(campaignId: Int, productId: String) async {
+        guard campaignId > 0, !productId.isEmpty else { return }
+        _ = try? await postForm("api/trader/marketplace/campaign-event",
+                                form: ["campaign_id": String(campaignId),
+                                       "event_type": "product_view",
+                                       "product_id": productId])
+    }
+
     /// Category browse/filter page (api/trader/marketplace/category). All args except
     /// `categoryId` are optional; empty/false values are omitted so the backend applies
     /// no constraint — parity with the Android `ApiClient.getCategoryPage`.
