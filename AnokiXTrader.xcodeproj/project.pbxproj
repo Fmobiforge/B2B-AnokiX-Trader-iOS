@@ -62,13 +62,13 @@
 		8035CDFA83F7EFA275C23A69 /* FinancesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C5B6B5A06A214A5053FED5 /* FinancesStore.swift */; };
 		80C9EAA90D5FBD44C3ECDBE5 /* GoodsReturnsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3505798C608C699E424D8706 /* GoodsReturnsStore.swift */; };
 		8B2973FA1A1854CC67DC6532 /* MarketStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1651A2A75A0267F8B90A490 /* MarketStore.swift */; };
-		9D103FFDA0A30D16F3A8061D /* MarketplacePortalViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7832F88FCF0ACE3D796DAD37 /* MarketplacePortalViews.swift */; };
 		8D596DFE4355CA40C015B698 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAA2988953FDC67C3CD299 /* GoogleService-Info.plist */; };
 		90E292E3B4DFC5149F07A2B0 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B7C23EF6695669B46657AB /* FlowLayout.swift */; };
 		932E22F4852AF4FA385FBF51 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CD2B00377D56966727ED1C /* SettingsView.swift */; };
 		94177D83E04817A5B54F474E /* MarketplaceRealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */; };
 		98732CBDF84F3E17ABBBEEA5 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F612DF0751C5C28CA0A656 /* MockData.swift */; };
 		9A82CB1B2299C5AFE760709B /* DistributorsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D0491BFEBED50AF17FE93E /* DistributorsStore.swift */; };
+		9D103FFDA0A30D16F3A8061D /* MarketplacePortalViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7832F88FCF0ACE3D796DAD37 /* MarketplacePortalViews.swift */; };
 		9D4A787677D19CEB6895236D /* GoodsReceivedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D502CBEB08D436613B429 /* GoodsReceivedView.swift */; };
 		9F5D8029590588A316DD44A2 /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A20C9413C35FB20B0B107 /* FormControls.swift */; };
 		A211FCB2B095AE3D9C68831E /* AnokiXTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFE5D9299F47ED38E23E694 /* AnokiXTraderApp.swift */; };
@@ -156,6 +156,7 @@
 		72B9CD271808E91C6276A68A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		769FAF853B246C981F194D0C /* NotificationsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsStore.swift; sourceTree = "<group>"; };
 		7707AB1929A4D7AB4AACC1E6 /* MarketplaceRealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceRealView.swift; sourceTree = "<group>"; };
+		7832F88FCF0ACE3D796DAD37 /* MarketplacePortalViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplacePortalViews.swift; sourceTree = "<group>"; };
 		7C90FCEF9CF3611879C11FCD /* DistributorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorsView.swift; sourceTree = "<group>"; };
 		7CCBD2699E321399EB3D035E /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		81F612DF0751C5C28CA0A656 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
@@ -183,7 +184,6 @@
 		BFDF0F7DCD853687E4E28960 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		C0CFF0CFD267320664843B8F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		C1651A2A75A0267F8B90A490 /* MarketStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketStore.swift; sourceTree = "<group>"; };
-		7832F88FCF0ACE3D796DAD37 /* MarketplacePortalViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplacePortalViews.swift; sourceTree = "<group>"; };
 		C1C6EFE6FE72F72F58C22DFC /* OrdersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersStore.swift; sourceTree = "<group>"; };
 		C502BC529C4C1BBC3C28B7DC /* PendingApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingApprovalView.swift; sourceTree = "<group>"; };
 		C6B7C23EF6695669B46657AB /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
@@ -899,7 +899,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 1.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -933,7 +933,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 1.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.traderapp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
